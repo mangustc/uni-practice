@@ -15,13 +15,20 @@ async def get_product(product_id: int):
     return await ProductService.get_product(product_id)
 
 
+@router.get("/{product_id}/GetProductSmallCard")
+async def get_product_small_card(product_id: int):
+    return await ProductService.get_product_small_card(product_id)
+
+
 @router.get("/GetAllProducts")
 async def get_all_products():
     return await ProductService.get_all_products()
 
+
 @router.get("/{product_id}/GetPhoto")
 async def get_product_photo(product_id):
     return await ProductService.get_product_photo(product_id)
+
 
 @router.put("/{product_id}/UpdatePhoto")
 async def update_product_photo(request: Request, product_id: int, file: UploadFile = File(...)):

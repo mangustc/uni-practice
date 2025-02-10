@@ -67,6 +67,21 @@ class ProductService:
         }  # Correct format
 
     @classmethod
+    async def get_product_small_card(cls, product_id: int):
+        query = select(Product).options(joinedload(Product.article)).where(Product.id == product_id)
+        async with new_session() as db:
+            result = await db.execute(query)
+        product_field = result.scalars().first()
+        if not product_field:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Продукт не найден"
+            )
+        return {
+            "product_name": product_field.name,
+            "article_price": product_field.article.price
+        }  # Correct format
+
+    @classmethod
     async def get_all_products(cls):
         query = select(Product).options(joinedload(Product.article))
         async with new_session() as db:
