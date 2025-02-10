@@ -5,7 +5,6 @@ from services import CategoryService
 router = APIRouter(tags=["Category"], prefix="/category")
 
 
-
 @router.post("/AddCategory", response_model=CategoryResponse)
 async def add_category(category: AddCategory, request: Request):
     return await CategoryService.add_category(category, request)

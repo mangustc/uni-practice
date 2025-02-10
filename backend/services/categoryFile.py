@@ -6,7 +6,6 @@ from schemas import AddCategory, CategoryResponse
 from Function import Functions
 
 
-
 class CategoryService:
     @classmethod
     async def add_category(cls, category: AddCategory, request: Request):

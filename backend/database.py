@@ -22,14 +22,23 @@ class User(Base):
     INN = Column(Integer, nullable=True)
 
 
+class Article(Base):
+    __tablename__ = "article"
+    id = Column(Integer, primary_key=True)
+    subcategory_id = Column(Integer, ForeignKey("subcategory.id"))
+    description = Column(String, nullable=True)
+    characteristics = Column(String, nullable=True)
+    price = Column(Integer, nullable=True)
+
+
 class Product(Base):
     __tablename__ = "product"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    description = Column(String, nullable=False)
-    сharacteristics = Column(String, nullable=False)
-    article = Column(String, nullable=False)
-    subcategory_id = Column(Integer, ForeignKey("subcategory.id"))
-    subcategory = relationship("Subcategory", back_populates="products")
+    article_id = Column(Integer, ForeignKey("article.id"))
+    name = Column(String, nullable=False)
+    image_path = Column(String, nullable=True)
+    amount = Column(Integer, nullable=False)
+    article = relationship("Article")
 
 
 # КатегорииТоваров
@@ -47,7 +56,6 @@ class Subcategory(Base):
     name = Column(String, nullable=False)
     category_id = Column(Integer, ForeignKey("category.id"))
     category = relationship("Category", back_populates="subcategories")
-    products = relationship("Product", back_populates="subcategory")
 
 
 async def create_tables():

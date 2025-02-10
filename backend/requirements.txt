@@ -5,3 +5,5 @@ sqlalchemy
 aiosqlite
 pyjwt
 bcrypt
+python-multipart
+click
