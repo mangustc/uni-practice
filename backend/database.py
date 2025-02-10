@@ -9,7 +9,6 @@ new_session = async_sessionmaker(engine, expire_on_commit=False)
 Base = declarative_base()
 
 
-
 class User(Base):
     __tablename__ = "user"
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -18,8 +17,9 @@ class User(Base):
     number = Column(String, nullable=True)
     name = Column(String, nullable=True)
     surname = Column(String, nullable=True)
-    role = Column(String, nullable=False)
-
+    role = Column(String, nullable=False)  # "Пользователь", "Админ", "Юр.лицо", "ИП"
+    organization_name = Column(String, nullable=True)
+    INN = Column(Integer, nullable=True)
 
 
 async def create_tables():
