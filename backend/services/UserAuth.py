@@ -1,5 +1,5 @@
 from fastapi import HTTPException, status, Response, Request
-from database import new_session, User
+from database import *
 from schemas import *
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
@@ -45,6 +45,46 @@ class UserService:
                 "email": new_user.email,
                 "message": "Пользователь успешно зарегистрирован."
             }
+
+    @classmethod
+    async def registration_legal_entity(cls, user: RegistrLegalEntity):
+        return await UserService.registration_legal_entity_or_ip(user, "Юр.лицо")
+
+    @classmethod
+    async def registration_ip(cls, user: RegistrLegalEntity):
+        return await UserService.registration_legal_entity_or_ip(user, "ИП")
+
+    @classmethod
+    async def registration_legal_entity_or_ip(cls, user: RegistrLegalEntity, role: str):
+        async with new_session() as db:
+            result = await db.execute(select(User).where(User.email == user.email))
+            existing_user = result.scalars().first()
+            if existing_user:
+                raise HTTPException(status_code=400, detail="Email уже зарегистрирован")
+            if user.password != user.re_password:
+                raise HTTPException(status_code=400, detail="Пароли не совпадают")
+            hashed_password = bcrypt.hashpw(user.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+            new_user = User(
+                email=user.email,
+                password=hashed_password,
+                number=user.number,
+                role=role,
+                organization_name=user.organization_name,
+                INN=user.INN
+            )
+            db.add(new_user)
+            try:
+                await db.commit()
+                await db.refresh(new_user)  # Обновляем объект, чтобы получить ID
+            except IntegrityError:
+                await db.rollback()
+                raise HTTPException(status_code=500, detail="Ошибка при сохранении пользователя")
+            return {
+                "id": new_user.id,
+                "email": new_user.email,
+                "message": "Пользователь успешно зарегистрирован."
+            }
+
     @classmethod
     async def login(cls, login_data: Login, response: Response):
         async with new_session() as db:
