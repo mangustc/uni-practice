@@ -174,3 +174,39 @@ class UserService:
             except IntegrityError as e:
                 await db.rollback()
                 raise HTTPException(status_code=500, detail=f"Ошибка при удалении пользователя: {e}")
+
+    @classmethod
+    async def change_role(cls, new_role: str, request: Request):
+        user_data = await Functions.get_user_data(request)
+        user_id = user_data["user_id"]
+        user_role = user_data["user_role"]
+
+        valid_roles = ["Пользователь", "Юр.лицо", "Админ", "ИП"]
+        if new_role not in valid_roles:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Некорректная роль: {new_role}. Допустимые роли: {valid_roles}",
+            )
+
+        async with new_session() as db:
+            user = await db.get(User, user_id)
+
+            if not user:
+                raise HTTPException(status_code=404, detail="Пользователь не найден")
+
+            # if user_role != "Админ":
+            #     raise HTTPException(
+            #         status_code=403,
+            #         detail="Недостаточно прав для изменения роли пользователя.",
+            #     )
+
+            user.role = new_role
+            try:
+                await db.commit()
+            except IntegrityError as e:
+                await db.rollback()
+                raise HTTPException(
+                    status_code=500, detail=f"Ошибка при изменении роли пользователя: {e}"
+                )
+
+            return {"message": f"Роль пользователя с ID {user_id} успешно изменена на {new_role}."}

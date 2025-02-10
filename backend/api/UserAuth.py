@@ -37,3 +37,8 @@ async def get_user_info(request: Request):
 @router.delete("/delete_me")
 async def delete_me(request: Request, response: Response):
     return await UserService.delete_account(request=request, response=response)
+
+
+@router.put("/change_role")
+async def change_role(change_role_data: str, request: Request):
+    return await UserService.change_role(new_role=change_role_data, request=request)
