@@ -1,9 +1,7 @@
-from pydantic import BaseModel, field_validator
-from typing import Optional
-import re
+from pydantic import BaseModel
 
 
-class AddProduct(BaseModel):
+class ProductInformation(BaseModel):
     pass
 
 
