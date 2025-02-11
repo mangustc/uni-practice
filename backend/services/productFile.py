@@ -62,7 +62,11 @@ class ProductService:
             "product_name": product_field.name,
             "product_amount": product_field.amount,
             "article_description": product_field.article.description,
-            "article_characteristics": product_field.article.characteristics,
+            "country": product_field.article.country,
+            "characteristic_color": product_field.article.characteristic_color,
+            "characteristic_width": product_field.article.characteristic_width,
+            "characteristic_density": product_field.article.characteristic_density,
+            "characteristic_consist": product_field.article.characteristic_consist,
             "article_price": product_field.article.price
         }  # Correct format
 
@@ -92,7 +96,11 @@ class ProductService:
              "product_name": p.name,
              "product_amount": p.amount,
              "article_description": p.article.description,
-             "article_characteristics": p.article.characteristics,
+             "country": p.article.country,
+             "characteristic_color": p.article.characteristic_color,
+             "characteristic_width": p.article.characteristic_width,
+             "characteristic_density": p.article.characteristic_density,
+             "characteristic_consist": p.article.characteristic_consist,
              "article_price": p.article.price} for p in products
         ]  # Correct format
 
