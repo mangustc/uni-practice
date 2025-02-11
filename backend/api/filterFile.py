@@ -16,7 +16,7 @@ async def filter_articles_endpoint(
     densities: Optional[List[str]] = Query(None, description="List of densities"),
     consists: Optional[List[str]] = Query(None, description="List of consists"),
 ):
-    return await FilterService.filter_articles(
+    return await FilterService.filter_products(
         price_min=price_min,
         price_max=price_max,
         countries=countries,

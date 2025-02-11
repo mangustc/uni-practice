@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlalchemy.orm import declarative_base, relationship
-from sqlalchemy import Column, String, Boolean, Integer, ForeignKey, Numeric, Date, LargeBinary, DateTime, text
+from sqlalchemy import Column, String, Boolean, Integer, ForeignKey, Float, Date, DateTime
 
 engine = create_async_engine("sqlite+aiosqlite:///./data.db")
 
@@ -42,6 +42,13 @@ class Product(Base):
     name = Column(String, nullable=False)
     image_path = Column(String, nullable=True)
     amount = Column(Integer, nullable=False)
+    hit = Column(Boolean, nullable=False, default=False)
+    promotion = Column(Boolean, nullable=False, default=False)
+    procent_promotion = Column(Float, nullable=True)
+    new = Column(Boolean, nullable=False, default=True)
+    new_until = Column(DateTime, nullable=True)
+    old_price = Column(Float, nullable=True)
+    new_price = Column(Float, nullable=True)
     article = relationship("Article")
 
 

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File, status, Response, Request
+from fastapi import APIRouter, UploadFile, File, status, Response, Request, Query
 from schemas import *
 from services import ProductService
 
@@ -43,3 +43,39 @@ async def update_product_information(request: Request, product_id: int, data: Cr
 @router.delete("/{product_id}/Delete")
 async def delete_product(request: Request, product_id: int):
     return await ProductService.delete_product(request, product_id)
+
+
+@router.put("/products/{product_id}/new")
+async def set_product_new_endpoint(
+    request: Request, product_id: int, is_new: bool = Query(..., description="Set product as new (true/false)")
+):
+    return await ProductService.set_product_new(request, product_id, is_new)
+
+
+@router.put("/products/{product_id}/hit")
+async def set_product_hit_endpoint(
+    request: Request, product_id: int, is_hit: bool = Query(..., description="Set product as hit (true/false)")
+):
+    return await ProductService.set_product_hit(request, product_id, is_hit)
+
+
+@router.put("/products/{product_id}/promotion")
+async def set_product_promotion_endpoint(
+    request: Request,
+    product_id: int,
+    is_promotion: bool = Query(..., description="Set product as promotion (true/false)"),
+    procent_promotion: Optional[float] = Query(
+        None, description="Promotion percentage (1-100), required if is_promotion=true"
+    ),
+):
+    return await ProductService.set_product_promotion(request, product_id, is_promotion, procent_promotion)
+
+
+@router.get("/products/new", response_model=list[dict])
+async def get_new_products_endpoint():
+    return await ProductService.get_new_products()
+
+
+@router.get("/products/promotion", response_model=list[dict])
+async def get_promotion_products_endpoint():
+    return await ProductService.get_promotion_products()

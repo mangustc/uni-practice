@@ -1,5 +1,5 @@
 import os
-from datetime import date
+from datetime import date, timedelta, datetime
 from typing import Sequence
 from fastapi import UploadFile, HTTPException, status, Request
 from fastapi.responses import FileResponse
@@ -33,7 +33,7 @@ class ProductService:
                     detail="Такого артикула не существует",
                 )
 
-            new_product = Product(article_id=data.article_id, name=data.name, amount=data.amount)
+            new_product = Product(article_id=data.article_id, name=data.name, amount=data.amount, new_until=datetime.now() + timedelta(days=30))
             db.add(new_product)
             try:
                 await db.commit()
@@ -227,3 +227,217 @@ class ProductService:
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail="Не удалось удалить продукт",
                 )
+
+    @classmethod
+    async def set_product_new(cls, request: Request, product_id: int, is_new: bool):
+        user_data = await Functions.get_user_data(request)
+        if user_data["user_role"] != "Админ":
+            raise HTTPException(
+                status_code=403, detail="Только администраторы могут изменять статус новинки"
+            )
+
+        async with new_session() as db:
+            product = await db.get(Product, product_id)
+            if not product:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND, detail="Продукт не найден"
+                )
+
+            product.new = is_new
+
+            try:
+                await db.commit()
+                await db.refresh(product)
+                return {"message": f"Статус новинки для продукта {product_id} изменен на {is_new}"}
+            except IntegrityError:
+                await db.rollback()
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Не удалось изменить статус новинки",
+                )
+
+
+    #Изменить логику согласно количество покупок!!!!!
+    @classmethod
+    async def set_product_hit(cls, request: Request, product_id: int, is_hit: bool):
+        user_data = await Functions.get_user_data(request)
+        if user_data["user_role"] != "Админ":
+            raise HTTPException(
+                status_code=403, detail="Только администраторы могут изменять статус хита продаж"
+            )
+
+        async with new_session() as db:
+            product = await db.get(Product, product_id)
+            if not product:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND, detail="Продукт не найден"
+                )
+
+            product.hit = is_hit
+
+            try:
+                await db.commit()
+                await db.refresh(product)
+                return {"message": f"Статус хита продаж для продукта {product_id} изменен на {is_hit}"}
+            except IntegrityError:
+                await db.rollback()
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Не удалось изменить статус хита продаж",
+                )
+
+    @classmethod
+    async def set_product_promotion(
+            cls, request: Request, product_id: int, is_promotion: bool, procent_promotion: float
+    ):
+        user_data = await Functions.get_user_data(request)
+        if user_data["user_role"] != "Админ":
+            raise HTTPException(
+                status_code=403, detail="Только администраторы могут изменять статус акции"
+            )
+
+        async with new_session() as db:
+            product = await db.get(Product, product_id)
+            if not product:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND, detail="Продукт не найден"
+                )
+
+            if is_promotion:
+                if procent_promotion is None or not 0 < procent_promotion <= 100:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail="Процент скидки должен быть указан в диапазоне от 1 до 100",
+                    )
+
+                article_field = await db.execute(
+                    select(Article).where(Article.id == product.article_id)
+                )
+                article_field = article_field.scalars().first()
+                if article_field is None:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail="Такого артикула не существует",
+                    )
+
+                old_price = float(article_field.price)
+                discount_amount = old_price * (procent_promotion / 100)
+                new_price = old_price - discount_amount
+
+                product.promotion = is_promotion
+                product.procent_promotion = procent_promotion
+                product.old_price = old_price
+                product.new_price = new_price
+            else:
+                product.promotion = is_promotion
+                product.procent_promotion = None
+                product.old_price = None
+                product.new_price = None
+
+            try:
+                await db.commit()
+                await db.refresh(product)
+                return {"message": f"Статус акции для продукта {product_id} изменен на {is_promotion}"}
+            except IntegrityError:
+                await db.rollback()
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Не удалось изменить статус акции",
+                )
+
+    @classmethod
+    async def get_new_products(cls):
+        async with new_session() as db:
+            query = select(Product).options(joinedload(Product.article)).where(Product.new == True)
+            result = await db.execute(query)
+            products = result.scalars().all()
+
+            return [
+                {
+                    "product_id": p.id,
+                    "article_id": p.article_id,
+                    "product_name": p.name,
+                    "product_amount": p.amount,
+                    "article_description": p.article.description,
+                    "country": p.article.country,
+                    "characteristic_color": p.article.characteristic_color,
+                    "characteristic_width": p.article.characteristic_width,
+                    "characteristic_density": p.article.characteristic_density,
+                    "characteristic_consist": p.article.characteristic_consist,
+                    # "article_price": p.article.price,
+                    # "hit": p.hit,
+                    # "promotion": p.promotion,
+                    # "procent_promotion": p.procent_promotion,
+                    # "new": p.new,
+                    # "old_price": p.old_price,
+                    # "new_price": p.new_price,
+                }
+                for p in products
+            ]
+
+    @classmethod
+    async def get_promotion_products(cls):
+        async with new_session() as db:
+            query = select(Product).options(joinedload(Product.article)).where(
+                Product.promotion == True
+            )
+            result = await db.execute(query)
+            products = result.scalars().all()
+
+            return [
+                {
+                    "product_id": p.id,
+                    "article_id": p.article_id,
+                    "product_name": p.name,
+                    # "product_amount": p.amount,
+                    "article_description": p.article.description,
+                    "country": p.article.country,
+                    "characteristic_color": p.article.characteristic_color,
+                    "characteristic_width": p.article.characteristic_width,
+                    "characteristic_density": p.article.characteristic_density,
+                    "characteristic_consist": p.article.characteristic_consist,
+                    # "article_price": p.article.price,
+                    # "hit": p.hit,
+                     "promotion": p.promotion,
+                    # "procent_promotion": p.procent_promotion,
+                    # "new": p.new,
+                    "old_price": p.old_price,
+                    "new_price": p.new_price,
+                }
+                for p in products
+            ]
+
+
+
+
+  # @classmethod
+  #   async def set_product_new1(cls, request: Request, product_id: int, is_new: bool):
+  #       user_data = await Functions.get_user_data(request)
+  #       if user_data["user_role"] != "Админ":
+  #           raise HTTPException(
+  #               status_code=403, detail="Только администраторы могут изменять статус новинки"
+  #           )
+  #
+  #       async with new_session() as db:
+  #           product = await db.get(Product, product_id)
+  #           if not product:
+  #               raise HTTPException(
+  #                   status_code=status.HTTP_404_NOT_FOUND, detail="Продукт не найден"
+  #               )
+  #
+  #           product.new = is_new
+  #           if is_new:
+  #               product.new_until = datetime.now() + timedelta(minutes=1)  # Save datetime
+  #           else:
+  #               product.new_until = None
+  #
+  #           try:
+  #               await db.commit()
+  #               await db.refresh(product)
+  #               return {"message": f"Статус новинки для продукта {product_id} изменен на {is_new}"}
+  #           except IntegrityError:
+  #               await db.rollback()
+  #               raise HTTPException(
+  #                   status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+  #                   detail="Не удалось изменить статус новинки",
+  #               )
