@@ -79,3 +79,7 @@ async def get_new_products_endpoint():
 @router.get("/products/promotion", response_model=list[dict])
 async def get_promotion_products_endpoint():
     return await ProductService.get_promotion_products()
+
+@router.get("/products/hit", response_model=list[dict])
+async def get_hit_products_endpoint():
+    return await ProductService.get_hit_products()

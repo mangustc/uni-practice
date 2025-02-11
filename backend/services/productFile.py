@@ -407,6 +407,34 @@ class ProductService:
                 for p in products
             ]
 
+    @classmethod
+    async def get_hit_products(cls):
+        async with new_session() as db:
+            query = select(Product).options(joinedload(Product.article)).where(
+                Product.hit == True
+            )
+            result = await db.execute(query)
+            products = result.scalars().all()
+
+            return [
+                {
+                    "product_id": p.id,
+                    "article_id": p.article_id,
+                    "product_name": p.name,
+                    "product_amount": p.amount,
+                    "article_description": p.article.description,
+                    "country": p.article.country,
+                    "characteristic_color": p.article.characteristic_color,
+                    "characteristic_width": p.article.characteristic_width,
+                    "characteristic_density": p.article.characteristic_density,
+                    "characteristic_consist": p.article.characteristic_consist,
+                    "hit": p.hit,
+                    "promotion": p.promotion,
+                    "new": p.new,
+                }
+                for p in products
+            ]
+
 
 
 
