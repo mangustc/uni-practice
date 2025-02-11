@@ -25,6 +25,11 @@ async def update_article_information(request: Request, article_id: int, data: Cr
     return await ArticleService.update_article_information(request, article_id, data)
 
 
+@router.patch("/{article_id}/characteristics", response_model=ArticleResponse)
+async def update_article_characteristics_endpoint(request: Request, article_id: int, data: UpdateArticleCharacteristics):
+    return await ArticleService.update_article_characteristics(request, article_id, data)
+
+
 @router.delete("/{article_id}/Delete")
 async def delete_article(request: Request, article_id: int):
     return await ArticleService.delete_article(request, article_id)

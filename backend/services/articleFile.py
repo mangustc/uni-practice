@@ -33,13 +33,21 @@ class ArticleService:
                     detail="Подкатегории с таким именем не существует",
                 )
 
-            new_article = Article(subcategory_id=subcategory.id, description=data.description,
-                                  characteristics=data.characteristics, price=data.price)
+            new_article = Article(
+                subcategory_id=subcategory.id,
+                description=data.description,
+                country=data.country,
+                price=data.price,
+                characteristic_color=None,
+                characteristic_width=None,
+                characteristic_density=None,
+                characteristic_consist=None,
+            )
             db.add(new_article)
             try:
                 await db.commit()
                 await db.refresh(new_article)
-                return ArticleResponse(article_id=new_article.id)  # Return правильный формат
+                return ArticleResponse(article_id=new_article.id)
             except IntegrityError:
                 await db.rollback()
                 raise HTTPException(
@@ -59,10 +67,14 @@ class ArticleService:
             )
         return {
             "subcategory_id": article.subcategory_id,
-            "article_description": article.description,
-            "article_characteristics": article.characteristics,
-            "article_price": article.price
-        }  # Correct format
+            "description": article.description,
+            "country": article.country,
+            "price": article.price,
+            "characteristic_color": article.characteristic_color,
+            "characteristic_width": article.characteristic_width,
+            "characteristic_density": article.characteristic_density,
+            "characteristic_consist": article.characteristic_consist,
+        }
 
     @classmethod
     async def get_all_articles(cls):
@@ -71,11 +83,17 @@ class ArticleService:
             result = await db.execute(query)
         articles = result.scalars().all()
         return [
-            {"subcategory_id": a.subcategory_id,
-             "article_description": a.description,
-             "article_characteristics": a.characteristics,
-             "article_price": a.price} for a in articles
-        ]  # Correct format
+            {
+                "subcategory_id": a.subcategory_id,
+                "description": a.description,
+                "country": a.country,
+                "price": a.price,
+                "characteristic_color": a.characteristic_color,
+                "characteristic_width": a.characteristic_width,
+                "characteristic_density": a.characteristic_density,
+                "characteristic_consist": a.characteristic_consist,
+            } for a in articles
+        ]
 
     @classmethod
     async def update_article_information(cls, request: Request, article_id: int, data: CreateArticle):
@@ -106,17 +124,57 @@ class ArticleService:
 
             old_article.subcategory_id = subcategory.id
             old_article.description = data.description
-            old_article.characteristics = data.characteristics
+            old_article.country = data.country
             old_article.price = data.price
+
             try:
                 await db.commit()
                 await db.refresh(old_article)
-                return ArticleResponse(article_id=old_article.id)  # Return правильный формат
+                return ArticleResponse(article_id=old_article.id)
             except IntegrityError:
                 await db.rollback()
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail="Не удалось обновить информацию об артикуле",
+                )
+
+    @classmethod
+    async def update_article_characteristics(cls, request: Request, article_id: int, data: UpdateArticleCharacteristics):
+        user_data = await Functions.get_user_data(request)
+        if user_data["user_role"] != "Админ":
+            raise HTTPException(
+                status_code=403, detail="Только администраторы могут обновлять характеристики артикула"
+            )
+
+        async with new_session() as db:
+            old_article = await db.execute(select(Article).where(Article.id == article_id))
+            old_article = old_article.scalars().first()
+
+            if old_article is None:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Такого артикула не существует",
+                )
+
+            # Update only the provided characteristics
+            if data.characteristic_color is not None:
+                old_article.characteristic_color = data.characteristic_color
+            if data.characteristic_width is not None:
+                old_article.characteristic_width = data.characteristic_width
+            if data.characteristic_density is not None:
+                old_article.characteristic_density = data.characteristic_density
+            if data.characteristic_consist is not None:
+                old_article.characteristic_consist = data.characteristic_consist
+
+            try:
+                await db.commit()
+                await db.refresh(old_article)
+                return ArticleResponse(article_id=old_article.id)
+            except IntegrityError:
+                await db.rollback()
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Не удалось обновить характеристики артикула",
                 )
 
     @classmethod
@@ -134,10 +192,10 @@ class ArticleService:
                     status_code=status.HTTP_404_NOT_FOUND, detail="Артикул не найден"
                 )
 
-            await db.delete(article)  # Correct delete
+            await db.delete(article)
             try:
                 await db.commit()
-                return {"message": "Артикул успешно удалён"}  # Правильный формат
+                return {"message": "Артикул успешно удалён"}
             except IntegrityError:
                 await db.rollback()
                 raise HTTPException(

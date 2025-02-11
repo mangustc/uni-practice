@@ -27,7 +27,11 @@ class Article(Base):
     id = Column(Integer, primary_key=True)
     subcategory_id = Column(Integer, ForeignKey("subcategory.id"))
     description = Column(String, nullable=True)
-    characteristics = Column(String, nullable=True)
+    country = Column(String, nullable=True)
+    characteristic_color = Column(String, nullable=True)
+    characteristic_width = Column(String, nullable=True)
+    characteristic_density = Column(String, nullable=True)
+    characteristic_consist = Column(String, nullable=True)
     price = Column(Integer, nullable=True)
 
 
