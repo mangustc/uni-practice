@@ -272,6 +272,11 @@ class ProductService:
     @classmethod
     async def add_in_cart(cls, request: Request, product_id: int, amount: float):
         user_data = await Functions.get_user_data(request)
+        if amount <= 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Количество не может быть <= 0",
+            )
         query = select(Product).where(Product.id == product_id)
         async with new_session() as db:
             result = await db.execute(query)
@@ -280,6 +285,11 @@ class ProductService:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Продукт не найден",
+                )
+            if result.amount < amount:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Количество превышает доступное значение",
                 )
             field = Cart(user_id=user_data["user_id"], product_id=product_id, amount=amount)
             db.add(field)
@@ -296,8 +306,26 @@ class ProductService:
     @classmethod
     async def change_product_amount_in_cart(cls, request: Request, product_id: int, amount: float):
         user_data = await Functions.get_user_data(request)
-        query = select(Cart).where(and_(Cart.user_id == user_data["user_id"], Cart.product_id == product_id))
+        if amount <= 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Количество не может быть <= 0",
+            )
+        query = select(Product).where(Product.id == product_id)
         async with new_session() as db:
+            result = await db.execute(query)
+            result = result.scalars().first()
+            if result is None:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Продукт не найден",
+                )
+            if result.amount < amount:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Количество превышает доступное значение",
+                )
+            query = select(Cart).where(and_(Cart.user_id == user_data["user_id"], Cart.product_id == product_id))
             result = await db.execute(query)
             result = result.scalars().first()
             if result is None:

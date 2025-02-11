@@ -1,4 +1,7 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from typing_extensions import Annotated
+
+PositiveInt = Annotated[int, Field(gt=0)]
 
 
 class CreateArticle(BaseModel):
@@ -6,7 +9,7 @@ class CreateArticle(BaseModel):
     description: str
     country: str
     measured_in: str
-    price: int
+    price: PositiveInt
 
 
 class UpdateArticleCharacteristics(BaseModel):
