@@ -37,6 +37,7 @@ class ArticleService:
                 subcategory_id=subcategory.id,
                 description=data.description,
                 country=data.country,
+                measured_in=data.measured_in,
                 price=data.price,
                 characteristic_color=None,
                 characteristic_width=None,
@@ -69,6 +70,7 @@ class ArticleService:
             "subcategory_id": article.subcategory_id,
             "description": article.description,
             "country": article.country,
+            "measured_in": article.measured_in,
             "price": article.price,
             "characteristic_color": article.characteristic_color,
             "characteristic_width": article.characteristic_width,
@@ -87,6 +89,7 @@ class ArticleService:
                 "subcategory_id": a.subcategory_id,
                 "description": a.description,
                 "country": a.country,
+                "measured_in": a.measured_in,
                 "price": a.price,
                 "characteristic_color": a.characteristic_color,
                 "characteristic_width": a.characteristic_width,
@@ -125,6 +128,7 @@ class ArticleService:
             old_article.subcategory_id = subcategory.id
             old_article.description = data.description
             old_article.country = data.country
+            old_article.measured_in = data.measured_in
             old_article.price = data.price
 
             try:

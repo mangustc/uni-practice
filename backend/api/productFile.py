@@ -45,6 +45,26 @@ async def delete_product(request: Request, product_id: int):
     return await ProductService.delete_product(request, product_id)
 
 
+@router.put("/{product_id}/ChangeWishlistState")
+async def change_wishlist_state(request: Request, product_id: int):
+    return await ProductService.change_wishlist_state(request, product_id)
+
+
+@router.put("/{product_id}/{amount}/AddInCart")
+async def add_in_cart(request: Request, product_id: int, amount: float):
+    return await ProductService.add_in_cart(request, product_id, amount)
+
+
+@router.put("/{product_id}/{amount}/ChangeAmountInCart")
+async def change_product_amount_in_cart(request: Request, product_id: int, amount: int):
+    return await ProductService.change_product_amount_in_cart(request, product_id, amount)
+
+
+@router.put("/{product_id}/DeleteFromCart")
+async def delete_from_cart(request: Request, product_id: int):
+    return await ProductService.delete_from_cart(request, product_id)
+
+
 @router.put("/products/{product_id}/new")
 async def set_product_new_endpoint(
     request: Request, product_id: int, is_new: bool = Query(..., description="Set product as new (true/false)")
@@ -79,6 +99,7 @@ async def get_new_products_endpoint():
 @router.get("/products/promotion", response_model=list[dict])
 async def get_promotion_products_endpoint():
     return await ProductService.get_promotion_products()
+
 
 @router.get("/products/hit", response_model=list[dict])
 async def get_hit_products_endpoint():

@@ -5,6 +5,7 @@ class CreateArticle(BaseModel):
     subcategory_name: str
     description: str
     country: str
+    measured_in: str
     price: int
 
 
@@ -13,6 +14,7 @@ class UpdateArticleCharacteristics(BaseModel):
     characteristic_width: str
     characteristic_density: str
     characteristic_consist: str
+
 
 class ArticleResponse(BaseModel):
     article_id: int

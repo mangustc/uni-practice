@@ -32,6 +32,7 @@ class Article(Base):
     characteristic_width = Column(String, nullable=True)
     characteristic_density = Column(String, nullable=True)
     characteristic_consist = Column(String, nullable=True)
+    measured_in = Column(String, nullable=False)  # "м", "упак", "шт"
     price = Column(Integer, nullable=True)
 
 
@@ -41,7 +42,7 @@ class Product(Base):
     article_id = Column(Integer, ForeignKey("article.id"))
     name = Column(String, nullable=False)
     image_path = Column(String, nullable=True)
-    amount = Column(Integer, nullable=False)
+    amount = Column(Float, nullable=False)
     hit = Column(Boolean, nullable=False, default=False)
     promotion = Column(Boolean, nullable=False, default=False)
     procent_promotion = Column(Float, nullable=True)
@@ -50,6 +51,19 @@ class Product(Base):
     old_price = Column(Float, nullable=True)
     new_price = Column(Float, nullable=True)
     article = relationship("Article")
+
+
+class Wishlist(Base):
+    __tablename__ = "wishlist"
+    user_id = Column(Integer, ForeignKey("user.id"), primary_key=True)
+    product_id = Column(Integer, ForeignKey("product.id"), primary_key=True)
+
+
+class Cart(Base):
+    __tablename__ = "cart"
+    user_id = Column(Integer, ForeignKey("user.id"), primary_key=True)
+    product_id = Column(Integer, ForeignKey("product.id"), primary_key=True)
+    amount = Column(Float, nullable=False)
 
 
 # КатегорииТоваров

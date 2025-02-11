@@ -6,7 +6,7 @@ from fastapi.responses import FileResponse
 from sqlalchemy.orm import joinedload
 from database import *
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import select, delete, Select
+from sqlalchemy import select, delete, Select, and_
 from schemas import *
 from Function import Functions
 from uuid import uuid4
@@ -67,6 +67,7 @@ class ProductService:
             "characteristic_width": product_field.article.characteristic_width,
             "characteristic_density": product_field.article.characteristic_density,
             "characteristic_consist": product_field.article.characteristic_consist,
+            "article_measured_in": product_field.article.measured_in,
             "article_price": product_field.article.price
         }  # Correct format
 
@@ -82,6 +83,7 @@ class ProductService:
             )
         return {
             "product_name": product_field.name,
+            "article_measured_in": product_field.article.measured_in,
             "article_price": product_field.article.price
         }  # Correct format
 
@@ -101,6 +103,7 @@ class ProductService:
              "characteristic_width": p.article.characteristic_width,
              "characteristic_density": p.article.characteristic_density,
              "characteristic_consist": p.article.characteristic_consist,
+             "article_measured_in": p.article.measured_in,
              "article_price": p.article.price} for p in products
         ]  # Correct format
 
@@ -226,6 +229,115 @@ class ProductService:
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail="Не удалось удалить продукт",
+                )
+
+    @classmethod
+    async def change_wishlist_state(cls, request: Request, product_id: int):
+        user_data = await Functions.get_user_data(request)
+        query = select(Wishlist).where(and_(Wishlist.user_id == user_data["user_id"], Wishlist.product_id == product_id))
+        async with new_session() as db:
+            result = await db.execute(query)
+            result = result.scalars().first()
+            if result is not None:
+                await db.delete(result)
+                try:
+                    await db.commit()
+                    return {"message": "Продукт убран из избранного"}  # Правильный формат
+                except IntegrityError:
+                    await db.rollback()
+                    raise HTTPException(
+                        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        detail="Не удалось убрать продукт из избранного",
+                    )
+            query = select(Product).where(Product.id == product_id)
+            result = await db.execute(query)
+            result = result.scalars().first()
+            if result is None:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Продукт не найден",
+                )
+            field = Wishlist(user_id=user_data["user_id"], product_id=product_id)
+            db.add(field)
+            try:
+                await db.commit()
+                return {"message": "Продукт добавлен в избранное"}  # Правильный формат
+            except IntegrityError:
+                await db.rollback()
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Не удалось добавить продукт в избранное",
+                )
+
+    @classmethod
+    async def add_in_cart(cls, request: Request, product_id: int, amount: float):
+        user_data = await Functions.get_user_data(request)
+        query = select(Product).where(Product.id == product_id)
+        async with new_session() as db:
+            result = await db.execute(query)
+            result = result.scalars().first()
+            if result is None:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Продукт не найден",
+                )
+            field = Cart(user_id=user_data["user_id"], product_id=product_id, amount=amount)
+            db.add(field)
+            try:
+                await db.commit()
+                return {"message": "Продукт добавлен в корзину"}  # Правильный формат
+            except IntegrityError:
+                await db.rollback()
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Не удалось добавить продукт в корзину, скорее всего он уже добавлен",
+                )
+
+    @classmethod
+    async def change_product_amount_in_cart(cls, request: Request, product_id: int, amount: float):
+        user_data = await Functions.get_user_data(request)
+        query = select(Cart).where(and_(Cart.user_id == user_data["user_id"], Cart.product_id == product_id))
+        async with new_session() as db:
+            result = await db.execute(query)
+            result = result.scalars().first()
+            if result is None:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Продукт не найден в корзине",
+                )
+            result.amount = amount
+            try:
+                await db.commit()
+                return {"message": "Корзина обновлена"}  # Правильный формат
+            except IntegrityError:
+                await db.rollback()
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Не удалось обновить корзину",
+                )
+
+    @classmethod
+    async def delete_from_cart(cls, request: Request, product_id: int):
+        user_data = await Functions.get_user_data(request)
+        query = select(Cart).where(
+            and_(Cart.user_id == user_data["user_id"], Cart.product_id == product_id))
+        async with new_session() as db:
+            result = await db.execute(query)
+            result = result.scalars().first()
+            if result is None:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Продукт не найден в корзине",
+                )
+            await db.delete(result)
+            try:
+                await db.commit()
+                return {"message": "Продукт убран из корзины"}  # Правильный формат
+            except IntegrityError:
+                await db.rollback()
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Не удалось убрать продукт из корзины",
                 )
 
     @classmethod
