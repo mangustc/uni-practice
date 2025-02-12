@@ -6,7 +6,7 @@ from typing import List, Optional
 router = APIRouter(tags=["Filers"], prefix="/filter")
 
 
-@router.get("/articles/filter")
+@router.get("/articles/filter", response_model=GetProductResponse, status_code=status.HTTP_200_OK)
 async def filter_articles_endpoint(
     price_min: Optional[int] = Query(None, description="Minimum price"),
     price_max: Optional[int] = Query(None, description="Maximum price"),

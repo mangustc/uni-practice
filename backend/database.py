@@ -35,7 +35,7 @@ class Article(Base):
     characteristic_density = Column(String, nullable=True)
     characteristic_consist = Column(String, nullable=True)
     measured_in = Column(String, nullable=False)  # "м", "упак", "шт"
-    price = Column(Integer, nullable=True)
+    price = Column(Integer, nullable=False)
 
 
 class Product(Base):
@@ -68,6 +68,7 @@ class Cart(Base):
     user_id = Column(Integer, ForeignKey("user.id"), primary_key=True)
     product_id = Column(Integer, ForeignKey("product.id"), primary_key=True)
     amount = Column(Float, nullable=False)
+
 
 class Order(Base):
     __tablename__ = "order"

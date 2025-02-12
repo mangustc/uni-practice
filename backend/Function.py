@@ -31,6 +31,7 @@ async def deactivate_expired_new_products():
             await db.rollback()
             print(f"Error deactivating expired 'new' products: {e}")
 
+
 class Functions:
     @staticmethod
     async def get_user_data(request: Request):

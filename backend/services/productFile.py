@@ -59,6 +59,7 @@ class ProductService:
                 status_code=status.HTTP_404_NOT_FOUND, detail="Продукт не найден"
             )
         return {
+            "product_id": product_field.id,
             "article_id": product_field.article_id,
             "product_name": product_field.name,
             "product_amount": product_field.amount,
@@ -73,20 +74,18 @@ class ProductService:
         }  # Correct format
 
     @classmethod
-    async def get_product_small_card(cls, product_id: int):
-        query = select(Product).options(joinedload(Product.article)).where(Product.id == product_id)
+    async def get_all_products_small_card(cls):
+        query = select(Product).options(joinedload(Product.article))
         async with new_session() as db:
             result = await db.execute(query)
-        product_field = result.scalars().first()
-        if not product_field:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Продукт не найден"
-            )
-        return {
-            "product_name": product_field.name,
-            "article_measured_in": product_field.article.measured_in,
-            "article_price": product_field.article.price
-        }  # Correct format
+        products = result.scalars().all()
+        return [
+            {
+                "product_name": p.name,
+                "article_measured_in": p.article.measured_in,
+                "article_price": p.article.price
+            } for p in products
+        ]
 
     @classmethod
     async def get_all_products(cls):
@@ -95,7 +94,8 @@ class ProductService:
             result = await db.execute(query)
         products = result.scalars().all()
         return [
-            {"article_id": p.article_id,
+            {"product_id": p.id,
+             "article_id": p.article_id,
              "product_name": p.name,
              "product_amount": p.amount,
              "article_description": p.article.description,

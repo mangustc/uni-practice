@@ -90,3 +90,24 @@ class Login(BaseModel):
             ]
         }
     }
+
+
+class LoginResponse(BaseModel):
+    email: str
+    token: str
+    message: str
+
+
+class RegistrResponse(BaseModel):
+    user_id: int
+    email: str
+    message: str
+
+
+class GetUserInfoResponse(BaseModel):
+    user_id: int
+    email: str
+    name: Optional[str]
+    surname: Optional[str]
+    number: Optional[str]
+    role: str

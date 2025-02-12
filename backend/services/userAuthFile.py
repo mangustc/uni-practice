@@ -41,7 +41,7 @@ class UserService:
                 raise HTTPException(status_code=500, detail="Ошибка при сохранении пользователя")
 
             return {
-                "id": new_user.id,
+                "user_id": new_user.id,
                 "email": new_user.email,
                 "message": "Пользователь успешно зарегистрирован."
             }
@@ -80,7 +80,7 @@ class UserService:
                 await db.rollback()
                 raise HTTPException(status_code=500, detail="Ошибка при сохранении пользователя")
             return {
-                "id": new_user.id,
+                "user_id": new_user.id,
                 "email": new_user.email,
                 "message": "Пользователь успешно зарегистрирован."
             }
@@ -186,7 +186,7 @@ class UserService:
                 raise HTTPException(status_code=404, detail="Пользователь не найден")
 
             return {
-                "id": user.id,
+                "user_id": user.id,
                 "email": user.email,
                 "name": user.name,
                 "surname": user.surname,

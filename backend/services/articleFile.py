@@ -67,15 +67,15 @@ class ArticleService:
                 status_code=status.HTTP_404_NOT_FOUND, detail="Продукт не найден"
             )
         return {
-            "subcategory_id": article.subcategory_id,
-            "description": article.description,
-            "country": article.country,
-            "measured_in": article.measured_in,
-            "price": article.price,
-            "characteristic_color": article.characteristic_color,
-            "characteristic_width": article.characteristic_width,
-            "characteristic_density": article.characteristic_density,
-            "characteristic_consist": article.characteristic_consist,
+            "article_subcategory_id": article.subcategory_id,
+            "article_description": article.description,
+            "article_country": article.country,
+            "article_measured_in": article.measured_in,
+            "article_price": article.price,
+            "article_characteristic_color": article.characteristic_color,
+            "article_characteristic_width": article.characteristic_width,
+            "article_characteristic_density": article.characteristic_density,
+            "article_characteristic_consist": article.characteristic_consist,
         }
 
     @classmethod
@@ -86,15 +86,15 @@ class ArticleService:
         articles = result.scalars().all()
         return [
             {
-                "subcategory_id": a.subcategory_id,
-                "description": a.description,
-                "country": a.country,
-                "measured_in": a.measured_in,
-                "price": a.price,
-                "characteristic_color": a.characteristic_color,
-                "characteristic_width": a.characteristic_width,
-                "characteristic_density": a.characteristic_density,
-                "characteristic_consist": a.characteristic_consist,
+                "article_subcategory_id": a.subcategory_id,
+                "article_description": a.description,
+                "article_country": a.country,
+                "article_measured_in": a.measured_in,
+                "article_price": a.price,
+                "article_characteristic_color": a.characteristic_color,
+                "article_characteristic_width": a.characteristic_width,
+                "article_characteristic_density": a.characteristic_density,
+                "article_characteristic_consist": a.characteristic_consist,
             } for a in articles
         ]
 

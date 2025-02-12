@@ -1,15 +1,26 @@
-from pydantic import BaseModel, Field
-from typing_extensions import Annotated
-
-PositiveInt = Annotated[int, Field(gt=0)]
+from typing import Optional
+from pydantic import BaseModel
+from pydantic.types import PositiveInt
 
 
 class CreateArticle(BaseModel):
     subcategory_name: str
-    description: str
-    country: str
+    description: Optional[str]
+    country: Optional[str]
     measured_in: str
     price: PositiveInt
+
+
+class GetArticleResponse(BaseModel):
+    article_subcategory_id: int
+    article_description: Optional[str]
+    article_country: Optional[str]
+    article_measured_in: str
+    article_price: int
+    article_characteristic_color: Optional[str]
+    article_characteristic_width: Optional[str]
+    article_characteristic_density: Optional[str]
+    article_characteristic_consist: Optional[str]
 
 
 class UpdateArticleCharacteristics(BaseModel):
