@@ -1,0 +1,106 @@
+/* change and add variables here */
+:root {
+  --text-font: "Roboto";
+
+  --text-color-h: #1a1a1a;
+  --text-color-p: #1a1a1acc;
+  --text-color-red-main: #e32636;
+  --text-color-black-main: #1a1a1a;
+  --text-color-black-main-80: #1a1a1acc;
+  --text-color-black-main-70: #1a1a1ab3;
+  --text-color-black-main-50: #1a1a1a80;
+
+  --text-weight-h: 700;
+  --text-weight-p: 400;
+  --text-weight-link: 500;
+  --text-weight-button: 700;
+  --text-weight-label: 400;
+
+  --text-size-12px: 12px;
+  --text-size-13px: 13px;
+  --text-size-14px: 14px;
+  --text-size-15px: 15px;
+  --text-size-16px: 16px;
+  --text-height-12px: 14px;
+  --text-height-13px: 15px;
+  --text-height-14px: 16px;
+  --text-height-15px: 18px;
+  --text-height-16px: 19px;
+
+  --text-size-h1: 34px;
+  --text-height-h1: 42px;
+
+  --text-size-h2: 30px;
+  --text-h2-height-h2: 36px;
+
+  --text-size-h3: 24px;
+  --text-height-h3: 30px;
+
+  --text-size-h4: 20px;
+  --text-height-h4: 26px;
+
+  --text-size-h5: 18px;
+  --text-height-h5: 24px;
+
+  --text-size-h6: 16px;
+  --text-height-h6: 18px;
+
+  --text-size-p: 15px;
+  --text-height-p: 22px;
+}
+
+* {
+  font-family: var(--text-font);
+  color: var(--text-color-black-main);
+  font-weight: var(--text-weight-p);
+  line-height: var(--text-height-p);
+}
+
+h1 {
+  font-size: var(--text-size-h1);
+  line-height: var(--text-height-h1);
+  font-weight: var(--text-weight-h);
+  color: var(--text-color-black-main);
+}
+
+h2 {
+  font-size: var(--text-size-h2);
+  line-height: var(--text-height-h2);
+  font-weight: var(--text-weight-h);
+  color: var(--text-color-black-main);
+}
+
+h3 {
+  font-size: var(--text-size-h3);
+  line-height: var(--text-height-h3);
+  font-weight: var(--text-weight-h);
+  color: var(--text-color-black-main);
+}
+
+h4 {
+  font-size: var(--text-size-h4);
+  line-height: var(--text-height-h4);
+  font-weight: var(--text-weight-h);
+  color: var(--text-color-black-main);
+}
+
+h5 {
+  font-size: var(--text-size-h5);
+  line-height: var(--text-height-h5);
+  font-weight: var(--text-weight-h);
+  color: var(--text-color-black-main);
+}
+
+h6 {
+  font-size: var(--text-size-h6);
+  line-height: var(--text-height-h6);
+  font-weight: var(--text-weight-h);
+  color: var(--text-color-black-main);
+}
+
+p {
+  font-size: var(--text-size-p);
+  line-height: var(--text-height-p);
+  font-weight: var(--text-weight-p);
+  color: var(--text-color-black-main-80);
+}
