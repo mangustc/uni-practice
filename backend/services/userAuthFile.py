@@ -216,10 +216,10 @@ class UserService:
                 raise HTTPException(status_code=500, detail=f"Ошибка при удалении пользователя: {e}")
 
     @classmethod
-    async def change_role(cls, new_role: str, request: Request):
+    async def change_role(cls, new_role: str, request: Request, response: Response):
         user_data = await Functions.get_user_data(request)
         user_id = user_data["user_id"]
-        user_role = user_data["user_role"]
+        # user_role = user_data["user_role"]  # Не нужно использовать старую роль из кук
 
         valid_roles = ["Пользователь", "Юр.лицо", "Админ", "ИП"]
         if new_role not in valid_roles:
@@ -234,19 +234,24 @@ class UserService:
             if not user:
                 raise HTTPException(status_code=404, detail="Пользователь не найден")
 
-            # if user_role != "Админ":
-            #     raise HTTPException(
-            #         status_code=403,
-            #         detail="Недостаточно прав для изменения роли пользователя.",
-            #     )
-
             user.role = new_role
             try:
                 await db.commit()
+                await db.refresh(user)  # Обновляем объект user после коммита
             except IntegrityError as e:
                 await db.rollback()
                 raise HTTPException(
                     status_code=500, detail=f"Ошибка при изменении роли пользователя: {e}"
                 )
 
+            # Обновляем куки с новой ролью
+            token_data = {
+                "id": user.id,
+                "email": user.email,
+                "role": user.role  # Используем новую роль из базы данных
+            }
+            token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
+            response.set_cookie(key="token", value=token, httponly=True, secure=False)
+
             return {"message": f"Роль пользователя с ID {user_id} успешно изменена на {new_role}."}
+
