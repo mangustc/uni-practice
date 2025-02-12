@@ -25,6 +25,12 @@ async def get_all_products():
     return await ProductService.get_all_products()
 
 
+@router.get("/{category_name}/GetProductsByCategoryName", # response_model=list[GetProductResponse],
+            status_code=status.HTTP_200_OK)
+async def get_products_by_category_name(category_name: str):
+    return await ProductService.get_products_by_category_name(category_name)
+
+
 @router.get("/{product_id}/GetPhoto", status_code=status.HTTP_200_OK)
 async def get_product_photo(product_id):
     return await ProductService.get_product_photo(product_id)

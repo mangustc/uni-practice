@@ -23,18 +23,18 @@ class ArticleService:
             )
 
         async with new_session() as db:
-            subcategory = await db.execute(
-                select(Subcategory).where(Subcategory.name == data.subcategory_name)
+            category = await db.execute(
+                select(Category).where(Category.name == data.category_name)
             )
-            subcategory = subcategory.scalars().first()
-            if subcategory is None:
+            category = category.scalars().first()
+            if category is None:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Подкатегории с таким именем не существует",
+                    detail="Категории с таким именем не существует",
                 )
 
             new_article = Article(
-                subcategory_id=subcategory.id,
+                category_id=category.id,
                 description=data.description,
                 country=data.country,
                 measured_in=data.measured_in,
@@ -67,7 +67,7 @@ class ArticleService:
                 status_code=status.HTTP_404_NOT_FOUND, detail="Продукт не найден"
             )
         return {
-            "article_subcategory_id": article.subcategory_id,
+            "article_category_id": article.category_id,
             "article_description": article.description,
             "article_country": article.country,
             "article_measured_in": article.measured_in,
@@ -86,7 +86,7 @@ class ArticleService:
         articles = result.scalars().all()
         return [
             {
-                "article_subcategory_id": a.subcategory_id,
+                "article_category_id": a.category_id,
                 "article_description": a.description,
                 "article_country": a.country,
                 "article_measured_in": a.measured_in,
@@ -115,17 +115,17 @@ class ArticleService:
                     detail="Такого артикула не существует",
                 )
 
-            subcategory = await db.execute(
-                select(Subcategory).where(Subcategory.name == data.subcategory_name)
+            category = await db.execute(
+                select(Category).where(Category.name == data.category_name)
             )
-            subcategory = subcategory.scalars().first()
-            if subcategory is None:
+            category = category.scalars().first()
+            if category is None:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Подкатегории с таким именем не существует",
                 )
 
-            old_article.subcategory_id = subcategory.id
+            old_article.category_id = category.id
             old_article.description = data.description
             old_article.country = data.country
             old_article.measured_in = data.measured_in

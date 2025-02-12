@@ -27,7 +27,7 @@ class User(Base):
 class Article(Base):
     __tablename__ = "article"
     id = Column(Integer, primary_key=True)
-    subcategory_id = Column(Integer, ForeignKey("subcategory.id"))
+    category_id = Column(Integer, ForeignKey("category.id"))
     description = Column(String, nullable=True)
     country = Column(String, nullable=True)
     characteristic_color = Column(String, nullable=True)
@@ -85,16 +85,8 @@ class Category(Base):
     __tablename__ = "category"
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
-    subcategories = relationship("Subcategory", back_populates="category")
-
-
-# Подкатегории товаров
-class Subcategory(Base):
-    __tablename__ = "subcategory"
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, nullable=False)
-    category_id = Column(Integer, ForeignKey("category.id"))
-    category = relationship("Category", back_populates="subcategories")
+    parent_id = Column(Integer, ForeignKey("category.id"), nullable=True)
+    # subcategories = relationship('Category', remote_side=[id], uselist=True)
 
 
 async def create_tables():

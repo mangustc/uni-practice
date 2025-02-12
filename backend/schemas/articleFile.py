@@ -4,7 +4,7 @@ from pydantic.types import PositiveInt
 
 
 class CreateArticle(BaseModel):
-    subcategory_name: str
+    category_name: str
     description: Optional[str]
     country: Optional[str]
     measured_in: str
@@ -12,7 +12,7 @@ class CreateArticle(BaseModel):
 
 
 class GetArticleResponse(BaseModel):
-    article_subcategory_id: int
+    article_category_id: int
     article_description: Optional[str]
     article_country: Optional[str]
     article_measured_in: str

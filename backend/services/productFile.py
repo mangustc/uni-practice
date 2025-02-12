@@ -4,10 +4,10 @@ from datetime import date, timedelta, datetime
 from typing import Sequence
 from fastapi import UploadFile, HTTPException, status, Request
 from fastapi.responses import FileResponse
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, contains_eager
 from database import *
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from sqlalchemy import select, delete, Select, and_
+from sqlalchemy import select, delete, Select, and_, or_
 from schemas import *
 from Function import Functions
 from uuid import uuid4
@@ -109,6 +109,46 @@ class ProductService:
         ]  # Correct format
 
     @classmethod
+    async def get_products_by_category_name(cls, category_name: str):
+        query = select(Category).where(Category.name == category_name)
+        async with new_session() as db:
+            result = await db.execute(query)
+        result = result.scalars().first()
+        if result is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Категория с таким названием не найдена"
+            )
+
+        category_ids = []
+        categories = [result]
+        while len(categories) != 0:
+            temp = [elem.id for elem in categories]
+            category_ids.extend(temp)
+            query = select(Category).where(Category.parent_id.in_(temp))
+            async with new_session() as db:
+                result = await db.execute(query)
+            categories = result.scalars().all()
+        query = select(Product).join(Article).options(contains_eager(Product.article)).where(Article.category_id.in_(category_ids))
+        async with new_session() as db:
+            result = await db.execute(query)
+        result = result.scalars().all()
+
+        return [
+            {"product_id": p.id,
+             "article_id": p.article_id,
+             "product_name": p.name,
+             "product_amount": p.amount,
+             "article_description": p.article.description,
+             "country": p.article.country,
+             "characteristic_color": p.article.characteristic_color,
+             "characteristic_width": p.article.characteristic_width,
+             "characteristic_density": p.article.characteristic_density,
+             "characteristic_consist": p.article.characteristic_consist,
+             "article_measured_in": p.article.measured_in,
+             "article_price": p.article.price} for p in result
+        ]  # Correct format
+
+    @classmethod
     async def get_product_photo(cls, product_id: int):
         query = select(Product).where(Product.id == product_id)
         async with new_session() as db:
@@ -194,7 +234,7 @@ class ProductService:
                     detail="Такого артикула не существует",
                 )
 
-            old_product.subcategory_id = data.article_id
+            old_product.category_id = data.article_id
             old_product.name = data.name
             old_product.amount = data.amount
             try:
