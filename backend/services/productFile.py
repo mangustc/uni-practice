@@ -118,6 +118,10 @@ class ProductService:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Продукт не найден"
             )
+        if product_field.image_path is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Изображение продукта не было найдено"
+            )
         return FileResponse(product_field.image_path)
 
     @classmethod
