@@ -313,3 +313,74 @@
 #                 }
 #                 for a in articles
 #             ]
+    # @classmethod
+    # async def pay_order(cls, request: Request, order_id: int, pay: bool):
+    #     """
+    #     Имитирует процесс оплаты заказа.
+    #     """
+    #     async with new_session() as db:
+    #         order = await db.execute(select(Order).where(Order.id == order_id))
+    #         order = order.scalars().first()
+    #
+    #         if not order:
+    #             raise HTTPException(
+    #                 status_code=status.HTTP_404_NOT_FOUND,
+    #                 detail="Заказ не найден"
+    #             )
+    #
+    #         if order.payment_status == "paid":
+    #             raise HTTPException(
+    #                 status_code=status.HTTP_400_BAD_REQUEST,
+    #                 detail="Этот заказ уже оплачен и не может быть изменен."
+    #             )
+    #
+    #         if order.payment_status == "failed":
+    #             raise HTTPException(
+    #                 status_code=status.HTTP_400_BAD_REQUEST,
+    #                 detail="Этот заказ был отменен и не может быть оплачен снова."
+    #             )
+    #
+    #         # Если pay == False - отменяем оплату
+    #         if pay == False:
+    #             # если платеж был отменен
+    #             if order.payment_status == "failed":
+    #                 raise HTTPException(
+    #                     status_code=status.HTTP_400_BAD_REQUEST,
+    #                     detail="Вы уже отменили заказ"
+    #                 )
+    #             # Возвращаем количество товаров на склад
+    #             items_info = json.loads(order.items)
+    #             for item in items_info:
+    #                 product = await db.execute(select(Product).where(Product.id == item["product_id"]))
+    #                 product = product.scalars().first()
+    #                 if not product:
+    #                     raise HTTPException(
+    #                         status_code=status.HTTP_404_NOT_FOUND,
+    #                         detail=f"Продукт с ID {item['product_id']} не найден"
+    #                     )
+    #                 product.amount += item["quantity"]
+    #
+    #             order.payment_status = "failed"
+    #             await db.commit()
+    #             return {"message": "Оплата отменена, количество товаров возвращено на склад", "order_id": order.id}
+    #
+    #         # Если pay == True - проводим оплату
+    #         if pay == True:
+    #             # Увеличиваем счетчик покупок для каждого товара в заказе
+    #             items_info = json.loads(order.items)
+    #             for item in items_info:
+    #                 product = await db.execute(select(Product).where(Product.id == item["product_id"]))
+    #                 product = product.scalars().first()
+    #                 if not product:
+    #                     raise HTTPException(
+    #                         status_code=status.HTTP_404_NOT_FOUND,
+    #                         detail=f"Продукт с ID {item['product_id']} не найден"
+    #                     )
+    #                 product.purchase_count += item["quantity"]
+    #                 await ProductService.check_product_hit(product)
+    #
+    #             # Устанавливаем статус заказа как "оплачен"
+    #             order.payment_status = "paid"
+    #             await db.commit()
+    #
+    #             return {"message": "Оплата успешно проведена", "order_id": order.id}

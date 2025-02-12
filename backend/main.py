@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 from database import create_tables, new_session
 from Function import deactivate_expired_new_products
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from services import ProductService
 import os
 
 @asynccontextmanager
@@ -13,6 +14,7 @@ async def lifespan(app: FastAPI):
         await create_tables()
     scheduler = AsyncIOScheduler()
     scheduler.add_job(deactivate_expired_new_products, "interval", days=1)
+    scheduler.add_job(ProductService.check_and_reset_hit_status, "interval", days=1)
     scheduler.start()
     yield
     scheduler.shutdown()

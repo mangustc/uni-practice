@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy import Column, String, Boolean, Integer, ForeignKey, Float, Date, DateTime
@@ -50,6 +52,8 @@ class Product(Base):
     new_until = Column(DateTime, nullable=True)
     old_price = Column(Float, nullable=True)
     new_price = Column(Float, nullable=True)
+    purchase_count = Column(Integer, default=0)
+    last_hit_date = Column(DateTime, nullable=True)
     article = relationship("Article")
 
 
@@ -64,6 +68,15 @@ class Cart(Base):
     user_id = Column(Integer, ForeignKey("user.id"), primary_key=True)
     product_id = Column(Integer, ForeignKey("product.id"), primary_key=True)
     amount = Column(Float, nullable=False)
+
+class Order(Base):
+    __tablename__ = "order"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey("user.id"))
+    order_date = Column(DateTime, default=datetime.utcnow)
+    total_amount = Column(Float, nullable=False)
+    payment_status = Column(String, nullable=False, default="pending")  # "pending", "paid", "failed"
+    items = Column(String, nullable=True)  # JSON строка списка товаров
 
 
 # КатегорииТоваров

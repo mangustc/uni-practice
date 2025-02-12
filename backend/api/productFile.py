@@ -72,11 +72,24 @@ async def set_product_new_endpoint(
     return await ProductService.set_product_new(request, product_id, is_new)
 
 
-@router.put("/products/{product_id}/hit")
-async def set_product_hit_endpoint(
-    request: Request, product_id: int, is_hit: bool = Query(..., description="Set product as hit (true/false)")
-):
-    return await ProductService.set_product_hit(request, product_id, is_hit)
+
+@router.post("/orders/")
+async def create_order(request: Request):
+    return await ProductService.place_order(request=request)
+
+@router.post("/{order_id}/pay")
+async def pay_order(request: Request, order_id: int, pay: bool):
+    return await ProductService.pay_order(request=request, order_id=order_id, pay=pay)
+
+@router.get("/history_orders")
+async def order_history(request: Request):
+    return await ProductService.get_order_history(request=request)
+
+# @router.put("/products/{product_id}/hit")
+# async def set_product_hit_endpoint(
+#     request: Request, product_id: int, is_hit: bool = Query(..., description="Set product as hit (true/false)")
+# ):
+#     return await ProductService.set_product_hit(request, product_id, is_hit)
 
 
 @router.put("/products/{product_id}/promotion")
