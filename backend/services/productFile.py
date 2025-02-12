@@ -34,7 +34,8 @@ class ProductService:
                     detail="Такого артикула не существует",
                 )
 
-            new_product = Product(article_id=data.article_id, name=data.name, amount=data.amount, new_until=datetime.now() + timedelta(days=30))
+            new_product = Product(article_id=data.article_id, name=data.name,
+                                  amount=data.amount, new_until=datetime.now() + timedelta(days=30))
             db.add(new_product)
             try:
                 await db.commit()
@@ -50,7 +51,8 @@ class ProductService:
 
     @classmethod
     async def get_product(cls, product_id: int):
-        query = select(Product).options(joinedload(Product.article)).where(Product.id == product_id)
+        query = select(Product).options(joinedload(
+            Product.article)).where(Product.id == product_id)
         async with new_session() as db:
             result = await db.execute(query)
         product_field = result.scalars().first()
@@ -74,7 +76,8 @@ class ProductService:
 
     @classmethod
     async def get_product_small_card(cls, product_id: int):
-        query = select(Product).options(joinedload(Product.article)).where(Product.id == product_id)
+        query = select(Product).options(joinedload(
+            Product.article)).where(Product.id == product_id)
         async with new_session() as db:
             result = await db.execute(query)
         product_field = result.scalars().first()
@@ -118,6 +121,11 @@ class ProductService:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Продукт не найден"
             )
+        if product_field.image_path is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Фото продукта не существует"
+            )
+
         return FileResponse(product_field.image_path)
 
     @classmethod
@@ -155,7 +163,8 @@ class ProductService:
                 with open(path, "wb") as f:
                     f.write(contents)
             except Exception:
-                raise HTTPException(status_code=500, detail='Something went wrong')
+                raise HTTPException(
+                    status_code=500, detail='Something went wrong')
             finally:
                 file.file.close()
             product_field.image_path = path
@@ -224,7 +233,8 @@ class ProductService:
             await db.delete(product_field)  # Correct delete
             try:
                 await db.commit()
-                return {"message": "Продукт успешно удалён"}  # Правильный формат
+                # Правильный формат
+                return {"message": "Продукт успешно удалён"}
             except IntegrityError:
                 await db.rollback()
                 raise HTTPException(
@@ -235,7 +245,8 @@ class ProductService:
     @classmethod
     async def change_wishlist_state(cls, request: Request, product_id: int):
         user_data = await Functions.get_user_data(request)
-        query = select(Wishlist).where(and_(Wishlist.user_id == user_data["user_id"], Wishlist.product_id == product_id))
+        query = select(Wishlist).where(and_(Wishlist.user_id ==
+                                            user_data["user_id"], Wishlist.product_id == product_id))
         async with new_session() as db:
             result = await db.execute(query)
             result = result.scalars().first()
@@ -243,7 +254,8 @@ class ProductService:
                 await db.delete(result)
                 try:
                     await db.commit()
-                    return {"message": "Продукт убран из избранного"}  # Правильный формат
+                    # Правильный формат
+                    return {"message": "Продукт убран из избранного"}
                 except IntegrityError:
                     await db.rollback()
                     raise HTTPException(
@@ -258,11 +270,13 @@ class ProductService:
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Продукт не найден",
                 )
-            field = Wishlist(user_id=user_data["user_id"], product_id=product_id)
+            field = Wishlist(
+                user_id=user_data["user_id"], product_id=product_id)
             db.add(field)
             try:
                 await db.commit()
-                return {"message": "Продукт добавлен в избранное"}  # Правильный формат
+                # Правильный формат
+                return {"message": "Продукт добавлен в избранное"}
             except IntegrityError:
                 await db.rollback()
                 raise HTTPException(
@@ -292,11 +306,13 @@ class ProductService:
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Количество превышает доступное значение",
                 )
-            field = Cart(user_id=user_data["user_id"], product_id=product_id, amount=amount)
+            field = Cart(user_id=user_data["user_id"],
+                         product_id=product_id, amount=amount)
             db.add(field)
             try:
                 await db.commit()
-                return {"message": "Продукт добавлен в корзину"}  # Правильный формат
+                # Правильный формат
+                return {"message": "Продукт добавлен в корзину"}
             except IntegrityError:
                 await db.rollback()
                 raise HTTPException(
@@ -326,7 +342,8 @@ class ProductService:
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Количество превышает доступное значение",
                 )
-            query = select(Cart).where(and_(Cart.user_id == user_data["user_id"], Cart.product_id == product_id))
+            query = select(Cart).where(
+                and_(Cart.user_id == user_data["user_id"], Cart.product_id == product_id))
             result = await db.execute(query)
             result = result.scalars().first()
             if result is None:
@@ -361,7 +378,8 @@ class ProductService:
             await db.delete(result)
             try:
                 await db.commit()
-                return {"message": "Продукт убран из корзины"}  # Правильный формат
+                # Правильный формат
+                return {"message": "Продукт убран из корзины"}
             except IntegrityError:
                 await db.rollback()
                 raise HTTPException(
@@ -402,7 +420,8 @@ class ProductService:
                 if not product.article:
                     raise HTTPException(
                         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                        detail=f"Не удалось загрузить статью для продукта с ID {item.product_id}"
+                        detail=f"Не удалось загрузить статью для продукта с ID {
+                            item.product_id}"
                     )
 
                 # Определяем цену товара (со скидкой или без)
@@ -412,18 +431,21 @@ class ProductService:
                     price = product.article.price
 
                 total_amount += price * item.amount
-                items_info.append({"product_id": product.id, "quantity": item.amount})
+                items_info.append(
+                    {"product_id": product.id, "quantity": item.amount})
 
                 # Уменьшаем количество товара
                 product.amount -= item.amount
                 if product.amount < 0:
                     raise HTTPException(
                         status_code=status.HTTP_400_BAD_REQUEST,
-                        detail=f"Недостаточное количество товара  {product.name}"
+                        detail=f"Недостаточное количество товара  {
+                            product.name}"
                     )
 
             # Создаем запись о заказе
-            new_order = Order(user_id=user_id, total_amount=total_amount, items=json.dumps(items_info))
+            new_order = Order(
+                user_id=user_id, total_amount=total_amount, items=json.dumps(items_info))
             db.add(new_order)
             await db.commit()
             await db.refresh(new_order)
@@ -435,7 +457,6 @@ class ProductService:
 
             return {"order_id": new_order.id, "total_amount": total_amount,
                     "message": "Заказ успешно создан, ожидается оплата"}
-
 
     @classmethod
     async def pay_order(cls, request: Request, order_id: int, pay: bool):
@@ -487,7 +508,8 @@ class ProductService:
                     if not product:
                         raise HTTPException(
                             status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"Продукт с ID {item['product_id']} не найден"
+                            detail=f"Продукт с ID {
+                                item['product_id']} не найден"
                         )
                     product.amount += item["quantity"]
 
@@ -505,7 +527,8 @@ class ProductService:
                     if not product:
                         raise HTTPException(
                             status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"Продукт с ID {item['product_id']} не найден"
+                            detail=f"Продукт с ID {
+                                item['product_id']} не найден"
                         )
                     product.purchase_count += item["quantity"]
                     await ProductService.check_product_hit(product)
@@ -572,7 +595,6 @@ class ProductService:
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail="Не удалось изменить статус новинки",
                 )
-
 
     @classmethod
     async def set_product_hit(cls, request: Request, product_id: int, is_hit: bool):
@@ -695,7 +717,8 @@ class ProductService:
     @classmethod
     async def get_new_products(cls):
         async with new_session() as db:
-            query = select(Product).options(joinedload(Product.article)).where(Product.new == True)
+            query = select(Product).options(joinedload(
+                Product.article)).where(Product.new == True)
             result = await db.execute(query)
             products = result.scalars().all()
 
@@ -745,7 +768,7 @@ class ProductService:
                     "characteristic_consist": p.article.characteristic_consist,
                     # "article_price": p.article.price,
                     # "hit": p.hit,
-                     "promotion": p.promotion,
+                    "promotion": p.promotion,
                     # "procent_promotion": p.procent_promotion,
                     # "new": p.new,
                     "old_price": p.old_price,
@@ -781,9 +804,6 @@ class ProductService:
                 }
                 for p in products
             ]
-
-
-
 
   # @classmethod
   #   async def set_product_new1(cls, request: Request, product_id: int, is_new: bool):
