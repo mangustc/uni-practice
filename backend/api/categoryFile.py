@@ -25,10 +25,10 @@ async def get_category_roots():
     return await CategoryService.get_category_roots()
 
 
-@router.get("/{category_name_refers_to}/GetCategoriesByCategoryNameRefersTo", response_model=list[CategoryResponse],
+@router.get("/{category_name_parent}/GetCategoriesByCategoryNameRefersTo", response_model=list[CategoryResponse],
             status_code=status.HTTP_200_OK)
-async def get_categories_by_category_name_refers_to(category_name_refers_to: str):
-    return await CategoryService.get_categories_by_category_name_refers_to(category_name_refers_to)
+async def get_categories_by_category_name_parent(category_name_parent: str):
+    return await CategoryService.get_categories_by_category_name_parent(category_name_parent)
 
 
 @router.get("/GetAllCategories", response_model=list[CategoryResponse], status_code=status.HTTP_200_OK)
