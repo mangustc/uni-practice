@@ -48,10 +48,9 @@ class Product(Base):
     hit = Column(Boolean, nullable=False, default=False)
     promotion = Column(Boolean, nullable=False, default=False)
     procent_promotion = Column(Float, nullable=True)
+    new_price = Column(Float, nullable=True)
     new = Column(Boolean, nullable=False, default=True)
     new_until = Column(DateTime, nullable=True)
-    old_price = Column(Float, nullable=True)
-    new_price = Column(Float, nullable=True)
     purchase_count = Column(Integer, default=0)
     last_hit_date = Column(DateTime, nullable=True)
     article = relationship("Article")
@@ -87,6 +86,8 @@ class Category(Base):
     name = Column(String, nullable=False)
     parent_id = Column(Integer, ForeignKey("category.id"), nullable=True)
     # subcategories = relationship('Category', remote_side=[id], uselist=True)
+
+
 
 
 async def create_tables():

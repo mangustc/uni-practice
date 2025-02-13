@@ -746,21 +746,21 @@ class ProductService:
                     status_code=status.HTTP_404_NOT_FOUND, detail="Продукт не найден"
                 )
 
+            article_field = await db.execute(
+                select(Article).where(Article.id == product.article_id)
+            )
+            article_field = article_field.scalars().first()
+            if article_field is None:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Такого артикула не существует",
+                )
+
             if is_promotion:
                 if procent_promotion is None or not 0 < procent_promotion <= 100:
                     raise HTTPException(
                         status_code=status.HTTP_400_BAD_REQUEST,
                         detail="Процент скидки должен быть указан в диапазоне от 1 до 100",
-                    )
-
-                article_field = await db.execute(
-                    select(Article).where(Article.id == product.article_id)
-                )
-                article_field = article_field.scalars().first()
-                if article_field is None:
-                    raise HTTPException(
-                        status_code=status.HTTP_400_BAD_REQUEST,
-                        detail="Такого артикула не существует",
                     )
 
                 old_price = float(article_field.price)
@@ -769,13 +769,11 @@ class ProductService:
 
                 product.promotion = is_promotion
                 product.procent_promotion = procent_promotion
-                product.old_price = old_price
-                product.new_price = new_price
+                product.new_price = new_price  # Store the discounted price
             else:
                 product.promotion = is_promotion
                 product.procent_promotion = None
-                product.old_price = None
-                product.new_price = None
+                product.new_price = None  # Reset the discounted price
 
             try:
                 await db.commit()
@@ -787,6 +785,37 @@ class ProductService:
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail="Не удалось изменить статус акции",
                 )
+
+    @classmethod
+    async def get_promotion_products(cls):
+        async with new_session() as db:
+            query = select(Product).options(joinedload(Product.article)).where(
+                Product.promotion == True
+            )
+            result = await db.execute(query)
+            products = result.scalars().all()
+
+            return [
+                {
+                    "product_id": p.id,
+                    "article_id": p.article_id,
+                    "product_name": p.name,
+                    "product_amount": p.amount,
+                    "article_description": p.article.description if p.article else None,
+                    "article_country": p.article.country if p.article else None,
+                    "product_characteristic_color": p.characteristic_color,
+                    "article_characteristic_width": p.article.characteristic_width if p.article else None,
+                    "article_characteristic_density": p.article.characteristic_density if p.article else None,
+                    "article_characteristic_consist": p.article.characteristic_consist if p.article else None,
+                    "article_price": p.article.price if p.article else None,
+                    "product_new_price": p.new_price,  # Используем поле new_price из Product
+                    "product_hit": p.hit,
+                    "product_promotion": p.promotion,
+                    "product_procent_promotion": p.procent_promotion,
+                    "product_new": p.new,
+                }
+                for p in products
+            ]
 
     @classmethod
     async def get_new_products(cls):
@@ -808,44 +837,11 @@ class ProductService:
                     "article_characteristic_density": p.article.characteristic_density,
                     "article_characteristic_consist": p.article.characteristic_consist,
                     "article_price": p.article.price,
-                    "product_hit": p.hit,
-                    "product_promotion": p.promotion,
-                    "product_procent_promotion": p.procent_promotion,
-                    "product_new": p.new,
-                    "product_old_price": p.old_price,
                     "product_new_price": p.new_price,
-                }
-                for p in products
-            ]
-
-    @classmethod
-    async def get_promotion_products(cls):
-        async with new_session() as db:
-            query = select(Product).options(joinedload(Product.article)).where(
-                Product.promotion == True
-            )
-            result = await db.execute(query)
-            products = result.scalars().all()
-
-            return [
-                {
-                    "product_id": p.id,
-                    "article_id": p.article_id,
-                    "product_name": p.name,
-                    "product_amount": p.amount,
-                    "article_description": p.article.description,
-                    "article_country": p.article.country,
-                    "product_characteristic_color": p.characteristic_color,
-                    "article_characteristic_width": p.article.characteristic_width,
-                    "article_characteristic_density": p.article.characteristic_density,
-                    "article_characteristic_consist": p.article.characteristic_consist,
-                    "article_price": p.article.price,
                     "product_hit": p.hit,
                     "product_promotion": p.promotion,
                     "product_procent_promotion": p.procent_promotion,
-                    "new": p.new,
-                    "old_price": p.old_price,
-                    "new_price": p.new_price,
+                    "product_new": p.new
                 }
                 for p in products
             ]
@@ -872,8 +868,11 @@ class ProductService:
                     "characteristic_density": p.article.characteristic_density,
                     "characteristic_consist": p.article.characteristic_consist,
                     "hit": p.hit,
-                    "promotion": p.promotion,
-                    "new": p.new,
+                    "product_new_price": p.new_price,
+                    "product_hit": p.hit,
+                    "product_promotion": p.promotion,
+                    "product_procent_promotion": p.procent_promotion,
+                    "product_new": p.new
                 }
                 for p in products
             ]
