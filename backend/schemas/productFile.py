@@ -24,12 +24,23 @@ class GetProductResponse(BaseModel):
     article_characteristic_consist: Optional[str] = None
     article_measured_in: str
     article_price: PositiveInt
+    product_new: bool
+    product_hit: bool
+    product_promotion: bool
+    product_percent_promotion: Optional[int]
+    product_new_price: Optional[float]
 
 
 class GetProductSmallCardResponse(BaseModel):
+    product_id: int
     product_name: str
     article_measured_in: str
     article_price: int
+    product_new: bool
+    product_hit: bool
+    product_promotion: bool
+    product_percent_promotion: Optional[int]
+    product_new_price: Optional[float]
 
 
 class ProductResponse(BaseModel):
@@ -60,6 +71,7 @@ class CartItem(BaseModel):
     product_name: str
     amount: int
     total_price: float
+
 
 class CartResponse(BaseModel):
     items: List[CartItem]

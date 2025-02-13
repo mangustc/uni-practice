@@ -72,7 +72,12 @@ class ProductService:
             article_characteristic_density=product_field.article.characteristic_density if product_field.article else None,
             article_characteristic_consist=product_field.article.characteristic_consist if product_field.article else None,
             article_measured_in=product_field.article.measured_in if product_field.article else None,
-            article_price=product_field.article.price if product_field.article else None
+            article_price=product_field.article.price if product_field.article else None,
+            product_new=product_field.new,
+            product_hit=product_field.hit,
+            product_promotion=product_field.promotion,
+            product_percent_promotion=product_field.percent_promotion,
+            product_new_price=product_field.new_price
         )
 
     @classmethod
@@ -81,12 +86,17 @@ class ProductService:
         async with new_session() as db:
             result = await db.execute(query)
         products = result.scalars().all()
-        return [
-            {
-                "product_name": p.name,
-                "article_measured_in": p.article.measured_in,
-                "article_price": p.article.price
-            } for p in products
+        return [GetProductSmallCardResponse(
+            product_id=p.id,
+            product_name=p.name,
+            article_measured_in=p.article.measured_in,
+            article_price=p.article.price,
+            product_new=p.new,
+            product_hit=p.hit,
+            product_promotion=p.promotion,
+            product_percent_promotion=p.percent_promotion,
+            product_new_price=p.new_price
+        ).__dict__ for p in products
         ]
 
     @classmethod
@@ -112,6 +122,11 @@ class ProductService:
                     article_characteristic_consist=p.article.characteristic_consist if p.article else None,
                     article_measured_in=p.article.measured_in if p.article else None,
                     article_price=p.article.price if p.article else None,
+                    product_new=p.new,
+                    product_hit=p.hit,
+                    product_promotion=p.promotion,
+                    product_percent_promotion=p.percent_promotion,
+                    product_new_price=p.new_price
                 )
             )
 
@@ -142,19 +157,64 @@ class ProductService:
             result = await db.execute(query)
         result = result.scalars().all()
 
-        return [
-            {"product_id": p.id,
-             "article_id": p.article_id,
-             "product_name": p.name,
-             "product_amount": p.amount,
-             "article_description": p.article.description,
-             "article_country": p.article.country,
-             "product_characteristic_color": p.characteristic_color,
-             "article_characteristic_width": p.article.characteristic_width,
-             "article_characteristic_density": p.article.characteristic_density,
-             "article_characteristic_consist": p.article.characteristic_consist,
-             "article_measured_in": p.article.measured_in,
-             "article_price": p.article.price} for p in result
+        return [GetProductResponse(
+            product_id=p.id,
+            article_id=p.article_id,
+            product_name=p.name,
+            product_amount=p.amount,
+            article_description=p.article.description,
+            article_country=p.article.country,
+            product_characteristic_color=p.characteristic_color,
+            article_characteristic_width=p.article.characteristic_width,
+            article_characteristic_density=p.article.characteristic_density,
+            article_characteristic_consist=p.article.characteristic_consist,
+            article_measured_in=p.article.measured_in,
+            article_price=p.article.price,
+            product_new=p.new,
+            product_hit=p.hit,
+            product_promotion=p.promotion,
+            product_percent_promotion=p.percent_promotion,
+            product_new_price=p.new_price
+        ).__dict__ for p in result
+        ]
+
+    @classmethod
+    async def get_products_by_category_name_small_card(cls, category_name: str):
+        query = select(Category).where(Category.name == category_name)
+        async with new_session() as db:
+            result = await db.execute(query)
+        result = result.scalars().first()
+        if result is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Категория с таким названием не найдена"
+            )
+
+        category_ids = []
+        categories = [result]
+        while len(categories) != 0:
+            temp = [elem.id for elem in categories]
+            category_ids.extend(temp)
+            query = select(Category).where(Category.parent_id.in_(temp))
+            async with new_session() as db:
+                result = await db.execute(query)
+            categories = result.scalars().all()
+        query = select(Product).join(Article).options(contains_eager(Product.article)).where(
+            Article.category_id.in_(category_ids))
+        async with new_session() as db:
+            result = await db.execute(query)
+        result = result.scalars().all()
+
+        return [GetProductSmallCardResponse(
+            product_id=p.id,
+            product_name=p.name,
+            article_measured_in=p.article.measured_in,
+            article_price=p.article.price,
+            product_new=p.new,
+            product_hit=p.hit,
+            product_promotion=p.promotion,
+            product_percent_promotion=p.percent_promotion,
+            product_new_price=p.new_price
+        ).__dict__ for p in result
         ]
 
     @classmethod
@@ -669,7 +729,6 @@ class ProductService:
                     detail="Не удалось изменить статус новинки",
                 )
 
-
     @classmethod
     async def set_product_hit(cls, request: Request, product_id: int, is_hit: bool):
         user_data = await Functions.get_user_data(request)
@@ -731,7 +790,7 @@ class ProductService:
 
     @classmethod
     async def set_product_promotion(
-            cls, request: Request, product_id: int, is_promotion: bool, procent_promotion: float
+            cls, request: Request, product_id: int, is_promotion: bool, percent_promotion: float
     ):
         user_data = await Functions.get_user_data(request)
         if user_data["user_role"] != "Админ":
@@ -757,22 +816,22 @@ class ProductService:
                 )
 
             if is_promotion:
-                if procent_promotion is None or not 0 < procent_promotion <= 100:
+                if percent_promotion is None or not 0 < percent_promotion <= 100:
                     raise HTTPException(
                         status_code=status.HTTP_400_BAD_REQUEST,
                         detail="Процент скидки должен быть указан в диапазоне от 1 до 100",
                     )
 
                 old_price = float(article_field.price)
-                discount_amount = old_price * (procent_promotion / 100)
+                discount_amount = old_price * (percent_promotion / 100)
                 new_price = old_price - discount_amount
 
                 product.promotion = is_promotion
-                product.procent_promotion = procent_promotion
+                product.percent_promotion = percent_promotion
                 product.new_price = new_price  # Store the discounted price
             else:
                 product.promotion = is_promotion
-                product.procent_promotion = None
+                product.percent_promotion = None
                 product.new_price = None  # Reset the discounted price
 
             try:
@@ -788,94 +847,91 @@ class ProductService:
 
     @classmethod
     async def get_promotion_products(cls):
+        query = select(Product).options(joinedload(Product.article)).where(
+            Product.promotion == True
+        )
         async with new_session() as db:
-            query = select(Product).options(joinedload(Product.article)).where(
-                Product.promotion == True
-            )
             result = await db.execute(query)
-            products = result.scalars().all()
+        products = result.scalars().all()
 
-            return [
-                {
-                    "product_id": p.id,
-                    "article_id": p.article_id,
-                    "product_name": p.name,
-                    "product_amount": p.amount,
-                    "article_description": p.article.description if p.article else None,
-                    "article_country": p.article.country if p.article else None,
-                    "product_characteristic_color": p.characteristic_color,
-                    "article_characteristic_width": p.article.characteristic_width if p.article else None,
-                    "article_characteristic_density": p.article.characteristic_density if p.article else None,
-                    "article_characteristic_consist": p.article.characteristic_consist if p.article else None,
-                    "article_price": p.article.price if p.article else None,
-                    "product_new_price": p.new_price,  # Используем поле new_price из Product
-                    "product_hit": p.hit,
-                    "product_promotion": p.promotion,
-                    "product_procent_promotion": p.procent_promotion,
-                    "product_new": p.new,
-                }
-                for p in products
-            ]
+        return [GetProductResponse(
+            product_id=p.id,
+            article_id=p.article_id,
+            product_name=p.name,
+            product_amount=p.amount,
+            article_description=p.article.description,
+            article_country=p.article.country,
+            product_characteristic_color=p.characteristic_color,
+            article_characteristic_width=p.article.characteristic_width,
+            article_characteristic_density=p.article.characteristic_density,
+            article_characteristic_consist=p.article.characteristic_consist,
+            article_measured_in=p.article.measured_in,
+            article_price=p.article.price,
+            product_new=p.new,
+            product_hit=p.hit,
+            product_promotion=p.promotion,
+            product_percent_promotion=p.percent_promotion,
+            product_new_price=p.new_price
+        ).__dict__ for p in products
+        ]
 
     @classmethod
     async def get_new_products(cls):
+        query = select(Product).options(joinedload(Product.article)).where(Product.new == True)
         async with new_session() as db:
-            query = select(Product).options(joinedload(Product.article)).where(Product.new == True)
             result = await db.execute(query)
-            products = result.scalars().all()
+        products = result.scalars().all()
 
-            return [
-                {
-                    "product_id": p.id,
-                    "article_id": p.article_id,
-                    "product_name": p.name,
-                    "product_amount": p.amount,
-                    "article_description": p.article.description,
-                    "article_country": p.article.country,
-                    "product_characteristic_color": p.characteristic_color,
-                    "article_characteristic_width": p.article.characteristic_width,
-                    "article_characteristic_density": p.article.characteristic_density,
-                    "article_characteristic_consist": p.article.characteristic_consist,
-                    "article_price": p.article.price,
-                    "product_new_price": p.new_price,
-                    "product_hit": p.hit,
-                    "product_promotion": p.promotion,
-                    "product_procent_promotion": p.procent_promotion,
-                    "product_new": p.new
-                }
-                for p in products
-            ]
+        return [GetProductResponse(
+            product_id=p.id,
+            article_id=p.article_id,
+            product_name=p.name,
+            product_amount=p.amount,
+            article_description=p.article.description,
+            article_country=p.article.country,
+            product_characteristic_color=p.characteristic_color,
+            article_characteristic_width=p.article.characteristic_width,
+            article_characteristic_density=p.article.characteristic_density,
+            article_characteristic_consist=p.article.characteristic_consist,
+            article_measured_in=p.article.measured_in,
+            article_price=p.article.price,
+            product_new=p.new,
+            product_hit=p.hit,
+            product_promotion=p.promotion,
+            product_percent_promotion=p.percent_promotion,
+            product_new_price=p.new_price
+        ).__dict__ for p in products
+        ]
 
     @classmethod
     async def get_hit_products(cls):
+        query = select(Product).options(joinedload(Product.article)).where(
+            Product.hit == True
+        )
         async with new_session() as db:
-            query = select(Product).options(joinedload(Product.article)).where(
-                Product.hit == True
-            )
             result = await db.execute(query)
-            products = result.scalars().all()
+        products = result.scalars().all()
 
-            return [
-                {
-                    "product_id": p.id,
-                    "article_id": p.article_id,
-                    "product_name": p.name,
-                    "product_amount": p.amount,
-                    "article_description": p.article.description,
-                    "country": p.article.country,
-                    "product_characteristic_color": p.characteristic_color,
-                    "article_characteristic_width": p.article.characteristic_width,
-                    "article_characteristic_density": p.article.characteristic_density,
-                    "article_characteristic_consist": p.article.characteristic_consist,
-                    "article_price": p.article.price,
-                    "product_new_price": p.new_price,
-                    "product_hit": p.hit,
-                    "product_promotion": p.promotion,
-                    "product_procent_promotion": p.procent_promotion,
-                    "product_new": p.new
-                }
-                for p in products
-            ]
+        return [GetProductResponse(
+            product_id=p.id,
+            article_id=p.article_id,
+            product_name=p.name,
+            product_amount=p.amount,
+            article_description=p.article.description,
+            article_country=p.article.country,
+            product_characteristic_color=p.characteristic_color,
+            article_characteristic_width=p.article.characteristic_width,
+            article_characteristic_density=p.article.characteristic_density,
+            article_characteristic_consist=p.article.characteristic_consist,
+            article_measured_in=p.article.measured_in,
+            article_price=p.article.price,
+            product_new=p.new,
+            product_hit=p.hit,
+            product_promotion=p.promotion,
+            product_percent_promotion=p.percent_promotion,
+            product_new_price=p.new_price
+        ).__dict__ for p in products
+        ]
 
 
 

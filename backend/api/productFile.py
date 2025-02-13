@@ -25,9 +25,15 @@ async def get_all_products():
     return await ProductService.get_all_products()
 
 
-@router.get("/{category_name}/GetProductsByCategoryName", # response_model=list[GetProductResponse],
+@router.get("/{category_name}/GetProductsByCategoryName", response_model=list[GetProductResponse],
             status_code=status.HTTP_200_OK)
 async def get_products_by_category_name(category_name: str):
+    return await ProductService.get_products_by_category_name(category_name)
+
+
+@router.get("/{category_name}/GetProductsByCategoryNameSmallCard", response_model=list[GetProductSmallCardResponse],
+            status_code=status.HTTP_200_OK)
+async def get_products_by_category_name_small_card(category_name: str):
     return await ProductService.get_products_by_category_name(category_name)
 
 
@@ -104,11 +110,11 @@ async def set_product_promotion_endpoint(
     request: Request,
     product_id: int,
     is_promotion: bool = Query(..., description="Set product as promotion (true/false)"),
-    procent_promotion: Optional[float] = Query(
+    percent_promotion: Optional[float] = Query(
         None, description="Promotion percentage (1-100), required if is_promotion=true"
     ),
 ):
-    return await ProductService.set_product_promotion(request, product_id, is_promotion, procent_promotion)
+    return await ProductService.set_product_promotion(request, product_id, is_promotion, percent_promotion)
 
 
 @router.get("/products/new", response_model=list[dict])
