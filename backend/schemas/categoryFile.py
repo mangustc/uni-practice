@@ -8,7 +8,7 @@ class AddCategoryRoot(BaseModel):
 
 class AddCategory(BaseModel):
     name: str
-    category_name_refers_to: Optional[str]
+    category_name_parent: Optional[str]
 
 
 class CategoryResponse(BaseModel):
