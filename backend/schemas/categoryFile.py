@@ -14,7 +14,7 @@ class AddCategory(BaseModel):
 class CategoryResponse(BaseModel):
     category_id: int
     category_name: str
-    category_parent: Optional[int]
+    category_parent_id: Optional[int]
 
     class Config:
         orm_mode = True
