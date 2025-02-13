@@ -9,6 +9,7 @@
   --text-color-black-main-80: #1a1a1acc;
   --text-color-black-main-70: #1a1a1ab3;
   --text-color-black-main-50: #1a1a1a80;
+  --text-color-black-main-20: #1a1a1a33;
 
   --text-weight-h: 700;
   --text-weight-p: 400;
@@ -103,4 +104,50 @@ p {
   line-height: var(--text-height-p);
   font-weight: var(--text-weight-p);
   color: var(--text-color-black-main-80);
+}
+
+.navigation-container {
+  height: 50px;
+  display: flex;
+  overflow: hidden;
+  flex-direction: row;
+  justify-content: space-between;
+  background-color: white;
+  min-width: 132px;
+  border-bottom: 1px solid black;
+  padding: 20px 90px 20px 90px;
+}
+/* 
+@media (max-width: 320px) {
+  .navigation-container {
+  }
+} */
+
+.catalog-button {
+  background: var(--text-color-red-main);
+  width: 185px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border-radius: 2px;
+}
+
+.search {
+  border: 1px solid var(--text-color-black-main-20);
+  border-radius: 2px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 18px;
+  padding-right: 18px;
+}
+
+.nav-panel-icons {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  height: 40px;
+  margin-right: 24px;
 }
