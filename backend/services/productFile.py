@@ -179,45 +179,6 @@ class ProductService:
         ]
 
     @classmethod
-    async def get_products_by_category_name_small_card(cls, category_name: str):
-        query = select(Category).where(Category.name == category_name)
-        async with new_session() as db:
-            result = await db.execute(query)
-        result = result.scalars().first()
-        if result is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Категория с таким названием не найдена"
-            )
-
-        category_ids = []
-        categories = [result]
-        while len(categories) != 0:
-            temp = [elem.id for elem in categories]
-            category_ids.extend(temp)
-            query = select(Category).where(Category.parent_id.in_(temp))
-            async with new_session() as db:
-                result = await db.execute(query)
-            categories = result.scalars().all()
-        query = select(Product).join(Article).options(contains_eager(Product.article)).where(
-            Article.category_id.in_(category_ids))
-        async with new_session() as db:
-            result = await db.execute(query)
-        result = result.scalars().all()
-
-        return [GetProductSmallCardResponse(
-            product_id=p.id,
-            product_name=p.name,
-            article_measured_in=p.article.measured_in,
-            article_price=p.article.price,
-            product_new=p.new,
-            product_hit=p.hit,
-            product_promotion=p.promotion,
-            product_percent_promotion=p.percent_promotion,
-            product_new_price=p.new_price
-        ).__dict__ for p in result
-        ]
-
-    @classmethod
     async def get_product_photo(cls, product_id: int):
         query = select(Product).where(Product.id == product_id)
         async with new_session() as db:
