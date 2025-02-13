@@ -9,7 +9,7 @@ function bool(obj, defaultValue) {
 }
 
 function str(obj, defaultValue) {
-  const out = Number(obj);
+  const out = String(obj);
   return out ? out : defaultValue ? defaultValue : "";
 }
 
@@ -34,5 +34,14 @@ export const NewCatalogFilters = function (obj) {
     productDensity: arr(obj.productDensity, str),
     productConsist: arr(obj.productConsist, str),
     productCountry: arr(obj.productCountry, str),
+  };
+};
+
+export const NewCategory = function (obj) {
+  obj = obj ? obj : {};
+  return {
+    categoryID: num(obj.category_id),
+    categoryName: str(obj.category_name),
+    categoryParentID: num(obj.category_parent_id),
   };
 };

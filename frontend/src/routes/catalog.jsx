@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import * as requests from "../requests";
 import * as objects from "../objects";
+import CatalogFilter from "../components/catalog-filter";
 
 export const Catalog = function () {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -16,5 +17,12 @@ export const Catalog = function () {
   const catalogFilters = objects.NewCatalogFilters(
     Object.fromEntries(searchParams),
   );
-  return <></>;
+  return (
+    <>
+      <CatalogFilter
+        initFilters={catalogFilters}
+        updateSearchParams={updateSearchParams}
+      />
+    </>
+  );
 };
