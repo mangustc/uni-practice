@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 import Header from "../components/header";
 import { createContext, useState } from "react";
 import Cookies from "universal-cookie";
+import Footer from "../components/footer";
 
 const cookies = new Cookies();
 export const AuthContext = createContext({
@@ -26,6 +27,7 @@ export default function Root() {
         </div>
       </div> */}
       <Header></Header>
+      <Footer></Footer>
     </AuthContext.Provider>
   );
 }
