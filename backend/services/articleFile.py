@@ -39,7 +39,6 @@ class ArticleService:
                 country=data.country,
                 measured_in=data.measured_in,
                 price=data.price,
-                characteristic_color=None,
                 characteristic_width=None,
                 characteristic_density=None,
                 characteristic_consist=None,
@@ -72,7 +71,6 @@ class ArticleService:
             "article_country": article.country,
             "article_measured_in": article.measured_in,
             "article_price": article.price,
-            "article_characteristic_color": article.characteristic_color,
             "article_characteristic_width": article.characteristic_width,
             "article_characteristic_density": article.characteristic_density,
             "article_characteristic_consist": article.characteristic_consist,
@@ -91,7 +89,6 @@ class ArticleService:
                 "article_country": a.country,
                 "article_measured_in": a.measured_in,
                 "article_price": a.price,
-                "article_characteristic_color": a.characteristic_color,
                 "article_characteristic_width": a.characteristic_width,
                 "article_characteristic_density": a.characteristic_density,
                 "article_characteristic_consist": a.characteristic_consist,
@@ -160,9 +157,6 @@ class ArticleService:
                     detail="Такого артикула не существует",
                 )
 
-            # Update only the provided characteristics
-            if data.characteristic_color is not None:
-                old_article.characteristic_color = data.characteristic_color
             if data.characteristic_width is not None:
                 old_article.characteristic_width = data.characteristic_width
             if data.characteristic_density is not None:

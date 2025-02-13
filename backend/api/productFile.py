@@ -124,3 +124,8 @@ async def get_promotion_products_endpoint():
 @router.get("/products/hit", response_model=list[dict])
 async def get_hit_products_endpoint():
     return await ProductService.get_hit_products()
+
+
+@router.get("/GetCart", response_model=CartResponse, status_code=status.HTTP_200_OK)
+async def get_user_cart(request: Request):
+    return await ProductService.get_user_cart(request)

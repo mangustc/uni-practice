@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 
 from pydantic import BaseModel
 from pydantic.types import PositiveFloat, PositiveInt
@@ -16,12 +16,12 @@ class GetProductResponse(BaseModel):
     article_id: int
     product_name: str
     product_amount: PositiveFloat
-    article_description: Optional[str]
-    country: Optional[str]
-    characteristic_color: Optional[str]
-    characteristic_width: Optional[str]
-    characteristic_density: Optional[str]
-    characteristic_consist: Optional[str]
+    article_description: Optional[str] = None
+    article_country: Optional[str] = None
+    product_characteristic_color: Optional[str] = None
+    article_characteristic_width: Optional[str] = None
+    article_characteristic_density: Optional[str] = None
+    article_characteristic_consist: Optional[str] = None
     article_measured_in: str
     article_price: PositiveInt
 
@@ -53,3 +53,14 @@ class OrderHistoryResponse(BaseModel):
     order_date: datetime
     total_amount: PositiveFloat
     payment_status: str
+
+
+class CartItem(BaseModel):
+    product_id: int
+    product_name: str
+    amount: int
+    total_price: float
+
+class CartResponse(BaseModel):
+    items: List[CartItem]
+    total_cart_price: float

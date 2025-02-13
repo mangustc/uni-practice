@@ -17,14 +17,12 @@ class GetArticleResponse(BaseModel):
     article_country: Optional[str]
     article_measured_in: str
     article_price: int
-    article_characteristic_color: Optional[str]
     article_characteristic_width: Optional[str]
     article_characteristic_density: Optional[str]
     article_characteristic_consist: Optional[str]
 
 
 class UpdateArticleCharacteristics(BaseModel):
-    characteristic_color: str
     characteristic_width: str
     characteristic_density: str
     characteristic_consist: str

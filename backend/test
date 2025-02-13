@@ -384,3 +384,25 @@
     #             await db.commit()
     #
     #             return {"message": "Оплата успешно проведена", "order_id": order.id}
+
+
+@classmethod
+    async def get_all_products(cls):
+        query = select(Product).options(joinedload(Product.article))
+        async with new_session() as db:
+            result = await db.execute(query)
+        products = result.scalars().all()
+        return [
+            {"product_id": p.id,
+             "article_id": p.article_id,
+             "product_name": p.name,
+             "product_amount": p.amount,
+             "article_description": p.article.description,
+             "article_country": p.article.country,
+             "product_characteristic_color": p.characteristic_color,
+             "article_characteristic_width": p.article.characteristic_width,
+             "article_characteristic_density": p.article.characteristic_density,
+             "article_characteristic_consist": p.article.characteristic_consist,
+             "article_measured_in": p.article.measured_in,
+             "article_price": p.article.price} for p in products
+        ]

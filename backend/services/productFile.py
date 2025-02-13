@@ -53,25 +53,27 @@ class ProductService:
         query = select(Product).options(joinedload(Product.article)).where(Product.id == product_id)
         async with new_session() as db:
             result = await db.execute(query)
-        product_field = result.scalars().first()
+            product_field = result.scalars().first()
+
         if not product_field:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Продукт не найден"
             )
-        return {
-            "product_id": product_field.id,
-            "article_id": product_field.article_id,
-            "product_name": product_field.name,
-            "product_amount": product_field.amount,
-            "article_description": product_field.article.description,
-            "country": product_field.article.country,
-            "characteristic_color": product_field.article.characteristic_color,
-            "characteristic_width": product_field.article.characteristic_width,
-            "characteristic_density": product_field.article.characteristic_density,
-            "characteristic_consist": product_field.article.characteristic_consist,
-            "article_measured_in": product_field.article.measured_in,
-            "article_price": product_field.article.price
-        }  # Correct format
+
+        return GetProductResponse(
+            product_id=product_field.id,
+            article_id=product_field.article_id,
+            product_name=product_field.name,
+            product_amount=product_field.amount,
+            article_description=product_field.article.description if product_field.article else None,
+            article_country=product_field.article.country if product_field.article else None,
+            product_characteristic_color=product_field.characteristic_color,
+            article_characteristic_width=product_field.article.characteristic_width if product_field.article else None,
+            article_characteristic_density=product_field.article.characteristic_density if product_field.article else None,
+            article_characteristic_consist=product_field.article.characteristic_consist if product_field.article else None,
+            article_measured_in=product_field.article.measured_in if product_field.article else None,
+            article_price=product_field.article.price if product_field.article else None
+        )
 
     @classmethod
     async def get_all_products_small_card(cls):
@@ -88,25 +90,32 @@ class ProductService:
         ]
 
     @classmethod
-    async def get_all_products(cls):
+    async def get_all_products(cls) -> List[GetProductResponse]:  # Add return type hint
         query = select(Product).options(joinedload(Product.article))
         async with new_session() as db:
             result = await db.execute(query)
-        products = result.scalars().all()
-        return [
-            {"product_id": p.id,
-             "article_id": p.article_id,
-             "product_name": p.name,
-             "product_amount": p.amount,
-             "article_description": p.article.description,
-             "country": p.article.country,
-             "characteristic_color": p.article.characteristic_color,
-             "characteristic_width": p.article.characteristic_width,
-             "characteristic_density": p.article.characteristic_density,
-             "characteristic_consist": p.article.characteristic_consist,
-             "article_measured_in": p.article.measured_in,
-             "article_price": p.article.price} for p in products
-        ]  # Correct format
+            products = result.scalars().all()
+
+        product_list: List[GetProductResponse] = []
+        for p in products:
+            product_list.append(
+                GetProductResponse(
+                    product_id=p.id,
+                    article_id=p.article_id,
+                    product_name=p.name,
+                    product_amount=p.amount,
+                    article_description=p.article.description if p.article else None,
+                    article_country=p.article.country if p.article else None,
+                    product_characteristic_color=p.characteristic_color,
+                    article_characteristic_width=p.article.characteristic_width if p.article else None,
+                    article_characteristic_density=p.article.characteristic_density if p.article else None,
+                    article_characteristic_consist=p.article.characteristic_consist if p.article else None,
+                    article_measured_in=p.article.measured_in if p.article else None,
+                    article_price=p.article.price if p.article else None,
+                )
+            )
+
+        return product_list
 
     @classmethod
     async def get_products_by_category_name(cls, category_name: str):
@@ -139,14 +148,14 @@ class ProductService:
              "product_name": p.name,
              "product_amount": p.amount,
              "article_description": p.article.description,
-             "country": p.article.country,
-             "characteristic_color": p.article.characteristic_color,
-             "characteristic_width": p.article.characteristic_width,
-             "characteristic_density": p.article.characteristic_density,
-             "characteristic_consist": p.article.characteristic_consist,
+             "article_country": p.article.country,
+             "product_characteristic_color": p.characteristic_color,
+             "article_characteristic_width": p.article.characteristic_width,
+             "article_characteristic_density": p.article.characteristic_density,
+             "article_characteristic_consist": p.article.characteristic_consist,
              "article_measured_in": p.article.measured_in,
              "article_price": p.article.price} for p in result
-        ]  # Correct format
+        ]
 
     @classmethod
     async def get_product_photo(cls, product_id: int):
@@ -412,6 +421,49 @@ class ProductService:
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail="Не удалось убрать продукт из корзины",
                 )
+
+    @classmethod
+    async def get_user_cart(cls, request: Request) -> CartResponse:
+        user_data = await Functions.get_user_data(request)
+        async with new_session() as db:
+            query = select(Cart).where(Cart.user_id == user_data["user_id"])
+            cart_items = await db.execute(query)
+            cart_items = cart_items.scalars().all()
+
+            items: List[CartItem] = []
+            total_cart_price: float = 0.0
+
+            for cart_item in cart_items:
+                product_query = select(Product).where(Product.id == cart_item.product_id)
+                product_result = await db.execute(product_query)
+                product = product_result.scalars().first()
+
+                if product:
+                    article_query = select(Article).where(Article.id == product.article_id)
+                    article_result = await db.execute(article_query)
+                    article = article_result.scalars().first()
+
+                    if article:
+                        price = product.new_price if product.promotion and product.new_price is not None else article.price
+
+                        total_price = cart_item.amount * price
+
+                        item = CartItem(
+                            product_id=cart_item.product_id,
+                            product_name=product.name,
+                            amount=cart_item.amount,
+                            total_price=total_price,
+                        )
+                        items.append(item)
+                        total_cart_price += total_price
+                    else:
+                        await db.delete(cart_item)
+                        await db.commit()
+                else:
+                    await db.delete(cart_item)
+                    await db.commit()
+
+            return CartResponse(items=items, total_cart_price=total_cart_price)
 
     @classmethod
     async def place_order(cls, request: Request):
@@ -750,18 +802,18 @@ class ProductService:
                     "product_name": p.name,
                     "product_amount": p.amount,
                     "article_description": p.article.description,
-                    "country": p.article.country,
-                    "characteristic_color": p.article.characteristic_color,
-                    "characteristic_width": p.article.characteristic_width,
-                    "characteristic_density": p.article.characteristic_density,
-                    "characteristic_consist": p.article.characteristic_consist,
-                    # "article_price": p.article.price,
-                    # "hit": p.hit,
-                    # "promotion": p.promotion,
-                    # "procent_promotion": p.procent_promotion,
-                    # "new": p.new,
-                    # "old_price": p.old_price,
-                    # "new_price": p.new_price,
+                    "article_country": p.article.country,
+                    "product_characteristic_color": p.characteristic_color,
+                    "article_characteristic_width": p.article.characteristic_width,
+                    "article_characteristic_density": p.article.characteristic_density,
+                    "article_characteristic_consist": p.article.characteristic_consist,
+                    "article_price": p.article.price,
+                    "product_hit": p.hit,
+                    "product_promotion": p.promotion,
+                    "product_procent_promotion": p.procent_promotion,
+                    "product_new": p.new,
+                    "product_old_price": p.old_price,
+                    "product_new_price": p.new_price,
                 }
                 for p in products
             ]
@@ -780,18 +832,18 @@ class ProductService:
                     "product_id": p.id,
                     "article_id": p.article_id,
                     "product_name": p.name,
-                    # "product_amount": p.amount,
+                    "product_amount": p.amount,
                     "article_description": p.article.description,
-                    "country": p.article.country,
-                    "characteristic_color": p.article.characteristic_color,
-                    "characteristic_width": p.article.characteristic_width,
-                    "characteristic_density": p.article.characteristic_density,
-                    "characteristic_consist": p.article.characteristic_consist,
-                    # "article_price": p.article.price,
-                    # "hit": p.hit,
-                     "promotion": p.promotion,
-                    # "procent_promotion": p.procent_promotion,
-                    # "new": p.new,
+                    "article_country": p.article.country,
+                    "product_characteristic_color": p.characteristic_color,
+                    "article_characteristic_width": p.article.characteristic_width,
+                    "article_characteristic_density": p.article.characteristic_density,
+                    "article_characteristic_consist": p.article.characteristic_consist,
+                    "article_price": p.article.price,
+                    "product_hit": p.hit,
+                    "product_promotion": p.promotion,
+                    "product_procent_promotion": p.procent_promotion,
+                    "new": p.new,
                     "old_price": p.old_price,
                     "new_price": p.new_price,
                 }
