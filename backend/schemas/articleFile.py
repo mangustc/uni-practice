@@ -22,6 +22,20 @@ class GetArticleResponse(BaseModel):
     article_characteristic_consist: Optional[str]
 
 
+class AddCharacteristic(BaseModel):
+    property_name: str
+    property_value_name: str
+
+
+class AddCharacteristicResponse(BaseModel):
+    article_id: int
+    property_value_id: int
+
+
+class GetCharacteristicResponse(AddCharacteristic):
+    pass
+
+
 class UpdateArticleCharacteristics(BaseModel):
     characteristic_width: str
     characteristic_density: str

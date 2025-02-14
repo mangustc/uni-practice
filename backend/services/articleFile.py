@@ -3,10 +3,10 @@ from datetime import date
 from typing import Sequence
 from fastapi import UploadFile, HTTPException, status, Request
 from fastapi.responses import FileResponse
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, contains_eager
 from database import *
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import select, delete, Select
+from sqlalchemy import select, delete, Select, and_
 from schemas import *
 from Function import Functions
 from uuid import uuid4
@@ -53,6 +53,141 @@ class ArticleService:
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail="Не удалось добавить артикул",
+                )
+
+    @classmethod
+    async def add_characteristic(cls, request: Request, article_id: int, data: AddCharacteristic):
+        user_data = await Functions.get_user_data(request)
+        if user_data["user_role"] != "Админ":
+            raise HTTPException(
+                status_code=403, detail="Только администраторы могут добавлять характеристики"
+            )
+
+        query = Select(Article).options(
+            joinedload(Article.characteristics)
+            .joinedload(Characteristic.property_value)
+            .joinedload(PropertyValue.property)).where(Article.id == article_id)
+        async with new_session() as db:
+            article = await db.execute(query)
+            article = article.scalars().first()
+            if article is None:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Артикула с таким id не существует",
+                )
+            query = select(PropertyValue).join(Property).where(and_(Property.name == data.property_name,
+                                                                    PropertyValue.name == data.property_value_name))
+            result = await db.execute(query)
+            result = result.scalars().first()
+            if result is None:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Свойства/значения с таким именем не существует",
+                )
+            for characteristic in article.characteristics:
+                if characteristic.property_value.property.id == result.property_id:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail="У артикула уже есть характеристика с таким свойством",
+                    )
+            new_characteristic = Characteristic(
+                article_id=article_id,
+                property_value_id=result.id
+            )
+            db.add(new_characteristic)
+            try:
+                await db.commit()
+                await db.refresh(new_characteristic)
+                return AddCharacteristicResponse(article_id=article_id, property_value_id=result.id)
+            except IntegrityError:
+                await db.rollback()
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Не удалось добавить характеристику",
+                )
+
+    @classmethod
+    async def get_characteristics_by_article_id(cls, article_id: int):
+        query = select(Characteristic).options(
+            joinedload(Characteristic.property_value)
+            .joinedload(PropertyValue.property)).where(Characteristic.article_id == article_id)
+        async with new_session() as db:
+            result = await db.execute(query)
+        characteristics = result.scalars().all()
+        return [GetCharacteristicResponse(
+            property_name=c.property_value.property.name,
+            property_value_name=c.property_value.name
+        ).__dict__ for c in characteristics
+        ]
+
+    @classmethod
+    async def update_characteristic(cls, request: Request, article_id: int, data: AddCharacteristic):
+        user_data = await Functions.get_user_data(request)
+        if user_data["user_role"] != "Админ":
+            raise HTTPException(
+                status_code=403, detail="Только администраторы могут изменять характеристики"
+            )
+        query = select(Characteristic).join(PropertyValue).join(Property).where(
+            and_(Characteristic.article_id == article_id, Property.name == data.property_name))
+        async with new_session() as db:
+            result = await db.execute(query)
+            characteristic = result.scalars().first()
+            if characteristic is None:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Артикул/характеристика с указанными значениями не существует"
+                )
+            query = select(PropertyValue).join(Property).where(
+                and_(PropertyValue.name == data.property_value_name, Property.name == data.property_name))
+            result = await db.execute(query)
+            result = result.scalars().first()
+            if result is None:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Данного значения для свойства не существует"
+                )
+            characteristic.property_value_id = result.id
+            try:
+                await db.commit()
+                await db.refresh(characteristic)
+                return GetCharacteristicResponse(
+                    property_name=data.property_name,
+                    property_value_name=data.property_value_name
+                )
+            except IntegrityError:
+                await db.rollback()
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Не удалось обновить информацию об характеристике",
+                )
+
+
+    @classmethod
+    async def delete_characteristic_by_property_name(cls, request: Request, article_id: int, property_name: str):
+        user_data = await Functions.get_user_data(request)
+        if user_data["user_role"] != "Админ":
+            raise HTTPException(
+                status_code=403, detail="Только администраторы могут удалять характеристики"
+            )
+        query = select(Characteristic).join(PropertyValue).join(Property).where(
+            and_(Characteristic.article_id == article_id, Property.name == property_name))
+        async with new_session() as db:
+            result = await db.execute(query)
+            result = result.scalars().first()
+            if result is None:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Артикул/характеристика с указанными значениями не существует"
+                )
+            await db.delete(result)
+            try:
+                await db.commit()
+                return {"message": "Характеристика успешна удалёна"}
+            except IntegrityError:
+                await db.rollback()
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Не удалось удалить характеристику",
                 )
 
     @classmethod

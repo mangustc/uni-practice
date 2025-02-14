@@ -30,8 +30,8 @@ class User(Base):
     organization_name = Column(String, nullable=True)
     INN = Column(Integer, nullable=True)
 
-    orders = relationship("Order", back_populates="user", cascade="all, delete", passive_deletes=True)
-    wishlist = relationship("Wishlist", back_populates="user", cascade="all, delete", passive_deletes=True)
+    orders = relationship("Order", cascade="all, delete", passive_deletes=True)
+    wishlist = relationship("Wishlist", cascade="all, delete", passive_deletes=True)
 
 
 class Article(Base):
@@ -47,6 +47,7 @@ class Article(Base):
     price = Column(Integer, nullable=False)
 
     category = relationship("Category", back_populates="articles")
+    characteristics = relationship("Characteristic", cascade="all, delete", passive_deletes=True)
     products = relationship("Product", back_populates="article", cascade="all, delete", passive_deletes=True)
 
 
@@ -68,8 +69,31 @@ class Product(Base):
     last_hit_date = Column(DateTime, nullable=True)
 
     article = relationship("Article", back_populates="products")
-    wishlists = relationship("Wishlist", back_populates="product", cascade="all, delete", passive_deletes=True)
-    carts = relationship("Cart", back_populates="product", cascade="all, delete", passive_deletes=True)
+
+
+class Property(Base):
+    __tablename__ = "property"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String, nullable=False)
+
+    values = relationship("PropertyValue", back_populates="property", cascade="all, delete", passive_deletes=True)
+
+
+class PropertyValue(Base):
+    __tablename__ = "property_value"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    property_id = Column(Integer, ForeignKey("property.id",  ondelete="CASCADE"), nullable=False)
+    name = Column(String, nullable=False)
+
+    property = relationship("Property", back_populates="values")
+
+
+class Characteristic(Base):
+    __tablename__ = "characteristic"
+    article_id = Column(Integer, ForeignKey("article.id",  ondelete="CASCADE"), primary_key=True, nullable=False)
+    property_value_id = Column(Integer, ForeignKey("property_value.id",  ondelete="CASCADE"), primary_key=True, nullable=False)
+
+    property_value = relationship("PropertyValue")
 
 
 class Wishlist(Base):
@@ -77,8 +101,7 @@ class Wishlist(Base):
     user_id = Column(Integer, ForeignKey("user.id",  ondelete="CASCADE"), primary_key=True)
     product_id = Column(Integer, ForeignKey("product.id",  ondelete="CASCADE"), primary_key=True)
 
-    user = relationship("User", back_populates="wishlist")
-    product = relationship("Product", back_populates="wishlists")
+    product = relationship("Product")
 
 
 class Cart(Base):
@@ -87,7 +110,7 @@ class Cart(Base):
     product_id = Column(Integer, ForeignKey("product.id",  ondelete="CASCADE"), primary_key=True)
     amount = Column(Float, nullable=False)
 
-    product = relationship("Product", back_populates="carts")
+    product = relationship("Product")
 
 
 class Order(Base):
@@ -99,9 +122,7 @@ class Order(Base):
     payment_status = Column(String, nullable=False, default="pending")  # "pending", "paid", "failed"
     items = Column(String, nullable=True)  # JSON строка списка товаров
     delivery_service_id = Column(Integer, ForeignKey("delivery_service.id", ondelete="CASCADE"), nullable=True)
-    user = relationship("User", back_populates="orders")
     delivery_service = relationship("DeliveryService", back_populates="orders")
-
 
 
 class DeliveryService(Base):
