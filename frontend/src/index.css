@@ -49,11 +49,14 @@
 
   --text-size-p: 15px;
   --text-height-p: 22px;
+
+  --color-background: white;
 }
 
 body {
   margin: 0;
   width: 100%;
+  background-color: var(--color-background);
 }
 
 * {
