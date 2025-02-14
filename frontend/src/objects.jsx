@@ -27,8 +27,8 @@ export const NewCatalogFilters = function (obj) {
   return {
     categoryID: num(obj.categoryID),
     productsOnlyInStock: bool(obj.productsOnlyInStock),
-    articlePriceStart: bool(obj.productPriceStart),
-    articlePriceEnd: bool(obj.productPriceEnd),
+    articlePriceStart: num(obj.productPriceStart),
+    articlePriceEnd: num(obj.productPriceEnd),
     productColors: arr(obj.productColors, str),
     productWidth: arr(obj.productWidth, str),
     productDensity: arr(obj.productDensity, str),
