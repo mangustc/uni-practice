@@ -37,7 +37,7 @@ class User(Base):
 class Article(Base):
     __tablename__ = "article"
     id = Column(Integer, primary_key=True)
-    category_id = Column(Integer, ForeignKey("category.id"))
+    category_id = Column(Integer, ForeignKey("category.id",  ondelete="CASCADE"))
     description = Column(String, nullable=True)
     country = Column(String, nullable=True)
     characteristic_width = Column(String, nullable=True)
@@ -74,8 +74,8 @@ class Product(Base):
 
 class Wishlist(Base):
     __tablename__ = "wishlist"
-    user_id = Column(Integer, ForeignKey("user.id"), primary_key=True)
-    product_id = Column(Integer, ForeignKey("product.id"), primary_key=True)
+    user_id = Column(Integer, ForeignKey("user.id",  ondelete="CASCADE"), primary_key=True)
+    product_id = Column(Integer, ForeignKey("product.id",  ondelete="CASCADE"), primary_key=True)
 
     user = relationship("User", back_populates="wishlist")
     product = relationship("Product", back_populates="wishlists")
@@ -83,8 +83,8 @@ class Wishlist(Base):
 
 class Cart(Base):
     __tablename__ = "cart"
-    user_id = Column(Integer, ForeignKey("user.id"), primary_key=True)
-    product_id = Column(Integer, ForeignKey("product.id"), primary_key=True)
+    user_id = Column(Integer, ForeignKey("user.id",  ondelete="CASCADE"), primary_key=True)
+    product_id = Column(Integer, ForeignKey("product.id",  ondelete="CASCADE"), primary_key=True)
     amount = Column(Float, nullable=False)
 
     product = relationship("Product", back_populates="carts")
@@ -93,7 +93,7 @@ class Cart(Base):
 class Order(Base):
     __tablename__ = "order"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey("user.id"))
+    user_id = Column(Integer, ForeignKey("user.id",  ondelete="CASCADE"))
     order_date = Column(DateTime, default=datetime.utcnow)
     total_amount = Column(Float, nullable=False)
     payment_status = Column(String, nullable=False, default="pending")  # "pending", "paid", "failed"
@@ -107,7 +107,7 @@ class Category(Base):
     __tablename__ = "category"
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
-    parent_id = Column(Integer, ForeignKey("category.id"), nullable=True)
+    parent_id = Column(Integer, ForeignKey("category.id",  ondelete="CASCADE"), nullable=True)
 
     parent = relationship("Category", remote_side=[id], backref="children", cascade="all, delete", passive_deletes=True)
     articles = relationship("Article", back_populates="category", cascade="all, delete", passive_deletes=True)
