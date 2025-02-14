@@ -22,7 +22,9 @@ venv
 .venv
 docs.zip
 archive.zip
-images
+images/*
+migrations/versions/*
+!**.gitkeep
 
 # vim temporary files
 *~

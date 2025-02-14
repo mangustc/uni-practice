@@ -182,15 +182,13 @@ class ArticleService:
             raise HTTPException(
                 status_code=403, detail="Только администраторы могут удалять артикулы"
             )
-
+        query = delete(Article).where(Article.id == article_id).returning(Article.id)
         async with new_session() as db:
-            article = await db.get(Article, article_id)
-            if not article:
+            result = await db.execute(query)
+            if result.scalars().first() is None:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND, detail="Артикул не найден"
                 )
-
-            await db.delete(article)
             try:
                 await db.commit()
                 return {"message": "Артикул успешно удалён"}

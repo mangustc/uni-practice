@@ -10,6 +10,14 @@ class CreateProduct(BaseModel):
     name: str
     amount: PositiveFloat
 
+class ProductColorResponse(BaseModel):
+    product_id: int
+    product_name: str
+    characteristic_color: str
+
+class UpdateProductColorRequest(BaseModel):
+    new_color: str
+
 
 class GetProductResponse(BaseModel):
     product_id: int
@@ -43,15 +51,45 @@ class GetProductSmallCardResponse(BaseModel):
     product_new_price: Optional[float]
 
 
-class ProductResponse(BaseModel):
-    product_id: int
-    product_name: str
+class DeliveryServiceBase(BaseModel):
+    name: str
+    description: Optional[str] = None
+    price: PositiveFloat
 
+
+class DeliveryServiceCreate(DeliveryServiceBase):
+    pass
+
+
+class DeliveryServiceResponse(DeliveryServiceBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+class OrderItem(BaseModel):
+  product_id: int
+  amount: float
+
+class PlaceOrderRequest(BaseModel):
+    delivery_service_id: int
+    class Config:
+        orm_mode = True
 
 class PlaceOrderResponse(BaseModel):
     order_id: int
     total_amount: PositiveFloat
     message: str
+
+class ProductResponse(BaseModel):
+    product_id: int
+    product_name: str
+#
+#
+# class PlaceOrderResponse(BaseModel):
+#     order_id: int
+#     total_amount: PositiveFloat
+#     message: str
 
 
 class PayOrderResponse(BaseModel):

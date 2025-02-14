@@ -3,5 +3,5 @@ from typing import List, Dict
 
 
 class OrderCreate(BaseModel):
-    items: List[Dict[int, float]]  #Список товаров в корзине с Product_id и количеством
+    items: List[Dict[int, float]]
     delivery_address: str

@@ -52,6 +52,11 @@ async def update_product_information(request: Request, product_id: int, data: Cr
     return await ProductService.update_product_information(request, product_id, data)
 
 
+@router.patch("/{product_id}/color", response_model=ProductColorResponse, status_code=status.HTTP_200_OK)
+async def update_product_color(request: Request, product_id: int, data: UpdateProductColorRequest):
+    return await ProductService.update_product_color(request, product_id, data)
+
+
 @router.delete("/{product_id}/Delete", response_model=Message, status_code=status.HTTP_200_OK)
 async def delete_product(request: Request, product_id: int):
     return await ProductService.delete_product(request, product_id)
@@ -84,9 +89,9 @@ async def set_product_new_endpoint(
     return await ProductService.set_product_new(request, product_id, is_new)
 
 
-@router.post("/orders", response_model=PlaceOrderResponse, status_code=status.HTTP_201_CREATED)
-async def create_order(request: Request):
-    return await ProductService.place_order(request=request)
+# @router.post("/orders", response_model=PlaceOrderResponse, status_code=status.HTTP_201_CREATED)
+# async def create_order(request: Request):
+#     return await ProductService.place_order(request=request)
 
 
 @router.put("/{order_id}/pay", response_model=PayOrderResponse, status_code=status.HTTP_200_OK)
@@ -135,3 +140,7 @@ async def get_hit_products_endpoint():
 @router.get("/GetCart", response_model=CartResponse, status_code=status.HTTP_200_OK)
 async def get_user_cart(request: Request):
     return await ProductService.get_user_cart(request)
+
+@router.post("/orders", response_model=PlaceOrderResponse, status_code=status.HTTP_201_CREATED)
+async def create_order(request: Request, order_request: PlaceOrderRequest):
+    return await ProductService.place_order(request=request, order_request=order_request)
