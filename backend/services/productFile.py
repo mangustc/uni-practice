@@ -279,6 +279,42 @@ class ProductService:
                     detail="Не удалось обновить информацию о продукте",
                 )
 
+    @staticmethod
+    async def update_product_color(request: Request, product_id: int, data: UpdateProductColorRequest):
+        user_data = await Functions.get_user_data(request)
+
+        if user_data["user_role"] != "Админ":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Только администраторы могут изменять цвет продукта",
+            )
+
+        async with new_session() as db:
+            product = await db.execute(select(Product).where(Product.id == product_id))
+            product = product.scalars().first()
+
+            if not product:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Продукт с указанным ID не найден",
+                )
+
+            product.characteristic_color = data.new_color
+
+            try:
+                await db.commit()
+                await db.refresh(product)
+                return ProductColorResponse(
+                    product_id=product.id,
+                    product_name=product.name,
+                    characteristic_color=product.characteristic_color,
+                )
+            except IntegrityError:
+                await db.rollback()
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Не удалось обновить цвет продукта",
+                )
     @classmethod
     async def delete_product(cls, request: Request, product_id: int):
         user_data = await Functions.get_user_data(request)

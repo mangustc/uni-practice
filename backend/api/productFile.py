@@ -52,6 +52,11 @@ async def update_product_information(request: Request, product_id: int, data: Cr
     return await ProductService.update_product_information(request, product_id, data)
 
 
+@router.patch("/{product_id}/color", response_model=ProductColorResponse, status_code=status.HTTP_200_OK)
+async def update_product_color(request: Request, product_id: int, data: UpdateProductColorRequest):
+    return await ProductService.update_product_color(request, product_id, data)
+
+
 @router.delete("/{product_id}/Delete", response_model=Message, status_code=status.HTTP_200_OK)
 async def delete_product(request: Request, product_id: int):
     return await ProductService.delete_product(request, product_id)

@@ -10,6 +10,14 @@ class CreateProduct(BaseModel):
     name: str
     amount: PositiveFloat
 
+class ProductColorResponse(BaseModel):
+    product_id: int
+    product_name: str
+    characteristic_color: str
+
+class UpdateProductColorRequest(BaseModel):
+    new_color: str
+
 
 class GetProductResponse(BaseModel):
     product_id: int
