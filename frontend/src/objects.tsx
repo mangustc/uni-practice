@@ -12,6 +12,7 @@ export type CatalogFilterIn = {
   productDensity?: string[];
   productConsist?: string[];
   productCountry?: string[];
+  [key: string]: any;
 };
 
 export type CatalogFilter = {
@@ -44,6 +45,7 @@ export type CategoryIn = {
   category_id?: number;
   category_name?: string;
   category_parent_id?: number;
+  [key: string]: any;
 };
 
 export type Category = {
