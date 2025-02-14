@@ -9,24 +9,24 @@ export const AuthContext = createContext({
   authenticated: (() => {
     return cookies.get("token") ? true : false;
   })(),
-  setAuthenticated: (auth) => {},
+  setAuthenticated: (auth: boolean) => {},
 });
 
 export default function Root() {
   const [authenticated, setAuthenticated] = useState(
     (() => {
       return cookies.get("token") ? true : false;
-    })()
+    })(),
   );
   return (
     <AuthContext.Provider value={{ authenticated, setAuthenticated }}>
-      {/* <div className="root-container">
+      <Header></Header>
+      <div className="root-container">
         <span>Hello world</span>
         <div className="outlet-container">
           <Outlet />
         </div>
-      </div> */}
-      <Header></Header>
+      </div>
       <Footer></Footer>
     </AuthContext.Provider>
   );

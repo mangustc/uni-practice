@@ -1,12 +1,12 @@
-import * as objects from "./objects";
+import * as objects from "./objects.tsx";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+const BACKEND_URL: string = import.meta.env.VITE_BACKEND_URL;
 const HEADER_JSON = {
   "Content-Type": "application/json",
   accept: "application/json",
 };
 
-export const GET_GetCategoryList = async function () {
+export async function GET_GetCategoryList() {
   // let response = await fetch(BACKEND_URL + "/dish/get_dishes", {
   //   method: "POST",
   //   headers: HEADER_JSON,
@@ -42,4 +42,4 @@ export const GET_GetCategoryList = async function () {
       category_parent_id: 3,
     }),
   ];
-};
+}

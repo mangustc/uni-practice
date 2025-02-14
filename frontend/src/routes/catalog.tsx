@@ -1,17 +1,16 @@
-import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import * as requests from "../requests";
 import * as objects from "../objects";
 import CatalogFilter from "../components/catalog-filter";
 
 export const Catalog = function () {
   const [searchParams, setSearchParams] = useSearchParams();
-  const updateSearchParams = function (newFilters) {
+  const updateSearchParams = function (newFilters: objects.CatalogFilter) {
     const newSearchParams = new URLSearchParams();
     for (let filter in newFilters) {
+      // @ts-expect-error
       newSearchParams.set(filter, newFilters[filter]);
     }
-    setSearchParams(newParams);
+    setSearchParams(newSearchParams);
   };
 
   const catalogFilters = objects.NewCatalogFilters(
