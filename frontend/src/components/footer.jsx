@@ -35,9 +35,40 @@ export default function Footer() {
             </div>
           </div>
           <div className="footer-contacts">
-            <span>Phone</span>
-            <span>Офис продаж</span>
-            <span>pochta</span>
+            <span className="footer-phone">8-800-250-8045</span>
+            <span
+              style={{
+                fontWeight: 400,
+                fontSize: "14px",
+                color: "var(--text-color-black-main-50)",
+                marginBottom: "40px",
+                height: "16px",
+              }}
+            >
+              офис продаж
+            </span>
+            <span className="footer-mail">support@wrose.ru</span>
+            <div className="footer-vk">
+              <img src="vk-logo.svg" alt="" />
+            </div>
+          </div>
+        </div>
+        <div className="footer-bot">
+          <div className="display-column">
+            <div className="footer-icons">
+              <img src="/mastercard.svg" alt="" />
+              <img src="/visa.svg" alt="" />
+              <img src="/mir.svg" alt="" />
+            </div>
+            <span className="footer-bot-text">
+              Текстиль-центр "Белая роза" © 2014-2025
+            </span>
+          </div>
+          <div className="footer-info-links">
+            <span className="footer-bot-text hover-text">
+              Политика конфиденциальности
+            </span>
+            <span className="footer-bot-text hover-text">Cookies</span>
           </div>
         </div>
       </div>
