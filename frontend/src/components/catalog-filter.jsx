@@ -62,7 +62,9 @@ const HTML_PrintTree = function (treeObj) {
 };
 
 const CatalogFilter = function ({ initFilters, updateSearchParams }) {
-  const [filters, setFilters] = useState(initFilters);
+  const [filters, setFilters] = useState(util.DeepClone(initFilters));
+  const setFiltersAttr = util.GetSetObjectAttrtibuteFunc(setFilters);
+
   const [categoryList, setCategoryList] = useState([]);
   useEffect(() => {
     requests.GET_GetCategoryList().then((categoryList) => {
@@ -73,6 +75,20 @@ const CatalogFilter = function ({ initFilters, updateSearchParams }) {
   return (
     <>
       <div>{HTML_PrintTree({ val: null, children: categoryTree })}</div>
+      <div style={{ display: "flex", flexDirection: "row" }}>
+        <input
+          type="number"
+          value={filters.articlePriceStart}
+          onChange={(e) => {
+            setFiltersAttr("articlePriceStart", e.target.value);
+          }}
+        />
+        <input
+          type="number"
+          value={filters.articlePriceEnd}
+          onChange={(e) => setFiltersAttr("articlePriceEnd", e.target.value)}
+        />
+      </div>
     </>
   );
 };
