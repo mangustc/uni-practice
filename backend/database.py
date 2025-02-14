@@ -98,8 +98,19 @@ class Order(Base):
     total_amount = Column(Float, nullable=False)
     payment_status = Column(String, nullable=False, default="pending")  # "pending", "paid", "failed"
     items = Column(String, nullable=True)  # JSON строка списка товаров
-
+    delivery_service_id = Column(Integer, ForeignKey("delivery_service.id", ondelete="CASCADE"), nullable=True)
     user = relationship("User", back_populates="orders")
+    delivery_service = relationship("DeliveryService", back_populates="orders")
+
+
+
+class DeliveryService(Base):
+    __tablename__ = "delivery_service"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String, nullable=False)
+    description = Column(String, nullable=True)
+    price = Column(Float, nullable=False)
+    orders = relationship("Order", back_populates="delivery_service")
 
 
 # КатегорииТоваров

@@ -522,16 +522,84 @@ class ProductService:
 
             return CartResponse(items=items, total_cart_price=total_cart_price)
 
+    # @classmethod
+    # async def place_order(cls, request: Request):
+    #     user_data = await Functions.get_user_data(request)
+    #     user_id = user_data["user_id"]
+    #     total_amount = 0.0
+    #     items_info = []
+    #
+    #     async with new_session() as db:
+    #         cart_items = await db.execute(select(Cart).where(Cart.user_id == user_id))
+    #         cart_items = cart_items.scalars().all()
+    #
+    #         if not cart_items:
+    #             raise HTTPException(
+    #                 status_code=status.HTTP_400_BAD_REQUEST,
+    #                 detail="Корзина пуста"
+    #             )
+    #
+    #         # Рассчитываем общую сумму заказа и обновляем количество товара
+    #         for item in cart_items:
+    #             product = await db.execute(
+    #                 select(Product).options(joinedload(Product.article)).where(Product.id == item.product_id))
+    #             product = product.scalars().first()
+    #
+    #             if not product:
+    #                 raise HTTPException(
+    #                     status_code=status.HTTP_404_NOT_FOUND,
+    #                     detail=f"Продукт с ID {item.product_id} не найден"
+    #                 )
+    #
+    #             # Check if article is loaded
+    #             if not product.article:
+    #                 raise HTTPException(
+    #                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+    #                     detail=f"Не удалось загрузить статью для продукта с ID {item.product_id}"
+    #                 )
+    #
+    #             # Определяем цену товара (со скидкой или без)
+    #             if product.new_price is not None:
+    #                 price = product.new_price
+    #             else:
+    #                 price = product.article.price
+    #
+    #             total_amount += price * item.amount
+    #             items_info.append({"product_id": product.id, "quantity": item.amount})
+    #
+    #             # Уменьшаем количество товара
+    #             product.amount -= item.amount
+    #             if product.amount < 0:
+    #                 raise HTTPException(
+    #                     status_code=status.HTTP_400_BAD_REQUEST,
+    #                     detail=f"Недостаточное количество товара  {product.name}"
+    #                 )
+    #
+    #         # Создаем запись о заказе
+    #         new_order = Order(user_id=user_id, total_amount=total_amount, items=json.dumps(items_info))
+    #         db.add(new_order)
+    #         await db.commit()
+    #         await db.refresh(new_order)
+    #
+    #         # Очищаем корзину пользователя
+    #         for item in cart_items:
+    #             await db.delete(item)
+    #         await db.commit()
+    #
+    #         return {"order_id": new_order.id, "total_amount": total_amount,
+    #                 "message": "Заказ успешно создан, ожидается оплата"}
+
     @classmethod
-    async def place_order(cls, request: Request):
+    async def place_order(cls, request: Request, order_request: PlaceOrderRequest):
         user_data = await Functions.get_user_data(request)
         user_id = user_data["user_id"]
         total_amount = 0.0
         items_info = []
 
         async with new_session() as db:
-            cart_items = await db.execute(select(Cart).where(Cart.user_id == user_id))
-            cart_items = cart_items.scalars().all()
+            # 1. Получаем товары из корзины
+            cart_items_list = await db.execute(select(Cart).where(Cart.user_id == user_id))
+            cart_items = cart_items_list.scalars().all()
 
             if not cart_items:
                 raise HTTPException(
@@ -539,11 +607,12 @@ class ProductService:
                     detail="Корзина пуста"
                 )
 
-            # Рассчитываем общую сумму заказа и обновляем количество товара
+            # 2. Рассчитываем общую сумму заказа и обновляем количество товара
             for item in cart_items:
-                product = await db.execute(
-                    select(Product).options(joinedload(Product.article)).where(Product.id == item.product_id))
-                product = product.scalars().first()
+                product_result = await db.execute(
+                    select(Product).options(joinedload(Product.article)).where(Product.id == item.product_id)
+                )
+                product = product_result.scalars().first()
 
                 if not product:
                     raise HTTPException(
@@ -551,7 +620,6 @@ class ProductService:
                         detail=f"Продукт с ID {item.product_id} не найден"
                     )
 
-                # Check if article is loaded
                 if not product.article:
                     raise HTTPException(
                         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -575,20 +643,78 @@ class ProductService:
                         detail=f"Недостаточное количество товара  {product.name}"
                     )
 
-            # Создаем запись о заказе
-            new_order = Order(user_id=user_id, total_amount=total_amount, items=json.dumps(items_info))
+            # 3. Получаем службу доставки
+            delivery_service_result = await db.execute(
+                select(DeliveryService).where(DeliveryService.id == order_request.delivery_service_id)
+            )
+            delivery_service = delivery_service_result.scalars().first()
+
+            if not delivery_service:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Служба доставки не найдена"
+                )
+
+            total_amount += delivery_service.price  # Add delivery price to total
+
+            # 4. Создаем запись о заказе
+            new_order = Order(
+                user_id=user_id,
+                total_amount=total_amount,
+                items=json.dumps(items_info),
+                delivery_service=delivery_service  # Assign the delivery service
+            )
             db.add(new_order)
             await db.commit()
             await db.refresh(new_order)
 
-            # Очищаем корзину пользователя
-            for item in cart_items:
-                await db.delete(item)
+            for cart_item in cart_items:
+                await db.delete(cart_item)
             await db.commit()
 
             return {"order_id": new_order.id, "total_amount": total_amount,
                     "message": "Заказ успешно создан, ожидается оплата"}
 
+    @classmethod
+    async def get_delivery_service(cls, delivery_service_id: int):
+        async with new_session() as db:
+            result = await db.execute(  # Await the execution
+                select(DeliveryService).where(DeliveryService.id == delivery_service_id)
+            )
+            delivery_service = result.scalar_one_or_none()
+            if not delivery_service:
+                raise HTTPException(status_code=404, detail="Delivery service not found")
+            return delivery_service
+
+    @classmethod
+    async def list_delivery_services(cls):
+        async with new_session() as db:
+            result = await db.execute(select(DeliveryService))
+            delivery_services = result.scalars().all()
+            return delivery_services
+
+
+    @classmethod
+    async def create_delivery_service(cls, request: Request, delivery_service: DeliveryServiceCreate):
+        user_data = await Functions.get_user_data(request)
+        if user_data["user_role"] != "Админ":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail="Только администраторы могут создавать службы доставки"
+            )
+
+        async with new_session() as db:
+            new_delivery_service = DeliveryService(**delivery_service.dict())
+            db.add(new_delivery_service)
+            try:
+                await db.commit()
+                await db.refresh(new_delivery_service)
+                return new_delivery_service
+            except IntegrityError:
+                await db.rollback()
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Не удалось создать службу доставки",
+                )
 
     @classmethod
     async def pay_order(cls, request: Request, order_id: int, pay: bool):
