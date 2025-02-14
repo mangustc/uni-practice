@@ -10,6 +10,30 @@ async def create_article(request: Request, data: CreateArticle):
     return await ArticleService.create_article(request, data)
 
 
+@router.post("/AddCharacteristic/{article_id}", response_model=AddCharacteristicResponse,
+             status_code=status.HTTP_201_CREATED)
+async def add_characteristic(request: Request, article_id: int, data: AddCharacteristic):
+    return await ArticleService.add_characteristic(request, article_id, data)
+
+
+@router.get("/GetCharacteristicsByArticleId/{article_id}", response_model=list[GetCharacteristicResponse],
+            status_code=status.HTTP_200_OK)
+async def get_characteristics_by_article_id(article_id: int):
+    return await ArticleService.get_characteristics_by_article_id(article_id)
+
+
+@router.put("/UpdateCharacteristic/{article_id}", response_model=GetCharacteristicResponse,
+            status_code=status.HTTP_200_OK)
+async def update_characteristic(request: Request, article_id: int, data: AddCharacteristic):
+    return await ArticleService.update_characteristic(request, article_id, data)
+
+
+@router.delete("/DeleteCharacteristicByPropertyName/{article_id}", response_model=Message,
+               status_code=status.HTTP_200_OK)
+async def delete_characteristic_by_property_name(request: Request, article_id: int, property_name: str):
+    return await ArticleService.delete_characteristic_by_property_name(request, article_id, property_name)
+
+
 @router.get("/{article_id}/GetArticle", response_model=GetArticleResponse, status_code=status.HTTP_200_OK)
 async def get_article(article_id: int):
     return await ArticleService.get_article(article_id)
