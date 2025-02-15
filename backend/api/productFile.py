@@ -5,84 +5,84 @@ from services import ProductService
 router = APIRouter(tags=["Product"], prefix="/product")
 
 
-@router.post("/CreateProduct", response_model=ProductResponse, status_code=status.HTTP_200_OK)
+@router.post("/create_product", response_model=ProductResponse, status_code=status.HTTP_200_OK)
 async def create_product(request: Request, data: CreateProduct):
     return await ProductService.create_product(request, data)
 
 
-@router.get("/{product_id}/GetProduct", response_model=GetProductResponse, status_code=status.HTTP_200_OK)
+@router.get("/get_product/{product_id}", response_model=GetProductResponse, status_code=status.HTTP_200_OK)
 async def get_product(product_id: int):
     return await ProductService.get_product(product_id)
 
 
-@router.get("/GetAllProductsSmallCard", response_model=list[GetProductSmallCardResponse], status_code=status.HTTP_200_OK)
+@router.get("/get_all_products_small_card", response_model=list[GetProductSmallCardResponse], status_code=status.HTTP_200_OK)
 async def get_all_products_small_card():
     return await ProductService.get_all_products_small_card()
 
 
-@router.get("/GetAllProducts", response_model=list[GetProductResponse], status_code=status.HTTP_200_OK)
+@router.get("/get_all_products", response_model=list[GetProductResponse], status_code=status.HTTP_200_OK)
 async def get_all_products():
     return await ProductService.get_all_products()
 
 
-@router.get("/{category_name}/GetProductsByCategoryName", response_model=list[GetProductResponse],
+@router.get("/get_products_by_category_name/{category_name}", response_model=list[GetProductResponse],
             status_code=status.HTTP_200_OK)
 async def get_products_by_category_name(category_name: str):
     return await ProductService.get_products_by_category_name(category_name)
 
 
-@router.get("/{category_name}/GetProductsByCategoryNameSmallCard", response_model=list[GetProductSmallCardResponse],
+@router.get("/get_products_by_category_name_small_card/{category_name}", response_model=list[GetProductSmallCardResponse],
             status_code=status.HTTP_200_OK)
 async def get_products_by_category_name_small_card(category_name: str):
     return await ProductService.get_products_by_category_name(category_name)
 
 
-@router.get("/{product_id}/GetPhoto", status_code=status.HTTP_200_OK)
+@router.get("/get_photo/{product_id}", status_code=status.HTTP_200_OK)
 async def get_product_photo(product_id):
     return await ProductService.get_product_photo(product_id)
 
 
-@router.put("/{product_id}/UpdatePhoto", status_code=status.HTTP_200_OK)
+@router.put("/update_photo/{product_id}", status_code=status.HTTP_200_OK)
 async def update_product_photo(request: Request, product_id: int, file: UploadFile = File(...)):
     return await ProductService.update_product_photo(request, product_id, file)
 
 
-@router.put("/{product_id}/Update", response_model=ProductResponse, status_code=status.HTTP_200_OK)
+@router.put("/update/{product_id}", response_model=ProductResponse, status_code=status.HTTP_200_OK)
 async def update_product_information(request: Request, product_id: int, data: CreateProduct):
     return await ProductService.update_product_information(request, product_id, data)
 
 
-@router.patch("/{product_id}/color", response_model=ProductColorResponse, status_code=status.HTTP_200_OK)
+@router.patch("/color/{product_id}", response_model=ProductColorResponse, status_code=status.HTTP_200_OK)
 async def update_product_color(request: Request, product_id: int, data: UpdateProductColorRequest):
     return await ProductService.update_product_color(request, product_id, data)
 
 
-@router.delete("/{product_id}/Delete", response_model=Message, status_code=status.HTTP_200_OK)
+@router.delete("/delete_product/{product_id}", response_model=Message, status_code=status.HTTP_200_OK)
 async def delete_product(request: Request, product_id: int):
     return await ProductService.delete_product(request, product_id)
 
 
-@router.put("/{product_id}/ChangeWishlistState", response_model=Message, status_code=status.HTTP_200_OK)
+@router.put("/change_wishlist_state/{product_id}", response_model=Message, status_code=status.HTTP_200_OK)
 async def change_wishlist_state(request: Request, product_id: int):
     return await ProductService.change_wishlist_state(request, product_id)
 
 
-@router.post("/{product_id}/{amount}/AddInCart", response_model=Message, status_code=status.HTTP_201_CREATED)
+@router.post("/add_in_cart/{product_id}/{amount}", response_model=Message, status_code=status.HTTP_201_CREATED)
 async def add_in_cart(request: Request, product_id: int, amount: float):
     return await ProductService.add_in_cart(request, product_id, amount)
 
 
-@router.put("/{product_id}/{amount}/ChangeAmountInCart", response_model=Message, status_code=status.HTTP_200_OK)
+@router.put("/change_amount_in_cart/{product_id}/{amount}", response_model=Message, status_code=status.HTTP_200_OK)
 async def change_product_amount_in_cart(request: Request, product_id: int, amount: int):
     return await ProductService.change_product_amount_in_cart(request, product_id, amount)
 
 
-@router.delete("/{product_id}/DeleteFromCart", response_model=Message, status_code=status.HTTP_200_OK)
+@router.delete("/delete_from_cart/{product_id}", response_model=Message, status_code=status.HTTP_200_OK)
 async def delete_from_cart(request: Request, product_id: int):
     return await ProductService.delete_from_cart(request, product_id)
 
 
-@router.put("/products/{product_id}/new", response_model=Message, status_code=status.HTTP_200_OK)
+@router.put("/products/new/{product_id}", response_model=Message, status_code=status.HTTP_200_OK)
 async def set_product_new_endpoint(
     request: Request, product_id: int, is_new: bool = Query(..., description="Set product as new (true/false)")
 ):
@@ -94,7 +94,7 @@ async def set_product_new_endpoint(
 #     return await ProductService.place_order(request=request)
 
 
-@router.put("/{order_id}/pay", response_model=PayOrderResponse, status_code=status.HTTP_200_OK)
+@router.put("/pay/{order_id}", response_model=PayOrderResponse, status_code=status.HTTP_200_OK)
 async def pay_order(request: Request, order_id: int, pay: bool):
     return await ProductService.pay_order(request=request, order_id=order_id, pay=pay)
 
@@ -110,7 +110,7 @@ async def order_history(request: Request):
 #     return await ProductService.set_product_hit(request, product_id, is_hit)
 
 
-@router.put("/products/{product_id}/promotion", response_model=Message, status_code=status.HTTP_200_OK)
+@router.put("/products/promotion/{product_id}", response_model=Message, status_code=status.HTTP_200_OK)
 async def set_product_promotion_endpoint(
     request: Request,
     product_id: int,
@@ -137,7 +137,7 @@ async def get_hit_products_endpoint():
     return await ProductService.get_hit_products()
 
 
-@router.get("/GetCart", response_model=CartResponse, status_code=status.HTTP_200_OK)
+@router.get("/get_cart", response_model=CartResponse, status_code=status.HTTP_200_OK)
 async def get_user_cart(request: Request):
     return await ProductService.get_user_cart(request)
 
