@@ -5,53 +5,14 @@ from services import ArticleService
 router = APIRouter(tags=["Article"], prefix="/article")
 
 
-@router.post("/create_article", response_model=ArticleResponse, status_code=status.HTTP_201_CREATED)
-async def create_article(request: Request, data: CreateArticle):
-    return await ArticleService.create_article(request, data)
-
-
-@router.post("/add_characteristic/{article_id}", response_model=AddCharacteristicResponse,
-             status_code=status.HTTP_201_CREATED)
-async def add_characteristic(request: Request, article_id: int, data: AddCharacteristic):
-    return await ArticleService.add_characteristic(request, article_id, data)
-
-
-@router.get("/get_characteristics_by_article_id/{article_id}", response_model=list[GetCharacteristicResponse],
-            status_code=status.HTTP_200_OK)
-async def get_characteristics_by_article_id(article_id: int):
-    return await ArticleService.get_characteristics_by_article_id(article_id)
-
-
-@router.put("/update_characteristic/{article_id}", response_model=GetCharacteristicResponse,
-            status_code=status.HTTP_200_OK)
-async def update_characteristic(request: Request, article_id: int, data: AddCharacteristic):
-    return await ArticleService.update_characteristic(request, article_id, data)
-
-
-@router.delete("/delete_characteristic_by_property_name/{article_id}", response_model=Message,
-               status_code=status.HTTP_200_OK)
-async def delete_characteristic_by_property_name(request: Request, article_id: int, property_name: str):
-    return await ArticleService.delete_characteristic_by_property_name(request, article_id, property_name)
-
-
-@router.get("/get_article/{article_id}", response_model=GetArticleResponse, status_code=status.HTTP_200_OK)
-async def get_article(article_id: int):
-    return await ArticleService.get_article(article_id)
+@router.post("/create_article", response_model=GetArticleResponse, status_code=status.HTTP_201_CREATED)
+async def create_article(request: Request):
+    return await ArticleService.create_article(request)
 
 
 @router.get("/get_all_articles", response_model=list[GetArticleResponse], status_code=status.HTTP_200_OK)
 async def get_all_articles():
     return await ArticleService.get_all_articles()
-
-
-@router.put("/update_article/{article_id}", response_model=ArticleResponse, status_code=status.HTTP_200_OK)
-async def update_article_information(request: Request, article_id: int, data: CreateArticle):
-    return await ArticleService.update_article_information(request, article_id, data)
-
-
-@router.patch("/characteristics/{article_id}", response_model=ArticleResponse, status_code=status.HTTP_200_OK)
-async def update_article_characteristics_endpoint(request: Request, article_id: int, data: UpdateArticleCharacteristics):
-    return await ArticleService.update_article_characteristics(request, article_id, data)
 
 
 @router.delete("/delete_article/{article_id}", response_model=Message, status_code=status.HTTP_200_OK)

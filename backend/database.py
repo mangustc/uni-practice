@@ -37,28 +37,41 @@ class User(Base):
 class Article(Base):
     __tablename__ = "article"
     id = Column(Integer, primary_key=True)
+
+    products = relationship("Product", back_populates="article", cascade="all, delete", passive_deletes=True)
+    '''
     category_id = Column(Integer, ForeignKey("category.id",  ondelete="CASCADE"))
-    description = Column(String, nullable=True)
-    country = Column(String, nullable=True)
-    characteristic_width = Column(String, nullable=True)
-    characteristic_density = Column(String, nullable=True)
-    characteristic_consist = Column(String, nullable=True)
-    measured_in = Column(String, nullable=False)  # "м", "упак", "шт"
-    price = Column(Integer, nullable=False)
+    # description = Column(String, nullable=True)
+    # country = Column(String, nullable=True)
+    # characteristic_width = Column(String, nullable=True)
+    # characteristic_density = Column(String, nullable=True)
+    # characteristic_consist = Column(String, nullable=True)
+    # measured_in = Column(String, nullable=False)  # "м", "упак", "шт"
+    # price = Column(Integer, nullable=False)
 
     category = relationship("Category", back_populates="articles")
-    characteristics = relationship("Characteristic", cascade="all, delete", passive_deletes=True)
-    products = relationship("Product", back_populates="article", cascade="all, delete", passive_deletes=True)
+    # characteristics = relationship("Characteristic", cascade="all, delete", passive_deletes=True)
+    '''
+
+
+class Color(Base):
+    __tablename__ = "color"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String, nullable=False)
 
 
 class Product(Base):
     __tablename__ = "product"
     id = Column(Integer, primary_key=True, autoincrement=True)
+    category_id = Column(Integer, ForeignKey("category.id",  ondelete="CASCADE"), nullable=False)
     article_id = Column(Integer, ForeignKey("article.id",  ondelete="CASCADE"), nullable=False)
+    color_id = Column(Integer, ForeignKey("color.id", ondelete="SET NULL"), nullable=True)
     name = Column(String, nullable=False)
     image_path = Column(String, nullable=True)
+    description = Column(String, nullable=True)
     amount = Column(Float, nullable=False)
-    characteristic_color = Column(String, nullable=True)
+    measured_in = Column(String, nullable=False)  # "м", "упак", "шт"
+    price = Column(Integer, nullable=False)
     new = Column(Boolean, nullable=False, default=True)
     new_until = Column(DateTime, nullable=True)
     hit = Column(Boolean, nullable=False, default=False)
@@ -68,7 +81,10 @@ class Product(Base):
     purchase_count = Column(Integer, default=0)
     last_hit_date = Column(DateTime, nullable=True)
 
+    category = relationship("Category", back_populates="products")
     article = relationship("Article", back_populates="products")
+    characteristics = relationship("Characteristic", cascade="all, delete", passive_deletes=True)
+    color = relationship("Color")
 
 
 class Property(Base):
@@ -76,24 +92,14 @@ class Property(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
 
-    values = relationship("PropertyValue", back_populates="property", cascade="all, delete", passive_deletes=True)
-
-
-class PropertyValue(Base):
-    __tablename__ = "property_value"
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    property_id = Column(Integer, ForeignKey("property.id",  ondelete="CASCADE"), nullable=False)
-    name = Column(String, nullable=False)
-
-    property = relationship("Property", back_populates="values")
-
 
 class Characteristic(Base):
     __tablename__ = "characteristic"
-    article_id = Column(Integer, ForeignKey("article.id",  ondelete="CASCADE"), primary_key=True, nullable=False)
-    property_value_id = Column(Integer, ForeignKey("property_value.id",  ondelete="CASCADE"), primary_key=True, nullable=False)
+    product_id = Column(Integer, ForeignKey("product.id",  ondelete="CASCADE"), primary_key=True, nullable=False)
+    property_id = Column(Integer, ForeignKey("property.id",  ondelete="CASCADE"), primary_key=True, nullable=False)
+    property_value = Column(String, nullable=False)
 
-    property_value = relationship("PropertyValue")
+    property = relationship("Property")
 
 
 class Wishlist(Base):
@@ -142,7 +148,7 @@ class Category(Base):
     parent_id = Column(Integer, ForeignKey("category.id",  ondelete="CASCADE"), nullable=True)
 
     parent = relationship("Category", remote_side=[id], backref="children", cascade="all, delete", passive_deletes=True)
-    articles = relationship("Article", back_populates="category", cascade="all, delete", passive_deletes=True)
+    products = relationship("Product", back_populates="category", cascade="all, delete", passive_deletes=True)
 
 
 async def create_tables():

@@ -6,9 +6,8 @@ class AddProperty(BaseModel):
     name: str
 
 
-class AddPropertyValue(BaseModel):
-    name: str
-    property_name: str
+class AddColor(AddProperty):
+    pass
 
 
 class GetPropertyResponse(BaseModel):
@@ -16,7 +15,6 @@ class GetPropertyResponse(BaseModel):
     property_name: str
 
 
-class GetPropertyValueResponse(BaseModel):
-    property_value_id: int
-    property_id: int
-    property_value_name: str
+class GetColorResponse(BaseModel):
+    color_id: int
+    color_name: str

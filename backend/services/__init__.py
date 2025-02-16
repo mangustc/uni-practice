@@ -4,4 +4,6 @@ from services.categoryFile import *
 from services.articleFile import *
 from services.filterFile import *
 from services.sortFile import *
-from services.characteristicFile import *
+from services.classifierFile import *
+from services.cartFile import *
+from services.orderFile import *

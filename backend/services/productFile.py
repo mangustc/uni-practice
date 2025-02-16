@@ -22,25 +22,59 @@ class ProductService:
             raise HTTPException(
                 status_code=403, detail="Только администраторы могут добавлять продукты"
             )
-
+        query = select(Article).where(Article.id == data.article_id)
         async with new_session() as db:
-            article = await db.execute(
-                select(Article).where(Article.id == data.article_id)
-            )
-            article = article.scalars().first()
-            if article is None:
+            result = await db.execute(query)
+            result = result.scalars().first()
+            if result is None:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Такого артикула не существует",
                 )
-
-            new_product = Product(article_id=data.article_id, name=data.name, amount=data.amount, new_until=datetime.now() + timedelta(days=30))
+            query = select(Category).where(Category.name == data.category_name)
+            result = await db.execute(query)
+            result = result.scalars().first()
+            if result is None:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Такогой категории не существует",
+                )
+            if data.color_name is not None:
+                query = select(Color).where(Color.name == data.color_name)
+                color = await db.execute(query)
+                color = color.scalars().first()
+                if color is None:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail="Такого цвета не существует",
+                    )
+                color_id = color.id
+            else:
+                color_id = None
+            new_product = Product(category_id=result.id, article_id=data.article_id, color_id=color_id,
+                                  name=data.name, measured_in=data.measured_in,
+                                  amount=data.amount, price=data.price,
+                                  description=data.description, new_until=datetime.now() + timedelta(days=30))
             db.add(new_product)
             try:
                 await db.commit()
                 await db.refresh(new_product)
-                return ProductResponse(product_id=new_product.id,
-                                       product_name=new_product.name)  # Return правильный формат
+                return GetProductResponse(
+                    product_id=new_product.id,
+                    category_id=new_product.category_id,
+                    article_id=new_product.article_id,
+                    color_id=color_id,
+                    product_name=new_product.name,
+                    product_description=new_product.description,
+                    product_measured_in=new_product.measured_in,
+                    product_amount=new_product.amount,
+                    product_price=new_product.price,
+                    product_new=new_product.new,
+                    product_hit=new_product.hit,
+                    product_promotion=new_product.promotion,
+                    product_percent_promotion=new_product.percent_promotion,
+                    product_new_price=new_product.new_price
+                )
             except IntegrityError:
                 await db.rollback()
                 raise HTTPException(
@@ -50,29 +84,29 @@ class ProductService:
 
     @classmethod
     async def get_product(cls, product_id: int):
-        query = select(Product).options(joinedload(Product.article)).where(Product.id == product_id)
+        query = select(Product).options(
+            joinedload(Product.category),
+            joinedload(Product.color)).where(Product.id == product_id)
         async with new_session() as db:
             result = await db.execute(query)
-            product_field = result.scalars().first()
-
+        product_field = result.scalars().first()
         if not product_field:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Продукт не найден"
             )
 
-        return GetProductResponse(
+        return GetProductResponseWithNames(
             product_id=product_field.id,
+            category_id=product_field.category_id,
+            category_name=product_field.category.name,
             article_id=product_field.article_id,
+            color_id=product_field.color_id,
+            color_name=product_field.color.name if product_field.color else None,
             product_name=product_field.name,
+            product_description=product_field.description,
+            product_measured_in=product_field.measured_in,
             product_amount=product_field.amount,
-            article_description=product_field.article.description if product_field.article else None,
-            article_country=product_field.article.country if product_field.article else None,
-            product_characteristic_color=product_field.characteristic_color,
-            article_characteristic_width=product_field.article.characteristic_width if product_field.article else None,
-            article_characteristic_density=product_field.article.characteristic_density if product_field.article else None,
-            article_characteristic_consist=product_field.article.characteristic_consist if product_field.article else None,
-            article_measured_in=product_field.article.measured_in if product_field.article else None,
-            article_price=product_field.article.price if product_field.article else None,
+            product_price=product_field.price,
             product_new=product_field.new,
             product_hit=product_field.hit,
             product_promotion=product_field.promotion,
@@ -81,27 +115,8 @@ class ProductService:
         )
 
     @classmethod
-    async def get_all_products_small_card(cls):
-        query = select(Product).options(joinedload(Product.article))
-        async with new_session() as db:
-            result = await db.execute(query)
-        products = result.scalars().all()
-        return [GetProductSmallCardResponse(
-            product_id=p.id,
-            product_name=p.name,
-            article_measured_in=p.article.measured_in,
-            article_price=p.article.price,
-            product_new=p.new,
-            product_hit=p.hit,
-            product_promotion=p.promotion,
-            product_percent_promotion=p.percent_promotion,
-            product_new_price=p.new_price
-        ).__dict__ for p in products
-        ]
-
-    @classmethod
     async def get_all_products(cls) -> List[GetProductResponse]:  # Add return type hint
-        query = select(Product).options(joinedload(Product.article))
+        query = select(Product).options(joinedload(Product.category), joinedload(Product.color))
         async with new_session() as db:
             result = await db.execute(query)
             products = result.scalars().all()
@@ -109,19 +124,18 @@ class ProductService:
         product_list: List[GetProductResponse] = []
         for p in products:
             product_list.append(
-                GetProductResponse(
+                GetProductResponseWithNames(
                     product_id=p.id,
+                    category_id=p.category_id,
+                    category_name=p.category.name,
                     article_id=p.article_id,
+                    color_id=p.color_id,
+                    color_name=p.color.name if p.color else None,
                     product_name=p.name,
+                    product_description=p.description,
+                    product_measured_in=p.measured_in,
                     product_amount=p.amount,
-                    article_description=p.article.description if p.article else None,
-                    article_country=p.article.country if p.article else None,
-                    product_characteristic_color=p.characteristic_color,
-                    article_characteristic_width=p.article.characteristic_width if p.article else None,
-                    article_characteristic_density=p.article.characteristic_density if p.article else None,
-                    article_characteristic_consist=p.article.characteristic_consist if p.article else None,
-                    article_measured_in=p.article.measured_in if p.article else None,
-                    article_price=p.article.price if p.article else None,
+                    product_price=p.price,
                     product_new=p.new,
                     product_hit=p.hit,
                     product_promotion=p.promotion,
@@ -152,24 +166,25 @@ class ProductService:
             async with new_session() as db:
                 result = await db.execute(query)
             categories = result.scalars().all()
-        query = select(Product).join(Article).options(contains_eager(Product.article)).where(Article.category_id.in_(category_ids))
+        query = select(Product).options(
+            joinedload(Product.category),
+            joinedload(Product.color)).where(Product.category_id.in_(category_ids))
         async with new_session() as db:
             result = await db.execute(query)
         result = result.scalars().all()
 
-        return [GetProductResponse(
+        return [GetProductResponseWithNames(
             product_id=p.id,
+            category_id=p.category_id,
+            category_name=p.category.name,
             article_id=p.article_id,
+            color_id=p.color_id,
+            color_name=p.color.name if p.color else None,
             product_name=p.name,
+            product_description=p.description,
+            product_measured_in=p.measured_in,
             product_amount=p.amount,
-            article_description=p.article.description,
-            article_country=p.article.country,
-            product_characteristic_color=p.characteristic_color,
-            article_characteristic_width=p.article.characteristic_width,
-            article_characteristic_density=p.article.characteristic_density,
-            article_characteristic_consist=p.article.characteristic_consist,
-            article_measured_in=p.article.measured_in,
-            article_price=p.article.price,
+            product_price=p.price,
             product_new=p.new,
             product_hit=p.hit,
             product_promotion=p.promotion,
@@ -238,7 +253,7 @@ class ProductService:
         return {"message": f"Файл загружен {path}"}
 
     @classmethod
-    async def update_product_information(cls, request: Request, product_id: int, data: CreateProduct):
+    async def update_product_information(cls, request: Request, product_id: int, data: UpdateProduct):
         user_data = await Functions.get_user_data(request)
         if user_data["user_role"] != "Админ":
             raise HTTPException(
@@ -253,25 +268,63 @@ class ProductService:
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Такого продукта не существует",
                 )
-
-            article_field = await db.execute(
-                select(Article).where(Article.id == data.article_id)
-            )
-            article_field = article_field.scalars().first()
-            if article_field is None:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Такого артикула не существует",
+            if data.category_name is not None:
+                query = select(Category).where(Category.name == data.category_name)
+                cat = await db.execute(query)
+                cat = cat.scalars().first()
+                if cat is None:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail="Такогой категории не существует",
+                    )
+            if data.article_id is not None:
+                article_field = await db.execute(
+                    select(Article).where(Article.id == data.article_id)
                 )
+                article_field = article_field.scalars().first()
+                if article_field is None:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail="Такого артикула не существует",
+                    )
+            if data.color_name is not None:
+                query = select(Color).where(Color.name == data.color_name)
+                color = await db.execute(query)
+                color = color.scalars().first()
+                if color is None:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail="Такого цвета не существует",
+                    )
 
-            old_product.category_id = data.article_id
-            old_product.name = data.name
-            old_product.amount = data.amount
+            for field in data.__fields__.keys():
+                if getattr(data, field) is not None:
+                    if field == "category_name":
+                        old_product.category_id = cat.name
+                        continue
+                    if field == "color_name":
+                        old_product.color_id = color.id
+                        continue
+                    setattr(old_product, field, getattr(data, field))
             try:
                 await db.commit()
                 await db.refresh(old_product)
-                return ProductResponse(product_id=old_product.id,
-                                       product_name=old_product.name)  # Return правильный формат
+                return GetProductResponse(
+                    product_id=old_product.id,
+                    category_id=old_product.category_id,
+                    article_id=old_product.article_id,
+                    color_id=old_product.color_id,
+                    product_name=old_product.name,
+                    product_description=old_product.description,
+                    product_measured_in=old_product.measured_in,
+                    product_amount=old_product.amount,
+                    product_price=old_product.price,
+                    product_new=old_product.new,
+                    product_hit=old_product.hit,
+                    product_promotion=old_product.promotion,
+                    product_percent_promotion=old_product.percent_promotion,
+                    product_new_price=old_product.new_price
+                )
             except IntegrityError:
                 await db.rollback()
                 raise HTTPException(
@@ -279,42 +332,133 @@ class ProductService:
                     detail="Не удалось обновить информацию о продукте",
                 )
 
-    @staticmethod
-    async def update_product_color(request: Request, product_id: int, data: UpdateProductColorRequest):
+    @classmethod
+    async def add_characteristic(cls, request: Request, product_id: int, data: AddCharacteristic):
         user_data = await Functions.get_user_data(request)
-
         if user_data["user_role"] != "Админ":
             raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Только администраторы могут изменять цвет продукта",
+                status_code=403, detail="Только администраторы могут добавлять характеристики"
             )
 
+        query = select(Product).options(
+            joinedload(Product.characteristics)
+            .joinedload(Characteristic.property)).where(Product.id == product_id)
         async with new_session() as db:
-            product = await db.execute(select(Product).where(Product.id == product_id))
+            product = await db.execute(query)
             product = product.scalars().first()
-
-            if not product:
+            if product is None:
                 raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail="Продукт с указанным ID не найден",
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Продукта с таким id не существует",
                 )
-
-            product.characteristic_color = data.new_color
-
+            query = select(Property).where(Property.name == data.property_name)
+            property_field = await db.execute(query)
+            property_field = property_field.scalars().first()
+            if property_field is None:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Свойства с таким именем не существует",
+                )
+            for characteristic in product.characteristics:
+                if characteristic.property.name == data.property_name:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail="У продукта уже есть характеристика с таким свойством",
+                    )
+            new_characteristic = Characteristic(
+                product_id=product_id,
+                property_id=property_field.id,
+                property_value=data.property_value
+            )
+            db.add(new_characteristic)
             try:
                 await db.commit()
-                await db.refresh(product)
-                return ProductColorResponse(
-                    product_id=product.id,
-                    product_name=product.name,
-                    characteristic_color=product.characteristic_color,
+                await db.refresh(new_characteristic)
+                return AddCharacteristicResponse(product_id=product_id,
+                                                 property_id=property_field.id,
+                                                 property_value=data.property_value)
+            except IntegrityError:
+                await db.rollback()
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Не удалось добавить характеристику",
+                )
+
+    @classmethod
+    async def get_characteristics_by_product_id(cls, product_id: int):
+        query = select(Characteristic).options(
+            joinedload(Characteristic.property)).where(Characteristic.product_id == product_id)
+        async with new_session() as db:
+            result = await db.execute(query)
+        characteristics = result.scalars().all()
+        return [GetCharacteristicResponse(
+            property_id=c.property_id,
+            property_name=c.property.name,
+            property_value=c.property_value,
+        ).__dict__ for c in characteristics
+        ]
+
+    @classmethod
+    async def update_characteristic(cls, request: Request, product_id: int, data: AddCharacteristic):
+        user_data = await Functions.get_user_data(request)
+        if user_data["user_role"] != "Админ":
+            raise HTTPException(
+                status_code=403, detail="Только администраторы могут изменять характеристики"
+            )
+        query = select(Characteristic).join(Property).where(
+            and_(Characteristic.product_id == product_id, Property.name == data.property_name))
+        async with new_session() as db:
+            result = await db.execute(query)
+            characteristic = result.scalars().first()
+            if characteristic is None:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Продукта/характеристики с указанными значениями не существует"
+                )
+            characteristic.property_value = data.property_value
+            try:
+                await db.commit()
+                await db.refresh(characteristic)
+                return AddCharacteristicResponse(
+                    product_id=characteristic.product_id,
+                    property_id=characteristic.property_id,
+                    property_value=characteristic.property_value
                 )
             except IntegrityError:
                 await db.rollback()
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail="Не удалось обновить цвет продукта",
+                    detail="Не удалось обновить информацию об характеристике",
                 )
+
+    @classmethod
+    async def delete_characteristic_by_property_name(cls, request: Request, product_id: int, property_name: str):
+        user_data = await Functions.get_user_data(request)
+        if user_data["user_role"] != "Админ":
+            raise HTTPException(
+                status_code=403, detail="Только администраторы могут удалять характеристики"
+            )
+        query = select(Characteristic).join(Property).where(
+            and_(Characteristic.product_id == product_id, Property.name == property_name))
+        async with new_session() as db:
+            result = await db.execute(query)
+            result = result.scalars().first()
+            if result is None:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Артикула/характеристики с указанными значениями не существует"
+                )
+            await db.delete(result)
+            try:
+                await db.commit()
+                return {"message": "Характеристика успешна удалёна"}
+            except IntegrityError:
+                await db.rollback()
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Не удалось удалить характеристику",
+                )
+
     @classmethod
     async def delete_product(cls, request: Request, product_id: int):
         user_data = await Functions.get_user_data(request)
@@ -345,7 +489,8 @@ class ProductService:
     @classmethod
     async def change_wishlist_state(cls, request: Request, product_id: int):
         user_data = await Functions.get_user_data(request)
-        query = select(Wishlist).where(and_(Wishlist.user_id == user_data["user_id"], Wishlist.product_id == product_id))
+        query = select(Wishlist).where(
+            and_(Wishlist.user_id == user_data["user_id"], Wishlist.product_id == product_id))
         async with new_session() as db:
             result = await db.execute(query)
             result = result.scalars().first()
@@ -379,148 +524,6 @@ class ProductService:
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail="Не удалось добавить продукт в избранное",
                 )
-
-    @classmethod
-    async def add_in_cart(cls, request: Request, product_id: int, amount: float):
-        user_data = await Functions.get_user_data(request)
-        if amount <= 0:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Количество не может быть <= 0",
-            )
-        query = select(Product).where(Product.id == product_id)
-        async with new_session() as db:
-            result = await db.execute(query)
-            result = result.scalars().first()
-            if result is None:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Продукт не найден",
-                )
-            if result.amount < amount:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Количество превышает доступное значение",
-                )
-            field = Cart(user_id=user_data["user_id"], product_id=product_id, amount=amount)
-            db.add(field)
-            try:
-                await db.commit()
-                return {"message": "Продукт добавлен в корзину"}  # Правильный формат
-            except IntegrityError:
-                await db.rollback()
-                raise HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail="Не удалось добавить продукт в корзину, скорее всего он уже добавлен",
-                )
-
-    @classmethod
-    async def change_product_amount_in_cart(cls, request: Request, product_id: int, amount: float):
-        user_data = await Functions.get_user_data(request)
-        if amount <= 0:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Количество не может быть <= 0",
-            )
-        query = select(Product).where(Product.id == product_id)
-        async with new_session() as db:
-            result = await db.execute(query)
-            result = result.scalars().first()
-            if result is None:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Продукт не найден",
-                )
-            if result.amount < amount:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Количество превышает доступное значение",
-                )
-            query = select(Cart).where(and_(Cart.user_id == user_data["user_id"], Cart.product_id == product_id))
-            result = await db.execute(query)
-            result = result.scalars().first()
-            if result is None:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Продукт не найден в корзине",
-                )
-            result.amount = amount
-            try:
-                await db.commit()
-                return {"message": "Корзина обновлена"}  # Правильный формат
-            except IntegrityError:
-                await db.rollback()
-                raise HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail="Не удалось обновить корзину",
-                )
-
-    @classmethod
-    async def delete_from_cart(cls, request: Request, product_id: int):
-        user_data = await Functions.get_user_data(request)
-        query = select(Cart).where(
-            and_(Cart.user_id == user_data["user_id"], Cart.product_id == product_id))
-        async with new_session() as db:
-            result = await db.execute(query)
-            result = result.scalars().first()
-            if result is None:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Продукт не найден в корзине",
-                )
-            await db.delete(result)
-            try:
-                await db.commit()
-                return {"message": "Продукт убран из корзины"}  # Правильный формат
-            except IntegrityError:
-                await db.rollback()
-                raise HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail="Не удалось убрать продукт из корзины",
-                )
-
-    @classmethod
-    async def get_user_cart(cls, request: Request) -> CartResponse:
-        user_data = await Functions.get_user_data(request)
-        async with new_session() as db:
-            query = select(Cart).where(Cart.user_id == user_data["user_id"])
-            cart_items = await db.execute(query)
-            cart_items = cart_items.scalars().all()
-
-            items: List[CartItem] = []
-            total_cart_price: float = 0.0
-
-            for cart_item in cart_items:
-                product_query = select(Product).where(Product.id == cart_item.product_id)
-                product_result = await db.execute(product_query)
-                product = product_result.scalars().first()
-
-                if product:
-                    article_query = select(Article).where(Article.id == product.article_id)
-                    article_result = await db.execute(article_query)
-                    article = article_result.scalars().first()
-
-                    if article:
-                        price = product.new_price if product.promotion and product.new_price is not None else article.price
-
-                        total_price = cart_item.amount * price
-
-                        item = CartItem(
-                            product_id=cart_item.product_id,
-                            product_name=product.name,
-                            amount=cart_item.amount,
-                            total_price=total_price,
-                        )
-                        items.append(item)
-                        total_cart_price += total_price
-                    else:
-                        await db.delete(cart_item)
-                        await db.commit()
-                else:
-                    await db.delete(cart_item)
-                    await db.commit()
-
-            return CartResponse(items=items, total_cart_price=total_cart_price)
 
     # @classmethod
     # async def place_order(cls, request: Request):
@@ -590,92 +593,6 @@ class ProductService:
     #                 "message": "Заказ успешно создан, ожидается оплата"}
 
     @classmethod
-    async def place_order(cls, request: Request, order_request: PlaceOrderRequest):
-        user_data = await Functions.get_user_data(request)
-        user_id = user_data["user_id"]
-        total_amount = 0.0
-        items_info = []
-
-        async with new_session() as db:
-            # 1. Получаем товары из корзины
-            cart_items_list = await db.execute(select(Cart).where(Cart.user_id == user_id))
-            cart_items = cart_items_list.scalars().all()
-
-            if not cart_items:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Корзина пуста"
-                )
-
-            # 2. Рассчитываем общую сумму заказа и обновляем количество товара
-            for item in cart_items:
-                product_result = await db.execute(
-                    select(Product).options(joinedload(Product.article)).where(Product.id == item.product_id)
-                )
-                product = product_result.scalars().first()
-
-                if not product:
-                    raise HTTPException(
-                        status_code=status.HTTP_404_NOT_FOUND,
-                        detail=f"Продукт с ID {item.product_id} не найден"
-                    )
-
-                if not product.article:
-                    raise HTTPException(
-                        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                        detail=f"Не удалось загрузить статью для продукта с ID {item.product_id}"
-                    )
-
-                # Определяем цену товара (со скидкой или без)
-                if product.new_price is not None:
-                    price = product.new_price
-                else:
-                    price = product.article.price
-
-                total_amount += price * item.amount
-                items_info.append({"product_id": product.id, "quantity": item.amount})
-
-                # Уменьшаем количество товара
-                product.amount -= item.amount
-                if product.amount < 0:
-                    raise HTTPException(
-                        status_code=status.HTTP_400_BAD_REQUEST,
-                        detail=f"Недостаточное количество товара  {product.name}"
-                    )
-
-            # 3. Получаем службу доставки
-            delivery_service_result = await db.execute(
-                select(DeliveryService).where(DeliveryService.id == order_request.delivery_service_id)
-            )
-            delivery_service = delivery_service_result.scalars().first()
-
-            if not delivery_service:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail="Служба доставки не найдена"
-                )
-
-            total_amount += delivery_service.price  # Add delivery price to total
-
-            # 4. Создаем запись о заказе
-            new_order = Order(
-                user_id=user_id,
-                total_amount=total_amount,
-                items=json.dumps(items_info),
-                delivery_service=delivery_service  # Assign the delivery service
-            )
-            db.add(new_order)
-            await db.commit()
-            await db.refresh(new_order)
-
-            for cart_item in cart_items:
-                await db.delete(cart_item)
-            await db.commit()
-
-            return {"order_id": new_order.id, "total_amount": total_amount,
-                    "message": "Заказ успешно создан, ожидается оплата"}
-
-    @classmethod
     async def get_delivery_service(cls, delivery_service_id: int):
         async with new_session() as db:
             result = await db.execute(  # Await the execution
@@ -692,7 +609,6 @@ class ProductService:
             result = await db.execute(select(DeliveryService))
             delivery_services = result.scalars().all()
             return delivery_services
-
 
     @classmethod
     async def create_delivery_service(cls, request: Request, delivery_service: DeliveryServiceCreate):
@@ -716,113 +632,9 @@ class ProductService:
                     detail="Не удалось создать службу доставки",
                 )
 
-    @classmethod
-    async def pay_order(cls, request: Request, order_id: int, pay: bool):
-        user_data = await Functions.get_user_data(request)
-        user_id = user_data["user_id"]
 
-        async with new_session() as db:
-            result = await db.execute(select(Order).where(Order.id == order_id))
-            order = result.scalars().first()
 
-            if not order:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail="Заказ не найден"
-                )
 
-            # Проверяем, является ли текущий пользователь владельцем заказа
-            if order.user_id != user_id:
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    detail="Вы не можете оплатить этот заказ, так как он принадлежит другому пользователю."
-                )
-
-            if order.payment_status == "paid":
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Этот заказ уже оплачен и не может быть изменен."
-                )
-
-            if order.payment_status == "failed":
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Этот заказ был отменен и не может быть оплачен снова."
-                )
-
-            # Если pay == False - отменяем оплату
-            if pay == False:
-                # если платеж был отменен
-                if order.payment_status == "failed":
-                    raise HTTPException(
-                        status_code=status.HTTP_400_BAD_REQUEST,
-                        detail="Вы уже отменили заказ"
-                    )
-                # Возвращаем количество товаров на склад
-                items_info = json.loads(order.items)
-                for item in items_info:
-                    product_result = await db.execute(select(Product).where(Product.id == item["product_id"]))
-                    product = product_result.scalars().first()
-                    if not product:
-                        raise HTTPException(
-                            status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"Продукт с ID {item['product_id']} не найден"
-                        )
-                    product.amount += item["quantity"]
-
-                order.payment_status = "failed"
-                await db.commit()
-                return {"message": "Оплата отменена, количество товаров возвращено на склад", "order_id": order.id}
-
-            # Если pay == True - проводим оплату
-            if pay == True:
-                # Увеличиваем счетчик покупок для каждого товара в заказе
-                items_info = json.loads(order.items)
-                for item in items_info:
-                    product_result = await db.execute(select(Product).where(Product.id == item["product_id"]))
-                    product = product_result.scalars().first()
-                    if not product:
-                        raise HTTPException(
-                            status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"Продукт с ID {item['product_id']} не найден"
-                        )
-                    product.purchase_count += item["quantity"]
-                    await ProductService.check_product_hit(product)
-
-                # Устанавливаем статус заказа как "оплачен"
-                order.payment_status = "paid"
-                await db.commit()
-
-                return {"message": "Оплата успешно проведена", "order_id": order.id}
-
-    @classmethod
-    async def get_order_history(cls, request: Request):
-        """
-        Получает историю заказов пользователя.
-        """
-        user_data = await Functions.get_user_data(request)
-        user_id = user_data["user_id"]
-
-        async with new_session() as db:
-            orders = await db.execute(select(Order).where(Order.user_id == user_id).order_by(Order.order_date.desc()))
-            orders = orders.scalars().all()
-
-            if not orders:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail="История заказов пуста"
-                )
-
-            order_history = []
-            for order in orders:
-                order_history.append({
-                    "order_id": order.id,
-                    "order_date": order.order_date,
-                    "total_amount": order.total_amount,
-                    "payment_status": order.payment_status
-                })
-
-            return order_history
 
     @classmethod
     async def set_product_new(cls, request: Request, product_id: int, is_new: bool):
@@ -881,16 +693,6 @@ class ProductService:
                 )
 
     @classmethod
-    async def check_product_hit(cls, product: Product):
-        async with new_session() as db:
-            if product.purchase_count >= 500 and not product.hit:
-                product.hit = True
-                product.last_hit_date = datetime.utcnow()
-                product.purchase_count = 0
-                await db.commit()
-                print(f"Product {product.name} has become a hit!")
-
-    @classmethod
     async def check_and_reset_hit_status(cls):
         async with new_session() as db:
             print("Checking for expired 'hit' products...")  # Added logging
@@ -928,16 +730,6 @@ class ProductService:
                     status_code=status.HTTP_404_NOT_FOUND, detail="Продукт не найден"
                 )
 
-            article_field = await db.execute(
-                select(Article).where(Article.id == product.article_id)
-            )
-            article_field = article_field.scalars().first()
-            if article_field is None:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Такого артикула не существует",
-                )
-
             if is_promotion:
                 if percent_promotion is None or not 0 < percent_promotion <= 100:
                     raise HTTPException(
@@ -945,7 +737,7 @@ class ProductService:
                         detail="Процент скидки должен быть указан в диапазоне от 1 до 100",
                     )
 
-                old_price = float(article_field.price)
+                old_price = float(product.price)
                 discount_amount = old_price * (percent_promotion / 100)
                 new_price = old_price - discount_amount
 
@@ -970,123 +762,119 @@ class ProductService:
 
     @classmethod
     async def get_promotion_products(cls):
-        query = select(Product).options(joinedload(Product.article)).where(
-            Product.promotion == True
-        )
+        query = select(Product).options(
+            joinedload(Product.category),
+            joinedload(Product.color)).where(Product.promotion == True)
         async with new_session() as db:
             result = await db.execute(query)
         products = result.scalars().all()
 
-        return [GetProductResponse(
-            product_id=p.id,
-            article_id=p.article_id,
-            product_name=p.name,
-            product_amount=p.amount,
-            article_description=p.article.description,
-            article_country=p.article.country,
-            product_characteristic_color=p.characteristic_color,
-            article_characteristic_width=p.article.characteristic_width,
-            article_characteristic_density=p.article.characteristic_density,
-            article_characteristic_consist=p.article.characteristic_consist,
-            article_measured_in=p.article.measured_in,
-            article_price=p.article.price,
-            product_new=p.new,
-            product_hit=p.hit,
-            product_promotion=p.promotion,
-            product_percent_promotion=p.percent_promotion,
-            product_new_price=p.new_price
-        ).__dict__ for p in products
+        return [GetProductResponseWithNames(
+                    product_id=p.id,
+                    category_id=p.category_id,
+                    category_name=p.category.name,
+                    article_id=p.article_id,
+                    color_id=p.color_id,
+                    color_name=p.color.name if p.color else None,
+                    product_name=p.name,
+                    product_description=p.description,
+                    product_measured_in=p.measured_in,
+                    product_amount=p.amount,
+                    product_price=p.price,
+                    product_new=p.new,
+                    product_hit=p.hit,
+                    product_promotion=p.promotion,
+                    product_percent_promotion=p.percent_promotion,
+                    product_new_price=p.new_price
+                ).__dict__ for p in products
         ]
 
     @classmethod
     async def get_new_products(cls):
-        query = select(Product).options(joinedload(Product.article)).where(Product.new == True)
+        query = select(Product).options(
+            joinedload(Product.category),
+            joinedload(Product.color)).where(Product.new == True)
         async with new_session() as db:
             result = await db.execute(query)
         products = result.scalars().all()
 
-        return [GetProductResponse(
-            product_id=p.id,
-            article_id=p.article_id,
-            product_name=p.name,
-            product_amount=p.amount,
-            article_description=p.article.description,
-            article_country=p.article.country,
-            product_characteristic_color=p.characteristic_color,
-            article_characteristic_width=p.article.characteristic_width,
-            article_characteristic_density=p.article.characteristic_density,
-            article_characteristic_consist=p.article.characteristic_consist,
-            article_measured_in=p.article.measured_in,
-            article_price=p.article.price,
-            product_new=p.new,
-            product_hit=p.hit,
-            product_promotion=p.promotion,
-            product_percent_promotion=p.percent_promotion,
-            product_new_price=p.new_price
-        ).__dict__ for p in products
-        ]
+        return [GetProductResponseWithNames(
+                    product_id=p.id,
+                    category_id=p.category_id,
+                    category_name=p.category.name,
+                    article_id=p.article_id,
+                    color_id=p.color_id,
+                    color_name=p.color.name if p.color else None,
+                    product_name=p.name,
+                    product_description=p.description,
+                    product_measured_in=p.measured_in,
+                    product_amount=p.amount,
+                    product_price=p.price,
+                    product_new=p.new,
+                    product_hit=p.hit,
+                    product_promotion=p.promotion,
+                    product_percent_promotion=p.percent_promotion,
+                    product_new_price=p.new_price
+                ).__dict__ for p in products
+                ]
 
     @classmethod
     async def get_hit_products(cls):
-        query = select(Product).options(joinedload(Product.article)).where(
-            Product.hit == True
-        )
+        query = select(Product).options(
+            joinedload(Product.category),
+            joinedload(Product.color)).where(Product.hit == True)
         async with new_session() as db:
             result = await db.execute(query)
         products = result.scalars().all()
 
-        return [GetProductResponse(
-            product_id=p.id,
-            article_id=p.article_id,
-            product_name=p.name,
-            product_amount=p.amount,
-            article_description=p.article.description,
-            article_country=p.article.country,
-            product_characteristic_color=p.characteristic_color,
-            article_characteristic_width=p.article.characteristic_width,
-            article_characteristic_density=p.article.characteristic_density,
-            article_characteristic_consist=p.article.characteristic_consist,
-            article_measured_in=p.article.measured_in,
-            article_price=p.article.price,
-            product_new=p.new,
-            product_hit=p.hit,
-            product_promotion=p.promotion,
-            product_percent_promotion=p.percent_promotion,
-            product_new_price=p.new_price
-        ).__dict__ for p in products
-        ]
+        return [GetProductResponseWithNames(
+                    product_id=p.id,
+                    category_id=p.category_id,
+                    category_name=p.category.name,
+                    article_id=p.article_id,
+                    color_id=p.color_id,
+                    color_name=p.color.name if p.color else None,
+                    product_name=p.name,
+                    product_description=p.description,
+                    product_measured_in=p.measured_in,
+                    product_amount=p.amount,
+                    product_price=p.price,
+                    product_new=p.new,
+                    product_hit=p.hit,
+                    product_promotion=p.promotion,
+                    product_percent_promotion=p.percent_promotion,
+                    product_new_price=p.new_price
+                ).__dict__ for p in products
+                ]
 
-
-
-
-  # @classmethod
-  #   async def set_product_new1(cls, request: Request, product_id: int, is_new: bool):
-  #       user_data = await Functions.get_user_data(request)
-  #       if user_data["user_role"] != "Админ":
-  #           raise HTTPException(
-  #               status_code=403, detail="Только администраторы могут изменять статус новинки"
-  #           )
-  #
-  #       async with new_session() as db:
-  #           product = await db.get(Product, product_id)
-  #           if not product:
-  #               raise HTTPException(
-  #                   status_code=status.HTTP_404_NOT_FOUND, detail="Продукт не найден"
-  #               )
-  #
-  #           product.new = is_new
-  #           if is_new:
-  #               product.new_until = datetime.now() + timedelta(minutes=1)  # Save datetime
-  #           else:
-  #               product.new_until = None
-  #
-  #           try:
-  #               await db.commit()
-  #               await db.refresh(product)
-  #               return {"message": f"Статус новинки для продукта {product_id} изменен на {is_new}"}
-  #           except IntegrityError:
-  #               await db.rollback()
-  #               raise HTTPException(
-  #                   status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-  #                   detail="Не удалось изменить статус новинки",
-  #               )
+# @classmethod
+#   async def set_product_new1(cls, request: Request, product_id: int, is_new: bool):
+#       user_data = await Functions.get_user_data(request)
+#       if user_data["user_role"] != "Админ":
+#           raise HTTPException(
+#               status_code=403, detail="Только администраторы могут изменять статус новинки"
+#           )
+#
+#       async with new_session() as db:
+#           product = await db.get(Product, product_id)
+#           if not product:
+#               raise HTTPException(
+#                   status_code=status.HTTP_404_NOT_FOUND, detail="Продукт не найден"
+#               )
+#
+#           product.new = is_new
+#           if is_new:
+#               product.new_until = datetime.now() + timedelta(minutes=1)  # Save datetime
+#           else:
+#               product.new_until = None
+#
+#           try:
+#               await db.commit()
+#               await db.refresh(product)
+#               return {"message": f"Статус новинки для продукта {product_id} изменен на {is_new}"}
+#           except IntegrityError:
+#               await db.rollback()
+#               raise HTTPException(
+#                   status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+#                   detail="Не удалось изменить статус новинки",
+#               )

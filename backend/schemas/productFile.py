@@ -6,14 +6,49 @@ from datetime import datetime
 
 
 class CreateProduct(BaseModel):
+    category_name: str
     article_id: int
     name: str
+    measured_in: str
     amount: PositiveFloat
+    price: PositiveInt
+    description: Optional[str]
+    color_name: Optional[str]
+
+
+class UpdateProduct(BaseModel):
+    category_name: Optional[str]
+    article_id: Optional[int]
+    name: Optional[str]
+    measured_in: Optional[str]
+    amount: Optional[PositiveFloat]
+    price: Optional[PositiveInt]
+    description: Optional[str]
+    color_name: Optional[str]
+
 
 class ProductColorResponse(BaseModel):
     product_id: int
     product_name: str
     characteristic_color: str
+
+
+class AddCharacteristic(BaseModel):
+    property_name: str
+    property_value: str
+
+
+class AddCharacteristicResponse(BaseModel):
+    product_id: int
+    property_id: int
+    property_value: str
+
+
+class GetCharacteristicResponse(BaseModel):
+    property_id: int
+    property_name: str
+    property_value: str
+
 
 class UpdateProductColorRequest(BaseModel):
     new_color: str
@@ -21,22 +56,24 @@ class UpdateProductColorRequest(BaseModel):
 
 class GetProductResponse(BaseModel):
     product_id: int
+    category_id: int
     article_id: int
+    color_id: Optional[int] = None
     product_name: str
+    product_description: Optional[str] = None
+    product_measured_in: str
     product_amount: PositiveFloat
-    article_description: Optional[str] = None
-    article_country: Optional[str] = None
-    product_characteristic_color: Optional[str] = None
-    article_characteristic_width: Optional[str] = None
-    article_characteristic_density: Optional[str] = None
-    article_characteristic_consist: Optional[str] = None
-    article_measured_in: str
-    article_price: PositiveInt
+    product_price: PositiveInt
     product_new: bool
     product_hit: bool
     product_promotion: bool
-    product_percent_promotion: Optional[int]
-    product_new_price: Optional[float]
+    product_percent_promotion: Optional[int] = None
+    product_new_price: Optional[float] = None
+
+
+class GetProductResponseWithNames(GetProductResponse):
+    category_name: str
+    color_name: Optional[str] = None
 
 
 class GetProductSmallCardResponse(BaseModel):
@@ -67,19 +104,6 @@ class DeliveryServiceResponse(DeliveryServiceBase):
     class Config:
         orm_mode = True
 
-class OrderItem(BaseModel):
-  product_id: int
-  amount: float
-
-class PlaceOrderRequest(BaseModel):
-    delivery_service_id: int
-    class Config:
-        orm_mode = True
-
-class PlaceOrderResponse(BaseModel):
-    order_id: int
-    total_amount: PositiveFloat
-    message: str
 
 class ProductResponse(BaseModel):
     product_id: int
@@ -102,15 +126,3 @@ class OrderHistoryResponse(BaseModel):
     order_date: datetime
     total_amount: PositiveFloat
     payment_status: str
-
-
-class CartItem(BaseModel):
-    product_id: int
-    product_name: str
-    amount: int
-    total_price: float
-
-
-class CartResponse(BaseModel):
-    items: List[CartItem]
-    total_cart_price: float
