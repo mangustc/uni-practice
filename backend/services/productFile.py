@@ -115,6 +115,54 @@ class ProductService:
         )
 
     @classmethod
+    async def get_product_for_page(cls, product_id: int):
+        query = select(Product).options(
+            joinedload(Product.category),
+            joinedload(Product.color),
+            joinedload(Product.characteristics)
+            .joinedload(Characteristic.property)).where(Product.id == product_id)
+        async with new_session() as db:
+            result = await db.execute(query)
+            product_field = result.scalars().first()
+            query = select(Product).where(Product.article_id == product_field.article_id)
+            result = await db.execute(query)
+            product_fields = result.scalars().all()
+
+        if not product_field:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Продукт не найден"
+            )
+
+        characteristics = []
+        for characteristic in product_field.characteristics:
+            characteristics.append(GetCharacteristicResponse(property_id=characteristic.property_id,
+                                                             property_name=characteristic.property.name,
+                                                             property_value=characteristic.property_value))
+        products_by_article = []
+        for prod in product_fields:
+            products_by_article.append(ProductInfo(product_id=prod.id, name=prod.name))
+        return GetProductForPageResponse(
+            product_id=product_field.id,
+            category_id=product_field.category_id,
+            category_name=product_field.category.name,
+            article_id=product_field.article_id,
+            color_id=product_field.color_id,
+            color_name=product_field.color.name if product_field.color else None,
+            product_name=product_field.name,
+            product_description=product_field.description,
+            product_measured_in=product_field.measured_in,
+            product_amount=product_field.amount,
+            product_price=product_field.price,
+            product_new=product_field.new,
+            product_hit=product_field.hit,
+            product_promotion=product_field.promotion,
+            product_percent_promotion=product_field.percent_promotion,
+            product_new_price=product_field.new_price,
+            get_products_by_article=products_by_article,
+            characteristics=characteristics
+        )
+
+    @classmethod
     async def get_all_products(cls) -> List[GetProductResponse]:  # Add return type hint
         query = select(Product).options(joinedload(Product.category), joinedload(Product.color))
         async with new_session() as db:
@@ -306,6 +354,10 @@ class ProductService:
                         old_product.color_id = color.id
                         continue
                     setattr(old_product, field, getattr(data, field))
+            if data.set_description_null:
+                old_product.description = None
+            if data.set_color_null:
+                old_product.color_id = None
             try:
                 await db.commit()
                 await db.refresh(old_product)

@@ -39,19 +39,6 @@ class Article(Base):
     id = Column(Integer, primary_key=True)
 
     products = relationship("Product", back_populates="article", cascade="all, delete", passive_deletes=True)
-    '''
-    category_id = Column(Integer, ForeignKey("category.id",  ondelete="CASCADE"))
-    # description = Column(String, nullable=True)
-    # country = Column(String, nullable=True)
-    # characteristic_width = Column(String, nullable=True)
-    # characteristic_density = Column(String, nullable=True)
-    # characteristic_consist = Column(String, nullable=True)
-    # measured_in = Column(String, nullable=False)  # "м", "упак", "шт"
-    # price = Column(Integer, nullable=False)
-
-    category = relationship("Category", back_populates="articles")
-    # characteristics = relationship("Characteristic", cascade="all, delete", passive_deletes=True)
-    '''
 
 
 class Color(Base):

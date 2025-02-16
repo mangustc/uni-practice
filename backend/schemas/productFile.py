@@ -25,12 +25,8 @@ class UpdateProduct(BaseModel):
     price: Optional[PositiveInt]
     description: Optional[str]
     color_name: Optional[str]
-
-
-class ProductColorResponse(BaseModel):
-    product_id: int
-    product_name: str
-    characteristic_color: str
+    set_description_null: bool = False
+    set_color_null: bool = False
 
 
 class AddCharacteristic(BaseModel):
@@ -48,10 +44,6 @@ class GetCharacteristicResponse(BaseModel):
     property_id: int
     property_name: str
     property_value: str
-
-
-class UpdateProductColorRequest(BaseModel):
-    new_color: str
 
 
 class GetProductResponse(BaseModel):
@@ -76,16 +68,29 @@ class GetProductResponseWithNames(GetProductResponse):
     color_name: Optional[str] = None
 
 
-class GetProductSmallCardResponse(BaseModel):
+class ProductInfo(BaseModel):
     product_id: int
+    name: str
+
+
+class GetProductForPageResponse(BaseModel):
+    category_id: int
+    category_name: str
+    article_id: int
+    color_id: Optional[int] = None
+    color_name: Optional[str] = None
     product_name: str
-    article_measured_in: str
-    article_price: int
+    product_description: Optional[str] = None
+    product_measured_in: str
+    product_amount: PositiveFloat
+    product_price: PositiveInt
     product_new: bool
     product_hit: bool
     product_promotion: bool
-    product_percent_promotion: Optional[int]
-    product_new_price: Optional[float]
+    product_percent_promotion: Optional[int] = None
+    product_new_price: Optional[float] = None
+    get_products_by_article: list[ProductInfo]
+    characteristics: list[GetCharacteristicResponse]
 
 
 class DeliveryServiceBase(BaseModel):
@@ -104,10 +109,6 @@ class DeliveryServiceResponse(DeliveryServiceBase):
     class Config:
         orm_mode = True
 
-
-class ProductResponse(BaseModel):
-    product_id: int
-    product_name: str
 #
 #
 # class PlaceOrderResponse(BaseModel):
