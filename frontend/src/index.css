@@ -134,27 +134,25 @@ p {
 
 .navigation-container {
   height: 50px;
-  min-width: 1440px;
-  max-width: 1440px;
+  min-width: 1260px;
+  max-width: 1260px;
   display: flex;
   overflow: hidden;
   flex-direction: row;
   justify-content: space-between;
   background-color: white;
   padding: 20px 0px 20px 0px;
-  margin: 0px 90px 0px 90px;
 }
 
 .navigation-info {
   height: 34px;
-  min-width: 1440px;
-  max-width: 1440px;
+  min-width: 1260px;
+  max-width: 1260px;
   display: flex;
   overflow: hidden;
   flex-direction: row;
   justify-content: space-between;
   background-color: white;
-  margin: 0px 90px 0px 90px;
   padding-top: 20px;
 }
 
@@ -435,24 +433,70 @@ p {
 
 /* CATEGORIES PANEL */
 
-.categories-panel-container-container {
+.screen-container {
   width: 100vw;
   display: flex;
   justify-content: center;
   flex-direction: column;
   align-items: center;
-  border-bottom: 1px solid var(--text-color-black-main-20);
 }
 
 .categories-panel-container {
   height: 90px;
-  min-width: 1440px;
-  max-width: 1440px;
+  min-width: 1260px;
+  max-width: 1260px;
   display: flex;
   overflow: hidden;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
   background-color: white;
-  padding: 20px 0px 20px 0px;
-  margin: 0px 90px 0px 90px;
+}
+
+.categories-panel-category {
+  height: 60px;
+  width: 292px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid;
+  border-radius: 2px;
+}
+
+#fabrics {
+  background-color: #F8EDFB;
+  border-color: #1A1A1A1A;
+}
+#fabrics:hover {
+  background-color: #F5E6F9;
+  cursor: pointer;
+}
+
+#for-art{
+  background-color: #F0FCF5; 
+  border-color: #1A1A1A1A;
+}
+#for-art:hover {
+  background-color: #E6F9EE;
+  cursor: pointer;
+}
+
+#for-interior{
+  background-color: #F2F9FC; 
+  border-color: #1A1A1A1A;
+}
+#for-interior:hover {
+  background-color: #E6F4F9;
+  cursor: pointer;
+}
+
+#accessories {
+  background-color: #FCF2F5; 
+  border-color: #1A1A1A1A;
+}
+#accessories:hover {
+  background-color: #F9E6EC;
+  cursor: pointer;
 }
