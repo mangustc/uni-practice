@@ -1,70 +1,60 @@
-from fastapi import APIRouter, status, Response, Request, Query
+import json
+
+from fastapi import APIRouter, status, Response, Request, Query, HTTPException
 from schemas import *
 from services import FilterService
 from typing import List, Optional
 
-router = APIRouter(tags=["Filers"], prefix="/filter")
+router = APIRouter(tags=["Filters"], prefix="/filter")
 
 
-@router.get("/articles/filter", response_model=List[GetProductResponse], status_code=status.HTTP_200_OK)
-async def filter_articles_endpoint(
-    price_min: Optional[int] = Query(None, description="Minimum price"),
-    price_max: Optional[int] = Query(None, description="Maximum price"),
-    countries: Optional[List[str]] = Query(None, description="List of countries"),
-    colors: Optional[List[str]] = Query(None, description="List of colors"),
-    widths: Optional[List[str]] = Query(None, description="List of widths"),
-    densities: Optional[List[str]] = Query(None, description="List of densities"),
-    consists: Optional[List[str]] = Query(None, description="List of consists"),
+class ProductResponse(BaseModel):
+    product_id: int
+    category_id: int
+    category_name: str
+    article_id: int
+    color_id: Optional[int]
+    color_name: Optional[str]
+    product_name: str
+    product_description: Optional[str]
+    product_measured_in: str
+    product_amount: float
+    product_price: int
+    product_new: bool
+    product_hit: bool
+    product_promotion: bool
+    product_percent_promotion: Optional[float]
+    product_new_price: Optional[float]
+
+@router.get("/{category_name}", response_model=List[ProductResponse])
+async def get_filter_products(
+        category_name: str,
+        filters: Optional[str] = Query(None),  # JSON строка с фильтрами
+        sort_by: Optional[str] = Query(None),  # Поле для сортировки
+        filter_by_params: Optional[str] = Query(None)  # Фильтрация по hit, promotion, new
 ):
-    return await FilterService.filter_products(
-        price_min=price_min,
-        price_max=price_max,
-        countries=countries,
-        colors=colors,
-        widths=widths,
-        densities=densities,
-        consists=consists,
-    )
+    """
+    Получение товаров по имени категории с возможностью фильтрации и сортировки.
 
+    - **category_name**: Название категории товаров.
+    - **filters**: JSON строка с фильтрами по характеристикам ({"property_id": "value"}).
+    - **sort_by**: Поле для сортировки (например, "price", "name", "-price", "-name").
+    - **filter_by_params**: Фильтрация по параметрам (hit, promotion, new).
+    """
+    # Преобразуем JSON строку в словарь, если она есть
+    filters_dict = None
+    if filters:
+        try:
+            filters_dict = json.loads(filters)
+        except json.JSONDecodeError:
+            raise HTTPException(status_code=400, detail="Invalid JSON format for filters")
 
-@router.get("/articles/filter/price", response_model=List[GetProductResponse], status_code=status.HTTP_200_OK)
-async def filter_articles_by_price_endpoint(
-    price_min: Optional[int] = Query(None, description="Minimum price"),
-    price_max: Optional[int] = Query(None, description="Maximum price"),
-):
-    return await FilterService.filter_by_price(price_min=price_min, price_max=price_max)
+    products = await FilterService.get_products_by_category_name(category_name, filters_dict, sort_by, filter_by_params)
 
+    return products
 
-@router.get("/articles/filter/country", response_model=List[GetProductResponse], status_code=status.HTTP_200_OK)
-async def filter_articles_by_country_endpoint(
-    countries: List[str] = Query(None, description="List of countries"),
-):
-    return await FilterService.filter_by_country(countries=countries)
-
-
-@router.get("/articles/filter/color", response_model=List[GetProductResponse], status_code=status.HTTP_200_OK)
-async def filter_articles_by_color_endpoint(
-    colors: List[str] = Query(None, description="List of colors"),
-):
-    return await FilterService.filter_by_color(colors=colors)
-
-
-@router.get("/articles/filter/width", response_model=List[GetProductResponse], status_code=status.HTTP_200_OK)
-async def filter_articles_by_width_endpoint(
-    widths: List[str] = Query(None, description="List of widths"),
-):
-    return await FilterService.filter_by_width(widths=widths)
-
-
-@router.get("/articles/filter/density", response_model=List[GetProductResponse], status_code=status.HTTP_200_OK)
-async def filter_articles_by_density_endpoint(
-    densities: List[str] = Query(None, description="List of densities"),
-):
-    return await FilterService.filter_by_density(densities=densities)
-
-
-@router.get("/articles/filter/consist", response_model=List[GetProductResponse], status_code=status.HTTP_200_OK)
-async def filter_articles_by_consist_endpoint(
-    consists: List[str] = Query(None, description="List of consists"),
-):
-    return await FilterService.filter_by_consist(consists=consists)
+@router.get("/search/", response_model=List[ProductResponse])
+async def search_products(search_term: str = Query(..., title="Search Term"), sort_by: Optional[str] = Query(None, title="Sort By")):
+    """- ** sort_by **: Поле для сортировки(например, "price", "name", "-price", "-name"). products"""
+    products = await FilterService.search_products_by_name(search_term, sort_by)
+    return products

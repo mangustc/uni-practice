@@ -4,6 +4,5 @@ from schemas.categoryFile import *
 from schemas.articleFile import *
 from schemas.orderFile import *
 from schemas.defaultFile import *
-from schemas.sortFile import *
 from schemas.classifierFile import *
 from schemas.cartFile import *

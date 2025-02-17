@@ -577,72 +577,6 @@ class ProductService:
                     detail="Не удалось добавить продукт в избранное",
                 )
 
-    # @classmethod
-    # async def place_order(cls, request: Request):
-    #     user_data = await Functions.get_user_data(request)
-    #     user_id = user_data["user_id"]
-    #     total_amount = 0.0
-    #     items_info = []
-    #
-    #     async with new_session() as db:
-    #         cart_items = await db.execute(select(Cart).where(Cart.user_id == user_id))
-    #         cart_items = cart_items.scalars().all()
-    #
-    #         if not cart_items:
-    #             raise HTTPException(
-    #                 status_code=status.HTTP_400_BAD_REQUEST,
-    #                 detail="Корзина пуста"
-    #             )
-    #
-    #         # Рассчитываем общую сумму заказа и обновляем количество товара
-    #         for item in cart_items:
-    #             product = await db.execute(
-    #                 select(Product).options(joinedload(Product.article)).where(Product.id == item.product_id))
-    #             product = product.scalars().first()
-    #
-    #             if not product:
-    #                 raise HTTPException(
-    #                     status_code=status.HTTP_404_NOT_FOUND,
-    #                     detail=f"Продукт с ID {item.product_id} не найден"
-    #                 )
-    #
-    #             # Check if article is loaded
-    #             if not product.article:
-    #                 raise HTTPException(
-    #                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-    #                     detail=f"Не удалось загрузить статью для продукта с ID {item.product_id}"
-    #                 )
-    #
-    #             # Определяем цену товара (со скидкой или без)
-    #             if product.new_price is not None:
-    #                 price = product.new_price
-    #             else:
-    #                 price = product.article.price
-    #
-    #             total_amount += price * item.amount
-    #             items_info.append({"product_id": product.id, "quantity": item.amount})
-    #
-    #             # Уменьшаем количество товара
-    #             product.amount -= item.amount
-    #             if product.amount < 0:
-    #                 raise HTTPException(
-    #                     status_code=status.HTTP_400_BAD_REQUEST,
-    #                     detail=f"Недостаточное количество товара  {product.name}"
-    #                 )
-    #
-    #         # Создаем запись о заказе
-    #         new_order = Order(user_id=user_id, total_amount=total_amount, items=json.dumps(items_info))
-    #         db.add(new_order)
-    #         await db.commit()
-    #         await db.refresh(new_order)
-    #
-    #         # Очищаем корзину пользователя
-    #         for item in cart_items:
-    #             await db.delete(item)
-    #         await db.commit()
-    #
-    #         return {"order_id": new_order.id, "total_amount": total_amount,
-    #                 "message": "Заказ успешно создан, ожидается оплата"}
 
     @classmethod
     async def get_delivery_service(cls, delivery_service_id: int):
@@ -899,34 +833,3 @@ class ProductService:
                 ).__dict__ for p in products
                 ]
 
-# @classmethod
-#   async def set_product_new1(cls, request: Request, product_id: int, is_new: bool):
-#       user_data = await Functions.get_user_data(request)
-#       if user_data["user_role"] != "Админ":
-#           raise HTTPException(
-#               status_code=403, detail="Только администраторы могут изменять статус новинки"
-#           )
-#
-#       async with new_session() as db:
-#           product = await db.get(Product, product_id)
-#           if not product:
-#               raise HTTPException(
-#                   status_code=status.HTTP_404_NOT_FOUND, detail="Продукт не найден"
-#               )
-#
-#           product.new = is_new
-#           if is_new:
-#               product.new_until = datetime.now() + timedelta(minutes=1)  # Save datetime
-#           else:
-#               product.new_until = None
-#
-#           try:
-#               await db.commit()
-#               await db.refresh(product)
-#               return {"message": f"Статус новинки для продукта {product_id} изменен на {is_new}"}
-#           except IntegrityError:
-#               await db.rollback()
-#               raise HTTPException(
-#                   status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-#                   detail="Не удалось изменить статус новинки",
-#               )

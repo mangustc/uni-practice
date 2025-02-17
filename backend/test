@@ -406,3 +406,775 @@
              "article_measured_in": p.article.measured_in,
              "article_price": p.article.price} for p in products
         ]
+
+
+        # @classmethod
+#   async def set_product_new1(cls, request: Request, product_id: int, is_new: bool):
+#       user_data = await Functions.get_user_data(request)
+#       if user_data["user_role"] != "Админ":
+#           raise HTTPException(
+#               status_code=403, detail="Только администраторы могут изменять статус новинки"
+#           )
+#
+#       async with new_session() as db:
+#           product = await db.get(Product, product_id)
+#           if not product:
+#               raise HTTPException(
+#                   status_code=status.HTTP_404_NOT_FOUND, detail="Продукт не найден"
+#               )
+#
+#           product.new = is_new
+#           if is_new:
+#               product.new_until = datetime.now() + timedelta(minutes=1)  # Save datetime
+#           else:
+#               product.new_until = None
+#
+#           try:
+#               await db.commit()
+#               await db.refresh(product)
+#               return {"message": f"Статус новинки для продукта {product_id} изменен на {is_new}"}
+#           except IntegrityError:
+#               await db.rollback()
+#               raise HTTPException(
+#                   status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+#                   detail="Не удалось изменить статус новинки",
+#               )
+# @classmethod
+    # async def filter_products(
+    #         cls,
+    #         price_min: Optional[int] = None,
+    #         price_max: Optional[int] = None,
+    #         countries: Optional[List[str]] = None,
+    #         colors: Optional[List[str]] = None,
+    #         widths: Optional[List[str]] = None,
+    #         densities: Optional[List[str]] = None,
+    #         consists: Optional[List[str]] = None,
+    # ):
+    #     async with new_session() as db:
+    #         query = select(Product).options(joinedload(Product.article))
+    #
+    #         conditions = []
+    #
+    #         if price_min is not None:
+    #             # Учитываем акционную цену, если она есть
+    #             price_condition = []
+    #             price_condition.append(
+    #                 and_(
+    #                     Product.promotion == False, Article.price >= price_min
+    #                 )
+    #             )
+    #             price_condition.append(
+    #                 and_(
+    #                     Product.promotion == True, Product.new_price >= price_min
+    #                 )
+    #             )
+    #             conditions.append(or_(*price_condition))
+    #
+    #         if price_max is not None:
+    #             # Учитываем акционную цену, если она есть
+    #             price_condition = []
+    #             price_condition.append(
+    #                 and_(
+    #                     Product.promotion == False, Article.price <= price_max
+    #                 )
+    #             )
+    #             price_condition.append(
+    #                 and_(
+    #                     Product.promotion == True, Product.new_price <= price_max
+    #                 )
+    #             )
+    #             conditions.append(or_(*price_condition))
+    #
+    #         if countries is not None and len(countries) > 0:
+    #             conditions.append(Article.country.in_(countries))
+    #         if colors is not None and len(colors) > 0:
+    #             conditions.append(Product.characteristic_color.in_(colors))
+    #         if widths is not None and len(widths) > 0:
+    #             conditions.append(Article.characteristic_width.in_(widths))
+    #         if densities is not None and len(densities) > 0:
+    #             conditions.append(Article.characteristic_density.in_(densities))
+    #         if consists is not None and len(consists) > 0:
+    #             conditions.append(Article.characteristic_consist.in_(consists))
+    #
+    #         if conditions:
+    #             query = query.join(Article, Article.id == Product.article_id).where(and_(*conditions))
+    #
+    #         result = await db.execute(query)
+    #         products = result.scalars().all()
+    #
+    #         product_list = [
+    #             GetProductResponse(
+    #                 product_id=p.id,
+    #                 article_id=p.article_id,
+    #                 product_name=p.name,
+    #                 product_amount=p.amount,
+    #                 article_description=p.article.description,
+    #                 article_country=p.article.country,
+    #                 product_characteristic_color=p.characteristic_color,
+    #                 article_characteristic_width=p.article.characteristic_width,
+    #                 article_characteristic_density=p.article.characteristic_density,
+    #                 article_characteristic_consist=p.article.characteristic_consist,
+    #                 article_measured_in=p.article.measured_in,
+    #                 article_price=p.article.price,
+    #                 product_new=p.new,
+    #                 product_hit=p.hit,
+    #                 product_promotion=p.promotion,
+    #                 product_percent_promotion=int(p.percent_promotion) if p.percent_promotion else None,
+    #                 product_new_price=p.new_price,
+    #             ).__dict__
+    #             for p in products
+    #         ]
+    #
+    #         return product_list
+    #
+    # @classmethod
+    # async def filter_by_price(cls, price_min: Optional[int] = None, price_max: Optional[int] = None):
+    #     async with new_session() as db:
+    #         query = select(Product).options(joinedload(Product.article))
+    #         conditions = []
+    #
+    #         if price_min is not None:
+    #             price_condition = [
+    #                 and_(Product.promotion == False, Article.price >= price_min),
+    #                 and_(Product.promotion == True, Product.new_price >= price_min),
+    #             ]
+    #             conditions.append(or_(*price_condition))
+    #
+    #         if price_max is not None:
+    #             price_condition = [
+    #                 and_(Product.promotion == False, Article.price <= price_max),
+    #                 and_(Product.promotion == True, Product.new_price <= price_max),
+    #             ]
+    #             conditions.append(or_(*price_condition))
+    #
+    #         if conditions:
+    #             query = query.join(Article, Article.id == Product.article_id).where(
+    #                 and_(*conditions)
+    #             )
+    #
+    #         result = await db.execute(query)
+    #         products = result.scalars().all()
+    #
+    #         product_list = [
+    #             GetProductResponse(
+    #                 product_id=p.id,
+    #                 article_id=p.article_id,
+    #                 product_name=p.name,
+    #                 product_amount=p.amount,
+    #                 article_description=p.article.description,
+    #                 article_country=p.article.country,
+    #                 product_characteristic_color=p.characteristic_color,
+    #                 article_characteristic_width=p.article.characteristic_width,
+    #                 article_characteristic_density=p.article.characteristic_density,
+    #                 article_characteristic_consist=p.article.characteristic_consist,
+    #                 article_measured_in=p.article.measured_in,
+    #                 article_price=p.article.price,
+    #                 product_new=p.new,
+    #                 product_hit=p.hit,
+    #                 product_promotion=p.promotion,
+    #                 product_percent_promotion=int(p.percent_promotion) if p.percent_promotion else None,
+    #                 product_new_price=p.new_price,
+    #             ).__dict__
+    #             for p in products
+    #         ]
+    #
+    #         return product_list
+    #
+    # @classmethod
+    # async def filter_by_country(cls, countries: List[str]):
+    #     async with new_session() as db:
+    #         query = select(Product).options(joinedload(Product.article))
+    #
+    #         if countries is not None and len(countries) > 0:
+    #             query = query.join(Article, Article.id == Product.article_id).where(Article.country.in_(countries))
+    #
+    #         result = await db.execute(query)
+    #         products = result.scalars().all()
+    #
+    #         product_list = [
+    #             GetProductResponse(
+    #                 product_id=p.id,
+    #                 article_id=p.article_id,
+    #                 product_name=p.name,
+    #                 product_amount=p.amount,
+    #                 article_description=p.article.description,
+    #                 article_country=p.article.country,
+    #                 product_characteristic_color=p.characteristic_color,
+    #                 article_characteristic_width=p.article.characteristic_width,
+    #                 article_characteristic_density=p.article.characteristic_density,
+    #                 article_characteristic_consist=p.article.characteristic_consist,
+    #                 article_measured_in=p.article.measured_in,
+    #                 article_price=p.article.price,
+    #                 product_new=p.new,
+    #                 product_hit=p.hit,
+    #                 product_promotion=p.promotion,
+    #                 product_percent_promotion=int(p.percent_promotion) if p.percent_promotion else None,
+    #                 product_new_price=p.new_price,
+    #             ).__dict__
+    #             for p in products
+    #         ]
+    #
+    #         return product_list
+    #
+    # @classmethod
+    # async def filter_by_color(cls, colors: List[str]):
+    #     async with new_session() as db:
+    #         query = select(Product).options(joinedload(Product.article))
+    #
+    #         if colors is not None and len(colors) > 0:
+    #             query = query.where(Product.characteristic_color.in_(colors))
+    #
+    #         result = await db.execute(query)
+    #         products = result.scalars().all()
+    #
+    #         product_list = [
+    #             GetProductResponse(
+    #                 product_id=p.id,
+    #                 article_id=p.article_id,
+    #                 product_name=p.name,
+    #                 product_amount=p.amount,
+    #                 article_description=p.article.description,
+    #                 article_country=p.article.country,
+    #                 product_characteristic_color=p.characteristic_color,
+    #                 article_characteristic_width=p.article.characteristic_width,
+    #                 article_characteristic_density=p.article.characteristic_density,
+    #                 article_characteristic_consist=p.article.characteristic_consist,
+    #                 article_measured_in=p.article.measured_in,
+    #                 article_price=p.article.price,
+    #                 product_new=p.new,
+    #                 product_hit=p.hit,
+    #                 product_promotion=p.promotion,
+    #                 product_percent_promotion=int(p.percent_promotion) if p.percent_promotion else None,
+    #                 product_new_price=p.new_price,
+    #             ).__dict__
+    #             for p in products
+    #         ]
+    #
+    #         return product_list
+    #
+    # @classmethod
+    # async def filter_by_width(cls, widths: List[str]):
+    #     async with new_session() as db:
+    #         query = select(Product).options(joinedload(Product.article))
+    #
+    #         if widths is not None and len(widths) > 0:
+    #             query = query.join(Article, Article.id == Product.article_id).where(
+    #                 Article.characteristic_width.in_(widths))
+    #
+    #         result = await db.execute(query)
+    #         products = result.scalars().all()
+    #
+    #         product_list = [
+    #             GetProductResponse(
+    #                 product_id=p.id,
+    #                 article_id=p.article_id,
+    #                 product_name=p.name,
+    #                 product_amount=p.amount,
+    #                 article_description=p.article.description,
+    #                 article_country=p.article.country,
+    #                 product_characteristic_color=p.characteristic_color,
+    #                 article_characteristic_width=p.article.characteristic_width,
+    #                 article_characteristic_density=p.article.characteristic_density,
+    #                 article_characteristic_consist=p.article.characteristic_consist,
+    #                 article_measured_in=p.article.measured_in,
+    #                 article_price=p.article.price,
+    #                 product_new=p.new,
+    #                 product_hit=p.hit,
+    #                 product_promotion=p.promotion,
+    #                 product_percent_promotion=int(p.percent_promotion) if p.percent_promotion else None,
+    #                 product_new_price=p.new_price,
+    #             ).__dict__
+    #             for p in products
+    #         ]
+    #
+    #         return product_list
+    #
+    # @classmethod
+    # async def filter_by_density(cls, densities: List[str]):
+    #     async with new_session() as db:
+    #         query = select(Product).options(joinedload(Product.article))
+    #
+    #         if densities is not None and len(densities) > 0:
+    #             query = query.join(Article, Article.id == Product.article_id).where(
+    #                 Article.characteristic_density.in_(densities))
+    #
+    #         result = await db.execute(query)
+    #         products = result.scalars().all()
+    #
+    #         product_list = [
+    #             GetProductResponse(
+    #                 product_id=p.id,
+    #                 article_id=p.article_id,
+    #                 product_name=p.name,
+    #                 product_amount=p.amount,
+    #                 article_description=p.article.description,
+    #                 article_country=p.article.country,
+    #                 product_characteristic_color=p.characteristic_color,
+    #                 article_characteristic_width=p.article.characteristic_width,
+    #                 article_characteristic_density=p.article.characteristic_density,
+    #                 article_characteristic_consist=p.article.characteristic_consist,
+    #                 article_measured_in=p.article.measured_in,
+    #                 article_price=p.article.price,
+    #                 product_new=p.new,
+    #                 product_hit=p.hit,
+    #                 product_promotion=p.promotion,
+    #                 product_percent_promotion=int(p.percent_promotion) if p.percent_promotion else None,
+    #                 product_new_price=p.new_price,
+    #             ).__dict__
+    #             for p in products
+    #         ]
+    #
+    #         return product_list
+    #
+    # @classmethod
+    # async def filter_by_consist(cls, consists: List[str]):
+    #     async with new_session() as db:
+    #         query = select(Product).options(joinedload(Product.article))
+    #
+    #         if consists is not None and len(consists) > 0:
+    #             query = query.join(Article, Article.id == Product.article_id).where(
+    #                 Article.characteristic_consist.in_(consists))
+    #
+    #         result = await db.execute(query)
+    #         products = result.scalars().all()
+    #
+    #         product_list = [
+    #             GetProductResponse(
+    #                 product_id=p.id,
+    #                 article_id=p.article_id,
+    #                 product_name=p.name,
+    #                 product_amount=p.amount,
+    #                 article_description=p.article.description,
+    #                 article_country=p.article.country,
+    #                 product_characteristic_color=p.characteristic_color,
+    #                 article_characteristic_width=p.article.characteristic_width,
+    #                 article_characteristic_density=p.article.characteristic_density,
+    #                 article_measured_in=p.article.measured_in,
+    #                 article_price=p.article.price,
+    #                 product_new=p.new,
+    #                 product_hit=p.hit,
+    #                 product_promotion=p.promotion,
+    #                 product_percent_promotion=int(p.percent_promotion) if p.percent_promotion else None,
+    #                 product_new_price=p.new_price,
+    #             ).__dict__
+    #             for p in products
+    #         ]
+    #
+    #         return product_list
+# @router.get("/articles/filter", response_model=List[GetProductResponse], status_code=status.HTTP_200_OK)
+# async def filter_articles_endpoint(
+#     price_min: Optional[int] = Query(None, description="Minimum price"),
+#     price_max: Optional[int] = Query(None, description="Maximum price"),
+#     countries: Optional[List[str]] = Query(None, description="List of countries"),
+#     colors: Optional[List[str]] = Query(None, description="List of colors"),
+#     widths: Optional[List[str]] = Query(None, description="List of widths"),
+#     densities: Optional[List[str]] = Query(None, description="List of densities"),
+#     consists: Optional[List[str]] = Query(None, description="List of consists"),
+# ):
+#     return await FilterService.filter_products(
+#         price_min=price_min,
+#         price_max=price_max,
+#         countries=countries,
+#         colors=colors,
+#         widths=widths,
+#         densities=densities,
+#         consists=consists,
+#     )
+#
+#
+# @router.get("/articles/filter/price", response_model=List[GetProductResponse], status_code=status.HTTP_200_OK)
+# async def filter_articles_by_price_endpoint(
+#     price_min: Optional[int] = Query(None, description="Minimum price"),
+#     price_max: Optional[int] = Query(None, description="Maximum price"),
+# ):
+#     return await FilterService.filter_by_price(price_min=price_min, price_max=price_max)
+#
+#
+# @router.get("/articles/filter/country", response_model=List[GetProductResponse], status_code=status.HTTP_200_OK)
+# async def filter_articles_by_country_endpoint(
+#     countries: List[str] = Query(None, description="List of countries"),
+# ):
+#     return await FilterService.filter_by_country(countries=countries)
+#
+#
+# @router.get("/articles/filter/color", response_model=List[GetProductResponse], status_code=status.HTTP_200_OK)
+# async def filter_articles_by_color_endpoint(
+#     colors: List[str] = Query(None, description="List of colors"),
+# ):
+#     return await FilterService.filter_by_color(colors=colors)
+#
+#
+# @router.get("/articles/filter/width", response_model=List[GetProductResponse], status_code=status.HTTP_200_OK)
+# async def filter_articles_by_width_endpoint(
+#     widths: List[str] = Query(None, description="List of widths"),
+# ):
+#     return await FilterService.filter_by_width(widths=widths)
+#
+#
+# @router.get("/articles/filter/density", response_model=List[GetProductResponse], status_code=status.HTTP_200_OK)
+# async def filter_articles_by_density_endpoint(
+#     densities: List[str] = Query(None, description="List of densities"),
+# ):
+#     return await FilterService.filter_by_density(densities=densities)
+#
+#
+# @router.get("/articles/filter/consist", response_model=List[GetProductResponse], status_code=status.HTTP_200_OK)
+# async def filter_articles_by_consist_endpoint(
+#     consists: List[str] = Query(None, description="List of consists"),
+# ):
+#     return await FilterService.filter_by_consist(consists=consists)
+
+
+from fastapi import APIRouter, status
+from services import SortService
+from schemas import *
+
+
+router = APIRouter(tags=["Sorts"], prefix="/sort")
+
+
+@router.get("/articles/sort/price/asc", response_model=List[GetProductResponse], status_code=status.HTTP_200_OK)
+async def sort_articles_by_price_ascending_endpoint():
+    return await SortService.sort_products_by_price_ascending()
+
+
+@router.get("/articles/sort/price/desc", response_model=List[GetProductResponse], status_code=status.HTTP_200_OK)
+async def sort_articles_by_price_descending_endpoint():
+    return await SortService.sort_products_by_price_descending()
+
+
+@router.get("/articles/sort/name/asc", response_model=List[GetProductResponse], status_code=status.HTTP_200_OK)
+async def sort_articles_by_name_ascending_endpoint():
+    return await SortService.sort_products_by_name_ascending()
+
+
+@router.get("/articles/sort/name/desc", response_model=List[GetProductResponse], status_code=status.HTTP_200_OK)
+async def sort_articles_by_name_descending_endpoint():
+    return await SortService.sort_products_by_name_descending()
+
+
+    from typing import List
+from sqlalchemy import select, asc, desc
+from sqlalchemy.orm import Session, joinedload
+from fastapi import HTTPException, status
+from schemas import *
+
+from database import Product, new_session, Article
+
+
+class SortService:
+    @classmethod
+    async def sort_products_by_price_ascending(cls):
+        async with new_session() as db:
+            products = await db.execute(select(Product).options(joinedload(Product.article)))
+            products = products.scalars().all()
+
+            products_sorted = sorted(products, key=lambda p: p.new_price if p.promotion and p.new_price is not None else p.article.price)
+
+            return [
+                GetProductResponse(
+                    product_id=p.id,
+                    article_id=p.article_id,
+                    product_name=p.name,
+                    product_amount=p.amount,
+                    article_description=p.article.description,
+                    article_country=p.article.country,
+                    product_characteristic_color=p.characteristic_color,
+                    article_characteristic_width=p.article.characteristic_width,
+                    article_characteristic_density=p.article.characteristic_density,
+                    article_characteristic_consist=p.article.characteristic_consist,
+                    article_measured_in=p.article.measured_in,
+                    article_price=p.article.price,
+                    product_new=p.new,
+                    product_hit=p.hit,
+                    product_promotion=p.promotion,
+                    product_percent_promotion=int(p.percent_promotion) if p.percent_promotion else None,
+                    product_new_price=p.new_price,
+                ).__dict__
+                for p in products_sorted
+            ]
+
+    @classmethod
+    async def sort_products_by_price_descending(cls):
+        async with new_session() as db:
+            products = await db.execute(select(Product).options(joinedload(Product.article)))
+            products = products.scalars().all()
+            products_sorted = sorted(products, key=lambda p: p.new_price if p.promotion and p.new_price is not None else p.article.price, reverse=True)
+
+            return [
+                GetProductResponse(
+                    product_id=p.id,
+                    article_id=p.article_id,
+                    product_name=p.name,
+                    product_amount=p.amount,
+                    article_description=p.article.description,
+                    article_country=p.article.country,
+                    product_characteristic_color=p.characteristic_color,
+                    article_characteristic_width=p.article.characteristic_width,
+                    article_characteristic_density=p.article.characteristic_density,
+                    article_characteristic_consist=p.article.characteristic_consist,
+                    article_measured_in=p.article.measured_in,
+                    article_price=p.article.price,
+                    product_new=p.new,
+                    product_hit=p.hit,
+                    product_promotion=p.promotion,
+                    product_percent_promotion=int(p.percent_promotion) if p.percent_promotion else None,
+                    product_new_price=p.new_price,
+                ).__dict__
+                for p in products_sorted
+            ]
+
+    @classmethod
+    async def sort_products_by_name_ascending(cls):
+        async with new_session() as db:
+            query = select(Product).options(joinedload(Product.article)).order_by(asc(Product.name))
+            result = await db.execute(query)
+            products = result.scalars().all()
+
+            return [
+                GetProductResponse(
+                    product_id=p.id,
+                    article_id=p.article_id,
+                    product_name=p.name,
+                    product_amount=p.amount,
+                    article_description=p.article.description,
+                    article_country=p.article.country,
+                    product_characteristic_color=p.characteristic_color,
+                    article_characteristic_width=p.article.characteristic_width,
+                    article_characteristic_density=p.article.characteristic_density,
+                    article_characteristic_consist=p.article.characteristic_consist,
+                    article_measured_in=p.article.measured_in,
+                    article_price=p.article.price,
+                    product_new=p.new,
+                    product_hit=p.hit,
+                    product_promotion=p.promotion,
+                    product_percent_promotion=int(p.percent_promotion) if p.percent_promotion else None,
+                    product_new_price=p.new_price,
+                ).__dict__
+                for p in products
+            ]
+
+    @classmethod
+    async def sort_products_by_name_descending(cls):
+        async with new_session() as db:
+            query = select(Product).options(joinedload(Product.article)).order_by(desc(Product.name))
+            result = await db.execute(query)
+            products = result.scalars().all()
+
+            return [
+                GetProductResponse(
+                    product_id=p.id,
+                    article_id=p.article_id,
+                    product_name=p.name,
+                    product_amount=p.amount,
+                    article_description=p.article.description,
+                    article_country=p.article.country,
+                    product_characteristic_color=p.characteristic_color,
+                    article_characteristic_width=p.article.characteristic_width,
+                    article_characteristic_density=p.article.characteristic_density,
+                    article_characteristic_consist=p.article.characteristic_consist,
+                    article_measured_in=p.article.measured_in,
+                    article_price=p.article.price,
+                    product_new=p.new,
+                    product_hit=p.hit,
+                    product_promotion=p.promotion,
+                    product_percent_promotion=int(p.percent_promotion) if p.percent_promotion else None,
+                    product_new_price=p.new_price,
+                ).__dict__
+                for p in products
+            ]
+
+
+                # @classmethod
+    # async def get_products_by_category_name(cls, category_name: str, filters: dict = None,
+    #                                         sort_by: str = None, filter_by_params: str = None):
+    #     # Получаем категорию по имени
+    #     query = select(Category).where(Category.name == category_name)
+    #     async with new_session() as db:
+    #         result = await db.execute(query)
+    #     result = result.scalars().first()
+    #
+    #     if result is None:
+    #         raise HTTPException(
+    #             status_code=status.HTTP_404_NOT_FOUND, detail="Категория с таким названием не найдена"
+    #         )
+    #
+    #     # Получаем все подкатегории
+    #     category_ids = []
+    #     categories = [result]
+    #     while categories:
+    #         temp = [elem.id for elem in categories]
+    #         category_ids.extend(temp)
+    #         query = select(Category).where(Category.parent_id.in_(temp))
+    #         async with new_session() as db:
+    #             result = await db.execute(query)
+    #         categories = result.scalars().all()
+    #
+    #     # Формируем базовый запрос на получение продуктов
+    #     query = select(Product).options(
+    #         joinedload(Product.category),
+    #         joinedload(Product.color),
+    #         joinedload(Product.characteristics)
+    #     ).where(Product.category_id.in_(category_ids))
+    #
+    #     # Применяем фильтры, если они заданы
+    #     if filters:
+    #         filter_conditions = []
+    #         for property_id, value in filters.items():
+    #             filter_conditions.append(
+    #                 and_(
+    #                     Characteristic.property_id == property_id,
+    #                     Characteristic.property_value == value
+    #                 )
+    #             )
+    #
+    #         # Используем or_ для объединения условий
+    #         if filter_conditions:
+    #             query = query.join(Product.characteristics).filter(or_(*filter_conditions))
+    #
+    #     # Добавляем условие для фильтрации по параметрам (hit, promotion, new)
+    #     if filter_by_params:
+    #         if filter_by_params == 'hit':
+    #             query = query.filter(Product.hit.is_(True))
+    #         elif filter_by_params == 'promotion':
+    #             query = query.filter(Product.promotion.is_(True))
+    #         elif filter_by_params == 'new':
+    #             query = query.filter(Product.new.is_(True))
+    #
+    #     # Применяем сортировку, если она задана
+    #     if sort_by:
+    #         sort_direction = 'asc'  # По умолчанию - по возрастанию
+    #         if sort_by.startswith('-'):
+    #             sort_direction = 'desc'
+    #             sort_by = sort_by[1:]  # Убираем символ '-'
+    #
+    #         if sort_by == "price":
+    #             if sort_direction == 'asc':
+    #                 query = query.order_by(asc(Product.price))
+    #             else:
+    #                 query = query.order_by(desc(Product.price))
+    #         elif sort_by == "name":
+    #             if sort_direction == 'asc':
+    #                 query = query.order_by(asc(Product.name))
+    #             else:
+    #                 query = query.order_by(desc(Product.name))
+    #
+    #     async with new_session() as db:
+    #         result = await db.execute(query)
+    #
+    #     products = result.scalars().unique().all()
+    #
+    #     return [GetProductResponseWithNames(
+    #         product_id=p.id,
+    #         category_id=p.category_id,
+    #         category_name=p.category.name,
+    #         article_id=p.article_id,
+    #         color_id=p.color_id,
+    #         color_name=p.color.name if p.color else None,
+    #         product_name=p.name,
+    #         product_description=p.description,
+    #         product_measured_in=p.measured_in,
+    #         product_amount=p.amount,
+    #         product_price=p.price,
+    #         product_new=p.new,
+    #         product_hit=p.hit,
+    #         product_promotion=p.promotion,
+    #         product_percent_promotion=p.percent_promotion,
+    #         product_new_price=p.new_price
+    #     ).__dict__ for p in products]
+
+    # @classmethod
+    # async def get_products_by_category_name(cls, category_name: str, filters: dict = None,
+    #                                         sort_by: str = None, filter_by_params: str = None):
+    #     # Получаем категорию по имени
+    #     query = select(Category).where(Category.name == category_name)
+    #     async with new_session() as db:
+    #         result = await db.execute(query)
+    #     result = result.scalars().first()
+    #
+    #     if result is None:
+    #         raise HTTPException(
+    #             status_code=status.HTTP_404_NOT_FOUND, detail="Категория с таким названием не найдена"
+    #         )
+    #
+    #     # Получаем все подкатегории
+    #     category_ids = []
+    #     categories = [result]
+    #     while categories:
+    #         temp = [elem.id for elem in categories]
+    #         category_ids.extend(temp)
+    #         query = select(Category).where(Category.parent_id.in_(temp))
+    #         async with new_session() as db:
+    #             result = await db.execute(query)
+    #         categories = result.scalars().all()
+    #
+    #     # Формируем базовый запрос на получение продуктов
+    #     query = select(Product).options(
+    #         joinedload(Product.category),
+    #         joinedload(Product.color)
+    #     ).where(Product.category_id.in_(category_ids))
+    #
+    #     # Применяем фильтры, если они заданы
+    #     if filters:
+    #         # Создаем подзапрос для фильтрации характеристик
+    #         characteristic_filters = []
+    #         for property_id, value in filters.items():
+    #             characteristic_filters.append(
+    #                 and_(Characteristic.property_id == property_id, Characteristic.property_value == value))
+    #
+    #         if characteristic_filters:
+    #             query = query.join(Characteristic, Product.id == Characteristic.product_id).filter(
+    #                 or_(*characteristic_filters))
+    #             query = query.group_by(Product.id)
+    #             query = query.having(func.count(Product.id) == len(filters))
+    #
+    #     # Добавляем условие для фильтрации по параметрам (hit, promotion, new)
+    #     if filter_by_params:
+    #         if filter_by_params == 'new':
+    #             query = query.filter(Product.new.is_(True))
+    #         elif filter_by_params == 'hit':
+    #             query = query.filter(Product.hit.is_(True))
+    #         elif filter_by_params == 'promotion':
+    #             query = query.filter(Product.promotion.is_(True))
+    #
+    #     # Применяем сортировку, если она задана
+    #     if sort_by:
+    #         sort_direction = 'asc'  # По умолчанию - по возрастанию
+    #         if sort_by.startswith('-'):
+    #             sort_direction = 'desc'
+    #             sort_by = sort_by[1:]  # Убираем символ '-'
+    #
+    #         if sort_by == "price":
+    #             if sort_direction == 'asc':
+    #                 query = query.order_by(asc(Product.price))
+    #             else:
+    #                 query = query.order_by(desc(Product.price))
+    #         elif sort_by == "name":
+    #             if sort_direction == 'asc':
+    #                 query = query.order_by(asc(Product.name))
+    #             else:
+    #                 query = query.order_by(desc(Product.name))
+    #
+    #     async with new_session() as db:
+    #         result = await db.execute(query)
+    #
+    #     products = result.scalars().unique().all()
+    #
+    #     return [GetProductResponseWithNames(
+    #         product_id=p.id,
+    #         category_id=p.category_id,
+    #         category_name=p.category.name,
+    #         article_id=p.article_id,
+    #         color_id=p.color_id,
+    #         color_name=p.color.name if p.color else None,
+    #         product_name=p.name,
+    #         product_description=p.description,
+    #         product_measured_in=p.measured_in,
+    #         product_amount=p.amount,
+    #         product_price=p.price,
+    #         product_new=p.new,
+    #         product_hit=p.hit,
+    #         product_promotion=p.promotion,
+    #         product_percent_promotion=p.percent_promotion,
+    #         product_new_price=p.new_price
+    #     ).__dict__ for p in products]
