@@ -22,6 +22,11 @@ class ProductService:
             raise HTTPException(
                 status_code=403, detail="Только администраторы могут добавлять продукты"
             )
+        if data.amount % 1 != 0 and data.measured_in != MeasurementEnum.meter:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Количество может быть float только при ед. измерения метры",
+            )
         query = select(Article).where(Article.id == data.article_id)
         async with new_session() as db:
             result = await db.execute(query)
@@ -307,7 +312,6 @@ class ProductService:
             raise HTTPException(
                 status_code=403, detail="Только администраторы могут обновлять информацию об артикуле"
             )
-
         async with new_session() as db:
             old_product = await db.execute(select(Product).where(Product.id == product_id))
             old_product = old_product.scalars().first()
@@ -344,6 +348,19 @@ class ProductService:
                         status_code=status.HTTP_400_BAD_REQUEST,
                         detail="Такого цвета не существует",
                     )
+            if data.measured_in is None:
+                temp_measured_in = old_product.measured_in
+            else:
+                temp_measured_in = data.measured_in
+            if data.amount is None:
+                temp_amount = old_product.amount
+            else:
+                temp_amount = data.amount
+            if temp_amount % 1 != 0 and temp_measured_in != MeasurementEnum.meter:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Количество может быть float только при ед. измерения метры",
+                )
 
             for field in data.__fields__.keys():
                 if getattr(data, field) is not None:

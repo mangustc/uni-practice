@@ -1,8 +1,8 @@
 from datetime import datetime
-
+import enum
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlalchemy.orm import declarative_base, relationship
-from sqlalchemy import Column, String, Boolean, Integer, ForeignKey, Float, Date, DateTime, event
+from sqlalchemy import Column, String, Boolean, Integer, ForeignKey, Float, Date, DateTime, event, Enum
 from sqlalchemy.engine import Engine
 
 
@@ -47,6 +47,12 @@ class Color(Base):
     name = Column(String, nullable=False)
 
 
+class MeasurementEnum(enum.Enum):
+    meter = "м"
+    package = "упак"
+    piece = "шт"
+
+
 class Product(Base):
     __tablename__ = "product"
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -57,7 +63,7 @@ class Product(Base):
     image_path = Column(String, nullable=True)
     description = Column(String, nullable=True)
     amount = Column(Float, nullable=False)
-    measured_in = Column(String, nullable=False)  # "м", "упак", "шт"
+    measured_in = Column(Enum(MeasurementEnum, values_callable=lambda x: [e.value for e in x]), nullable=False)
     price = Column(Integer, nullable=False)
     new = Column(Boolean, nullable=False, default=True)
     new_until = Column(DateTime, nullable=True)

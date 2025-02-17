@@ -6,7 +6,7 @@ from datetime import datetime
 
 
 class CartItem(BaseModel):
-    product_id: int
+    product_id: PositiveInt
     product_name: str
     amount: int
     total_price: float

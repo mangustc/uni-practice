@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from database import User
 from sqlalchemy import select, delete
 
-engine = create_engine("sqlite:///./data.db")
+engine = create_engine("sqlite:///./data/data.db")
 new_session = sessionmaker(engine, expire_on_commit=False)
 
 

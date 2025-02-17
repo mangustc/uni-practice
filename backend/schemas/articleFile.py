@@ -4,4 +4,4 @@ from pydantic.types import PositiveInt
 
 
 class GetArticleResponse(BaseModel):
-    article_id: int
+    article_id: PositiveInt

@@ -15,18 +15,18 @@ class OrderCreate(BaseModel):
 
 
 class OrderItem(BaseModel):
-    product_id: int
+    product_id: PositiveInt
     amount: float
 
 
 class PlaceOrderRequest(BaseModel):
-    delivery_service_id: int
+    delivery_service_id: PositiveInt
 
     class Config:
         orm_mode = True
 
 
 class PlaceOrderResponse(BaseModel):
-    order_id: int
+    order_id: PositiveInt
     total_amount: PositiveFloat
     message: str

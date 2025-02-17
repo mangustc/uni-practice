@@ -1,5 +1,6 @@
 from typing import Optional
 from pydantic import BaseModel, field_validator
+from pydantic.types import PositiveInt
 import re
 
 
@@ -20,10 +21,10 @@ class AddColor(AddProperty):
 
 
 class GetPropertyResponse(BaseModel):
-    property_id: int
+    property_id: PositiveInt
     property_name: str
 
 
 class GetColorResponse(BaseModel):
-    color_id: int
+    color_id: PositiveInt
     color_name: str

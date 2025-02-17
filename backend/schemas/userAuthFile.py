@@ -1,4 +1,5 @@
 from pydantic import BaseModel, field_validator
+from pydantic.types import PositiveInt
 from typing import Optional
 import re
 
@@ -99,13 +100,13 @@ class LoginResponse(BaseModel):
 
 
 class RegistrResponse(BaseModel):
-    user_id: int
+    user_id: PositiveInt
     email: str
     message: str
 
 
 class GetUserInfoResponse(BaseModel):
-    user_id: int
+    user_id: PositiveInt
     email: str
     name: Optional[str]
     surname: Optional[str]

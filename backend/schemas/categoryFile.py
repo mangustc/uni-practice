@@ -1,6 +1,7 @@
 import re
 from typing import Optional
 from pydantic import BaseModel, field_validator
+from pydantic.types import PositiveInt
 
 
 class AddCategoryRoot(BaseModel):
@@ -30,7 +31,7 @@ class AddCategory(BaseModel):
 
 
 class CategoryResponse(BaseModel):
-    category_id: int
+    category_id: PositiveInt
     category_name: str
     category_parent_id: Optional[int]
 
