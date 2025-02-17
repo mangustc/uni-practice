@@ -12,3 +12,11 @@ export function Str(obj: any, defaultValue = ""): string {
   const out = String(obj);
   return out ? out : defaultValue;
 }
+
+export function ArrFromURLSearchParam(obj: string): string[] {
+  if (obj.length === 0) {
+    return [];
+  } else {
+    return obj.split(",");
+  }
+}

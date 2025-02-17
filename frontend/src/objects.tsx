@@ -2,9 +2,9 @@ const DEFAULT_NUMBER = 0;
 const DEFAULT_STRING = "";
 const DEFAULT_BOOLEAN = false;
 
-export type CatalogFilterIn = {
+export type CatalogFiltersIn = {
   categoryID?: number;
-  productsOnlyInStock?: boolean;
+  productOnlyInStock?: boolean;
   productPriceStart?: number;
   productPriceEnd?: number;
   productColors?: string[];
@@ -15,9 +15,9 @@ export type CatalogFilterIn = {
   [key: string]: any;
 };
 
-export type CatalogFilter = {
+export type CatalogFilters = {
   categoryID: number;
-  productsOnlyInStock: boolean;
+  productOnlyInStock: boolean;
   productPriceStart: number;
   productPriceEnd: number;
   productColors: string[];
@@ -27,10 +27,10 @@ export type CatalogFilter = {
   productCountry: string[];
 };
 
-export function NewCatalogFilters(obj: CatalogFilterIn): CatalogFilter {
+export function NewCatalogFilters(obj: CatalogFiltersIn): CatalogFilters {
   return {
     categoryID: obj.categoryID ?? DEFAULT_NUMBER,
-    productsOnlyInStock: obj.productsOnlyInStock ?? DEFAULT_BOOLEAN,
+    productOnlyInStock: obj.productOnlyInStock ?? DEFAULT_BOOLEAN,
     productPriceStart: obj.productPriceStart ?? DEFAULT_NUMBER,
     productPriceEnd: obj.productPriceEnd ?? DEFAULT_NUMBER,
     productColors: obj.productColors ?? [],

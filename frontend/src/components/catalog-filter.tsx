@@ -52,22 +52,33 @@ function getCategoryTreeFromList(categoryList: objects.Category[]) {
   return tree;
 }
 
-function HTML_PrintTree(treeObj: Tree) {
-  return (
-    <ul key={treeObj.val.categoryID}>
-      {treeObj.val.categoryName}
-      {treeObj.children.map((childTreeObj) => HTML_PrintTree(childTreeObj))}
-    </ul>
-  );
-}
-
 function CatalogFilter({
   initFilters,
   updateSearchParams,
 }: {
-  initFilters: objects.CatalogFilter;
-  updateSearchParams: (newFilters: objects.CatalogFilter) => any;
+  initFilters: objects.CatalogFilters;
+  updateSearchParams: (newFilters: objects.CatalogFilters) => any;
 }) {
+  function JSX_PrintTree(treeObj: Tree) {
+    return (
+      <ul key={treeObj.val.categoryID}>
+        <span
+          onClick={() => {
+            const newFilters: objects.CatalogFilters = {
+              ...initFilters,
+              categoryID: util.Num(treeObj.val.categoryID),
+            };
+            updateSearchParams(newFilters);
+            setFilters(newFilters);
+          }}
+          style={{ cursor: "pointer" }}
+        >
+          {treeObj.val.categoryName}
+        </span>
+        {treeObj.children.map((childTreeObj) => JSX_PrintTree(childTreeObj))}
+      </ul>
+    );
+  }
   const [filters, setFilters] = useState(structuredClone(initFilters));
 
   const [categoryList, setCategoryList] = useState<objects.Category[]>([]);
@@ -76,15 +87,67 @@ function CatalogFilter({
       setCategoryList(categoryList);
     });
   }, []);
-  console.log(filters);
   const categoryTree = getCategoryTreeFromList(categoryList);
   return (
-    <>
+    <div style={{ display: "flex", flexDirection: "column" }}>
       <div>
-        {HTML_PrintTree({
+        {JSX_PrintTree({
           val: objects.NewCategory({ category_name: "Категории" }),
           children: categoryTree,
         })}
+      </div>
+      <div style={{ display: "flex", flexDirection: "row", gap: "20px" }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <label
+            onClick={() => {
+              setFilters({
+                ...filters,
+                productOnlyInStock: false,
+              });
+            }}
+          >
+            Все товары
+          </label>
+          <input
+            type="checkbox"
+            checked={!filters.productOnlyInStock}
+            onChange={(e) => {
+              if (e.target.checked)
+                setFilters({
+                  ...filters,
+                  productOnlyInStock: false,
+                });
+            }}
+          />
+        </div>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <label
+            onClick={() => {
+              setFilters({
+                ...filters,
+                productOnlyInStock: true,
+              });
+            }}
+          >
+            В наличии
+          </label>
+          <input
+            type="checkbox"
+            checked={filters.productOnlyInStock}
+            onChange={(e) => {
+              if (e.target.checked)
+                setFilters({
+                  ...filters,
+                  productOnlyInStock: true,
+                });
+            }}
+          />
+        </div>
       </div>
       <div style={{ display: "flex", flexDirection: "row" }}>
         <input
@@ -108,7 +171,10 @@ function CatalogFilter({
           }}
         />
       </div>
-    </>
+      <button onClick={() => updateSearchParams(structuredClone(filters))}>
+        Применить фильтры
+      </button>
+    </div>
   );
 }
 
