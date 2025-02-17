@@ -8,6 +8,7 @@ COPY package-lock.json package-lock.json
 RUN npm install
 
 COPY . .
+COPY vite.config-docker.ts vite.config.ts
 
 # RUN npm run build
 
