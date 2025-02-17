@@ -66,26 +66,23 @@ class CartService:
                 product = product_result.scalars().first()
 
                 if product:
-                    article_query = select(Article).where(Article.id == product.article_id)
-                    article_result = await db.execute(article_query)
-                    article = article_result.scalars().first()
+                    # article_query = select(Article).where(Article.id == product.article_id)
+                    # article_result = await db.execute(article_query)
+                    # article = article_result.scalars().first()
 
-                    if article:
-                        price = product.new_price if product.promotion and product.new_price is not None else article.price
+                    # if article:
+                    price = product.new_price if product.promotion and product.new_price is not None else product.price
 
-                        total_price = cart_item.amount * price
+                    total_price = cart_item.amount * price
 
-                        item = CartItem(
-                            product_id=cart_item.product_id,
-                            product_name=product.name,
-                            amount=cart_item.amount,
-                            total_price=total_price,
-                        )
-                        items.append(item)
-                        total_cart_price += total_price
-                    else:
-                        await db.delete(cart_item)
-                        await db.commit()
+                    item = CartItem(
+                        product_id=cart_item.product_id,
+                        product_name=product.name,
+                        amount=cart_item.amount,
+                        total_price=total_price,
+                    )
+                    items.append(item)
+                    total_cart_price += total_price
                 else:
                     await db.delete(cart_item)
                     await db.commit()

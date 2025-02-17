@@ -1,18 +1,41 @@
 from typing import Optional, List
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
+import re
 from pydantic.types import PositiveFloat, PositiveInt
 from datetime import datetime
 
 
 class CreateProduct(BaseModel):
     category_name: str
+
+    @field_validator('category_name')
+    def validate_category_name(cls, name: str) -> str:
+        if not re.match(r"^[\w\sа-яА-ЯёЁ]+$", name):
+            raise ValueError('Category name cannot contain special characters')
+        return name
     article_id: int
     name: str
+
+    @field_validator('name')
+    def validate_product_name(cls, name: str) -> str:
+        if not re.match(r"^[\w\sа-яА-ЯёЁ]+$", name):
+            raise ValueError('Product name cannot contain special characters')
+        if len(name) > 100:
+            raise ValueError('Product name must be less than 100 characters')
+        return name
+
     measured_in: str
     amount: PositiveFloat
     price: PositiveInt
     description: Optional[str]
+
+    @field_validator('description')
+    def validate_description(cls, description: Optional[str]) -> Optional[str]:
+        if description and len(description) > 255:
+            raise ValueError('Description must be less than 255 characters')
+        return description
+
     color_name: Optional[str]
 
 
