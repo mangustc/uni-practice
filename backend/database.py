@@ -12,7 +12,7 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor.execute("PRAGMA foreign_keys=ON")
     cursor.close()
 
-engine = create_async_engine("sqlite+aiosqlite:///./data.db")
+engine = create_async_engine("sqlite+aiosqlite:///./data/data.db")
 new_session = async_sessionmaker(engine, expire_on_commit=False)
 
 Base = declarative_base()

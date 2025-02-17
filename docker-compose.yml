@@ -1,0 +1,25 @@
+networks:
+  dev:
+
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: backend_app
+    ports:
+      - 8000:8000
+    volumes:
+      - ./docker/db-data:/app/data
+    networks:
+      - dev
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend_app
+    ports:
+      - 5173:5173
+    depends_on:
+      - backend
+    networks:
+      - dev

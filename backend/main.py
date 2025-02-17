@@ -10,7 +10,7 @@ import os
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    if not os.path.isfile("./data.db"):
+    if not os.path.isfile("./data/data.db"):
         await create_tables()
     scheduler = AsyncIOScheduler()
     scheduler.add_job(deactivate_expired_new_products, "interval", days=1)
