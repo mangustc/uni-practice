@@ -53,6 +53,12 @@ class ProductResponse(BaseModel):
 #
 #     return products
 
+
+@router.get("get_info_for_catalog_page/{category_id}", response_model=CatalogPageInfo)
+async def get_info_for_catalog_page(category_id: int):
+    return await FilterService.get_info_for_catalog_page(category_id)
+
+
 @router.get("test/{category_name}", response_model=List[ProductResponse])
 async def get_filter_products_test(
         category_name: str,

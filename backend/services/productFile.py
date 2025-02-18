@@ -237,14 +237,14 @@ class ProductService:
         return product_list
 
     @classmethod
-    async def get_products_by_category_name(cls, category_name: str):
-        query = select(Category).where(Category.name == category_name)
+    async def get_products_by_category_id(cls, category_id: int):
+        query = select(Category).where(Category.id == category_id)
         async with new_session() as db:
             result = await db.execute(query)
         result = result.scalars().first()
         if result is None:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Категория с таким названием не найдена"
+                status_code=status.HTTP_404_NOT_FOUND, detail="Категория с таким id не найдена"
             )
 
         category_ids = []

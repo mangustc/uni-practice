@@ -96,8 +96,8 @@ class CategoryService:
             ]  # Correct format
 
     @classmethod
-    async def get_categories_by_category_name_parent(cls, category_name_parent: str):
-        query = select(Category).where(Category.name == category_name_parent)
+    async def get_categories_by_category_parent_id(cls, category_parent_id: int):
+        query = select(Category).where(Category.id == category_parent_id)
         async with new_session() as db:
             result = await db.execute(query)
             result = result.scalars().first()

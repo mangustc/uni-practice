@@ -26,10 +26,13 @@ async def get_all_products():
     return await ProductService.get_all_products()
 
 
-@router.get("/get_products_by_category_name/{category_name}", response_model=list[GetProductResponseWithNames],
+@router.get("/get_products_by_category_name/{category_id}", response_model=list[GetProductResponseWithNames],
             status_code=status.HTTP_200_OK)
-async def get_products_by_category_name(category_name: str):
-    return await ProductService.get_products_by_category_name(category_name)
+async def get_products_by_category_id(category_id: int):
+    """
+    Возвращает продукты указанной категории и дочерних категорий.
+    """
+    return await ProductService.get_products_by_category_id(category_id)
 
 
 @router.get("/get_photo/{product_id}", status_code=status.HTTP_200_OK)
@@ -44,6 +47,9 @@ async def update_product_photo(request: Request, product_id: int, file: UploadFi
 
 @router.put("/update/{product_id}", response_model=GetProductResponse, status_code=status.HTTP_200_OK)
 async def update_product_information(request: Request, product_id: int, data: UpdateProduct):
+    """
+    Все поля, кроме **set_description_null** и **set_color_null** являются необязательными.
+    """
     return await ProductService.update_product_information(request, product_id, data)
 
 
