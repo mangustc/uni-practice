@@ -29,8 +29,8 @@ function pushToParent(tree: TreeChildren, category: objects.Category) {
   return 1;
 }
 
-function getCategoryTreeFromList(categoryList: objects.Category[]) {
-  let list = structuredClone(categoryList);
+function getCategoryTreeFromList(categories: objects.Category[]) {
+  let list = structuredClone(categories);
   let tree: TreeChildren = [];
 
   const listLen = list.length;
@@ -55,9 +55,15 @@ function getCategoryTreeFromList(categoryList: objects.Category[]) {
 function CatalogFilter({
   initFilters,
   updateSearchParams,
+  categories,
+  properties,
+  colors,
 }: {
   initFilters: objects.CatalogFilters;
   updateSearchParams: (newFilters: objects.CatalogFilters) => any;
+  categories: objects.Category[];
+  properties: objects.Property[];
+  colors: objects.Color[];
 }) {
   function JSX_PrintTree(treeObj: Tree) {
     return (
@@ -81,13 +87,7 @@ function CatalogFilter({
   }
   const [filters, setFilters] = useState(structuredClone(initFilters));
 
-  const [categoryList, setCategoryList] = useState<objects.Category[]>([]);
-  useEffect(() => {
-    requests.GET_GetCategoryList().then((categoryList) => {
-      setCategoryList(categoryList);
-    });
-  }, []);
-  const categoryTree = getCategoryTreeFromList(categoryList);
+  const categoryTree = getCategoryTreeFromList(categories);
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
       <div>
@@ -104,12 +104,12 @@ function CatalogFilter({
           }}
         >
           <label
-            onClick={() => {
+            onClick={() =>
               setFilters({
                 ...filters,
                 productOnlyInStock: false,
-              });
-            }}
+              })
+            }
           >
             Все товары
           </label>
@@ -127,12 +127,12 @@ function CatalogFilter({
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
           <label
-            onClick={() => {
+            onClick={() =>
               setFilters({
                 ...filters,
                 productOnlyInStock: true,
-              });
-            }}
+              })
+            }
           >
             В наличии
           </label>
@@ -153,23 +153,42 @@ function CatalogFilter({
         <input
           type="number"
           value={filters.productPriceStart}
-          onChange={(e) => {
+          onChange={(e) =>
             setFilters({
               ...filters,
               productPriceStart: util.Num(e.target.value),
-            });
-          }}
+            })
+          }
         />
         <input
           type="number"
           value={filters.productPriceEnd}
-          onChange={(e) => {
+          onChange={(e) =>
             setFilters({
               ...filters,
               productPriceEnd: util.Num(e.target.value),
-            });
-          }}
+            })
+          }
         />
+      </div>
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        {colors.map((color) => (
+          <div style={{ display: "flex", flexDirection: "row" }}>
+            <label>{color.colorName}</label>
+            <input
+              type="checkbox"
+              checked={filters.colors.includes(color.colorID)}
+              onChange={(e) => {
+                const newColors = structuredClone(filters.colors);
+                e.target.checked
+                  ? newColors.push(color.colorID)
+                  : newColors.splice(newColors.indexOf(color.colorID), 1);
+
+                setFilters({ ...filters, colors: newColors });
+              }}
+            />
+          </div>
+        ))}
       </div>
       <button onClick={() => updateSearchParams(structuredClone(filters))}>
         Применить фильтры

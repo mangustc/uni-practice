@@ -1,55 +1,59 @@
-import { useSearchParams } from "react-router-dom";
+import { createSearchParams, useSearchParams } from "react-router-dom";
 import * as objects from "../objects";
-import * as util from "../util";
+import * as requests from "../requests";
 import CatalogFilter from "../components/catalog-filter";
+import { useEffect, useState } from "react";
 
 export const Catalog = function () {
   const [searchParams, setSearchParams] = useSearchParams();
-  const updateSearchParams = function (newFilters: objects.CatalogFilters) {
-    const newSearchParams = new URLSearchParams();
-    for (let filter in newFilters) {
-      // @ts-expect-error
-      newSearchParams.set(filter, newFilters[filter]);
-    }
-    setSearchParams(newSearchParams);
-  };
-
-  const catalogFilters = objects.NewCatalogFilters({
-    categoryID: JSON.parse(searchParams.get("categoryID") as string),
-    productOnlyInStock: JSON.parse(
-      searchParams.get("productOnlyInStock") as string,
-    ),
-    productPriceStart: JSON.parse(
-      searchParams.get("productPriceStart") as string,
-    ),
-    productPriceEnd: JSON.parse(searchParams.get("productPriceEnd") as string),
-    productColors: util.ArrFromURLSearchParam(
-      searchParams.get("productColors") ?? "",
-    ),
-    productWidth: util.ArrFromURLSearchParam(
-      searchParams.get("productWidth") ?? "",
-    ),
-    productDensity: util.ArrFromURLSearchParam(
-      searchParams.get("productDensity") ?? "",
-    ),
-    productConsist: util.ArrFromURLSearchParam(
-      searchParams.get("productConsist") ?? "",
-    ),
-    productCountry: util.ArrFromURLSearchParam(
-      searchParams.get("productCountry") ?? "",
+  const [currentValues, setCurrentValues] = useState<{
+    categories: objects.Category[];
+    properties: objects.Property[];
+    colors: objects.Color[];
+    filters: objects.CatalogFilters;
+  }>({
+    categories: [],
+    properties: [],
+    colors: [],
+    filters: objects.NewCatalogFilters(
+      JSON.parse(searchParams.get("currentFilters") ?? "{}"),
     ),
   });
-  console.log(catalogFilters);
+
+  useEffect(() => {
+    requests.GET_GetCategoryList().then((categories) => {
+      setCurrentValues({
+        ...currentValues,
+        categories: categories,
+        colors: [
+          { colorID: 1, colorName: "Green" },
+          { colorID: 2, colorName: "GREEEN" },
+        ],
+      });
+    });
+  }, []);
+
+  function updateSearchParams(newFilters: objects.CatalogFilters) {
+    setCurrentValues({ ...currentValues, filters: newFilters });
+    setSearchParams(
+      createSearchParams({ currentFilters: JSON.stringify(newFilters) }),
+    );
+  }
+
   return (
     <>
       <div style={{ display: "flex", flexDirection: "row" }}>
         <CatalogFilter
-          initFilters={catalogFilters}
+          initFilters={currentValues.filters}
           updateSearchParams={updateSearchParams}
+          categories={currentValues.categories}
+          properties={currentValues.properties}
+          colors={currentValues.colors}
         />
         <textarea
           value={
-            "filtering values:\n" + JSON.stringify(catalogFilters, null, 2)
+            "filtering values:\n" +
+            JSON.stringify(currentValues.filters, null, 2)
           }
           readOnly
         ></textarea>

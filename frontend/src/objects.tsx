@@ -2,17 +2,24 @@ const DEFAULT_NUMBER = 0;
 const DEFAULT_STRING = "";
 const DEFAULT_BOOLEAN = false;
 
+export type Property = {
+  propertyID: number;
+  propertyName?: string;
+  propertyValues: string[];
+};
+
+export type Color = {
+  colorID: number;
+  colorName: string;
+};
+
 export type CatalogFiltersIn = {
   categoryID?: number;
   productOnlyInStock?: boolean;
   productPriceStart?: number;
   productPriceEnd?: number;
-  productColors?: string[];
-  productWidth?: string[];
-  productDensity?: string[];
-  productConsist?: string[];
-  productCountry?: string[];
-  [key: string]: any;
+  properties?: Property[];
+  colors?: number[];
 };
 
 export type CatalogFilters = {
@@ -20,11 +27,8 @@ export type CatalogFilters = {
   productOnlyInStock: boolean;
   productPriceStart: number;
   productPriceEnd: number;
-  productColors: string[];
-  productWidth: string[];
-  productDensity: string[];
-  productConsist: string[];
-  productCountry: string[];
+  properties: Property[];
+  colors: number[];
 };
 
 export function NewCatalogFilters(obj: CatalogFiltersIn): CatalogFilters {
@@ -33,11 +37,8 @@ export function NewCatalogFilters(obj: CatalogFiltersIn): CatalogFilters {
     productOnlyInStock: obj.productOnlyInStock ?? DEFAULT_BOOLEAN,
     productPriceStart: obj.productPriceStart ?? DEFAULT_NUMBER,
     productPriceEnd: obj.productPriceEnd ?? DEFAULT_NUMBER,
-    productColors: obj.productColors ?? [],
-    productWidth: obj.productWidth ?? [],
-    productDensity: obj.productDensity ?? [],
-    productConsist: obj.productConsist ?? [],
-    productCountry: obj.productCountry ?? [],
+    properties: obj.properties ?? [],
+    colors: obj.colors ?? [],
   };
 }
 
