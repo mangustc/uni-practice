@@ -126,46 +126,83 @@ class ProductService:
             joinedload(Product.color),
             joinedload(Product.characteristics)
             .joinedload(Characteristic.property)).where(Product.id == product_id)
+
         async with new_session() as db:
             result = await db.execute(query)
             product_field = result.scalars().first()
-            query = select(Product).where(Product.article_id == product_field.article_id)
-            result = await db.execute(query)
-            product_fields = result.scalars().all()
 
-        if not product_field:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Продукт не найден"
+            if not product_field:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND, detail="Продукт не найден"
+                )
+
+            # Получаем товары с тем же артикулом (товары с разными цветами)
+            products_with_same_article_query = select(Product).where(
+                Product.article_id == product_field.article_id,
+                Product.id != product_field.id  # Исключаем текущий продукт
             )
 
-        characteristics = []
-        for characteristic in product_field.characteristics:
-            characteristics.append(GetCharacteristicResponse(property_id=characteristic.property_id,
-                                                             property_name=characteristic.property.name,
-                                                             property_value=characteristic.property_value))
-        products_by_article = []
-        for prod in product_fields:
-            products_by_article.append(ProductInfo(product_id=prod.id, name=prod.name))
-        return GetProductForPageResponse(
-            product_id=product_field.id,
-            category_id=product_field.category_id,
-            category_name=product_field.category.name,
-            article_id=product_field.article_id,
-            color_id=product_field.color_id,
-            color_name=product_field.color.name if product_field.color else None,
-            product_name=product_field.name,
-            product_description=product_field.description,
-            product_measured_in=product_field.measured_in,
-            product_amount=product_field.amount,
-            product_price=product_field.price,
-            product_new=product_field.new,
-            product_hit=product_field.hit,
-            product_promotion=product_field.promotion,
-            product_percent_promotion=product_field.percent_promotion,
-            product_new_price=product_field.new_price,
-            get_products_by_article=products_by_article,
-            characteristics=characteristics
-        )
+            products_with_same_article_result = await db.execute(products_with_same_article_query)
+            products_with_same_article = products_with_same_article_result.scalars().all()
+
+            # Получаем похожие товары из той же категории (с другим артикулом)
+            similar_products_query = select(Product).where(
+                and_(Product.category_id == product_field.category_id,
+                     Product.article_id != product_field.article_id),
+                Product.id != product_field.id
+            )
+
+            similar_products_result = await db.execute(similar_products_query)
+            similar_products = similar_products_result.scalars().all()
+
+            # Получаем похожие товары из родительской категории (если есть)
+            parent_category_id = product_field.category.parent_id if product_field.category.parent_id else None
+            if parent_category_id:
+                parent_category_products_query = select(Product).where(
+                    and_(Product.category_id == parent_category_id,
+                         Product.article_id != product_field.article_id),
+                    Product.id != product_field.id
+                )
+
+                parent_category_products_result = await db.execute(parent_category_products_query)
+                parent_category_products = parent_category_products_result.scalars().all()
+                similar_products.extend(parent_category_products)
+
+            characteristics = []
+            for characteristic in product_field.characteristics:
+                characteristics.append(GetCharacteristicResponse(property_id=characteristic.property_id,
+                                                                 property_name=characteristic.property.name,
+                                                                 property_value=characteristic.property_value))
+
+            products_by_article = []
+            for prod in products_with_same_article:
+                products_by_article.append(ProductInfo(product_id=prod.id, name=prod.name))
+
+            similar_products_list = []
+            for prod in similar_products:
+                similar_products_list.append(ProductInfo(product_id=prod.id, name=prod.name))
+
+            return GetProductForPageResponse(
+                product_id=product_field.id,
+                category_id=product_field.category_id,
+                category_name=product_field.category.name,
+                article_id=product_field.article_id,
+                color_id=product_field.color_id,
+                color_name=product_field.color.name if product_field.color else None,
+                product_name=product_field.name,
+                product_description=product_field.description,
+                product_measured_in=product_field.measured_in,
+                product_amount=product_field.amount,
+                product_price=product_field.price,
+                product_new=product_field.new,
+                product_hit=product_field.hit,
+                product_promotion=product_field.promotion,
+                product_percent_promotion=product_field.percent_promotion,
+                product_new_price=product_field.new_price,
+                get_products_by_article=products_by_article,  # Товары с тем же артикулом
+                similar_products=similar_products_list,  # Похожие товары из той же и родительской категории
+                characteristics=characteristics
+            )
 
     @classmethod
     async def get_all_products(cls) -> List[GetProductResponse]:  # Add return type hint

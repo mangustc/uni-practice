@@ -114,6 +114,7 @@ class GetProductForPageResponse(BaseModel):
     product_percent_promotion: Optional[int] = None
     product_new_price: Optional[float] = None
     get_products_by_article: list[ProductInfo]
+    similar_products: List[ProductInfo]
     characteristics: list[GetCharacteristicResponse]
 
 

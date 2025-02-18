@@ -100,7 +100,7 @@ class UserService:
             token_data = {
                 "id": user.id,
                 "email": user.email,
-                "role": user.role  # Добавляем роль в токен
+                "role": user.role.value  # Добавляем роль в токен
             }
             token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
             response.set_cookie(key="token", value=token, httponly=True, secure=False)
@@ -191,7 +191,7 @@ class UserService:
                 "name": user.name,
                 "surname": user.surname,
                 "number": user.number,
-                "role": user.role
+                "role": user.role.value
             }
 
     @classmethod
@@ -248,7 +248,7 @@ class UserService:
             token_data = {
                 "id": user.id,
                 "email": user.email,
-                "role": user.role  # Используем новую роль из базы данных
+                "role": user.role.value  # Используем новую роль из базы данных
             }
             token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
             response.set_cookie(key="token", value=token, httponly=True, secure=False)

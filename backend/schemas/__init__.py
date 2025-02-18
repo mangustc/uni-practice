@@ -6,3 +6,4 @@ from schemas.orderFile import *
 from schemas.defaultFile import *
 from schemas.classifierFile import *
 from schemas.cartFile import *
+from schemas.feedbackFile import *

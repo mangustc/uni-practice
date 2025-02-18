@@ -7,6 +7,7 @@ from api.delivery import router as delivery_router
 from api.classifierFile import router as characteristic_router
 from api.cartFile import router as cart_router
 from api.orderFile import router as order_router
+from api.feedbackFile import router as feedback_router
 from fastapi import APIRouter
 
 
@@ -20,3 +21,4 @@ router.include_router(delivery_router)
 router.include_router(characteristic_router)
 router.include_router(cart_router)
 router.include_router(order_router)
+router.include_router(feedback_router)
