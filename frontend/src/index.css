@@ -500,3 +500,67 @@ p {
   background-color: #F9E6EC;
   cursor: pointer;
 }
+
+/* CARD */
+
+.card-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  width: 220px;
+  height: 370px;
+  border: 1px solid rebeccapurple;
+}
+
+.card-photo {
+  height: 220px;
+  width: 220px;
+  border-radius: 2px;
+  margin-bottom: 14px;
+  background-color: rosybrown;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+
+.card-name {
+  font-weight: var(--text-weight-link);
+  font-size: var(--text-size-16px);
+  height: 30px;
+  margin-bottom: 10px;
+}
+
+.card-descr {
+  font-weight: var(--text-weight-label);
+  font-size: var(--text-size-12px);
+  height: var(--text-height-14px);
+  color: var(--text-color-black-main-50);
+  margin-bottom: 4px;
+}
+
+.card-cost {
+  font-weight: var(--text-weight-h);
+  font-size: var(--text-size-h4);
+  height: 24px;
+  margin-bottom: 14px;
+}
+
+.card-add-btn {
+  height: 51px;
+  width: 220px;
+  text-align: center;
+  border: 1px solid var(--text-color-red-main);
+  border-radius: 2px;
+  background-color: white;
+  color: #e32636;
+  font-weight: var(--text-weight-h);
+  font-size: var(--text-size-15px);
+}
+
+.card-add-btn:hover {
+  background-color: #e32636;
+  color: white;
+  cursor: pointer;
+}
