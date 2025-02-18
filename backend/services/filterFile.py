@@ -65,7 +65,7 @@ class FilterService:
             )
         temp_unique_properties = sorted([GetCharacteristicResponse(**dict(t))
                                          for t in {frozenset(d.items())for d in properties}],
-                                        key=lambda x: x.property_id)
+                                        key=lambda x: x.property_name)
         unique_colors = sorted([GetColorResponse(**dict(t))
                                 for t in {frozenset(d.items()) for d in colors}],
                                key=lambda x: x.color_name)
