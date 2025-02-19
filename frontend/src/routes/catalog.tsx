@@ -29,6 +29,18 @@ export const Catalog = function () {
           { colorID: 1, colorName: "Green" },
           { colorID: 2, colorName: "GREEEN" },
         ],
+        properties: [
+          {
+            propertyID: 1,
+            propertyName: "Shirina",
+            propertyValues: ["long", "short", "extra long"],
+          },
+          {
+            propertyID: 2,
+            propertyName: "material",
+            propertyValues: ["gold", "silver", "copper"],
+          },
+        ],
       });
     });
   }, []);

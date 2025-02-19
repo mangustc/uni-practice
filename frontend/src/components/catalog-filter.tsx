@@ -172,6 +172,7 @@ function CatalogFilter({
         />
       </div>
       <div style={{ display: "flex", flexDirection: "column" }}>
+        <h5>Colors:</h5>
         {colors.map((color) => (
           <div style={{ display: "flex", flexDirection: "row" }}>
             <label>{color.colorName}</label>
@@ -190,6 +191,55 @@ function CatalogFilter({
           </div>
         ))}
       </div>
+      {properties.map((property) => {
+        let filterPropertyIndex = -1;
+        for (let i = 0; i < filters.properties.length; i++) {
+          if (filters.properties[i].propertyID == property.propertyID) {
+            filterPropertyIndex = i;
+            break;
+          }
+        }
+        if (filterPropertyIndex == -1) {
+          filterPropertyIndex = filters.properties.length;
+          filters.properties.push({
+            propertyID: property.propertyID,
+            propertyValues: [],
+          });
+        }
+        return (
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <h5>{property.propertyName}:</h5>
+            {property.propertyValues.map((value) => (
+              <div style={{ display: "flex", flexDirection: "row" }}>
+                <label>{value}</label>
+                <input
+                  type="checkbox"
+                  checked={filters.properties[
+                    filterPropertyIndex
+                  ].propertyValues.includes(value)}
+                  onChange={(e) => {
+                    const newProperties = structuredClone(filters.properties);
+                    e.target.checked
+                      ? newProperties[filterPropertyIndex].propertyValues.push(
+                          value,
+                        )
+                      : newProperties[
+                          filterPropertyIndex
+                        ].propertyValues.splice(
+                          newProperties[
+                            filterPropertyIndex
+                          ].propertyValues.indexOf(value),
+                          1,
+                        );
+
+                    setFilters({ ...filters, properties: newProperties });
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        );
+      })}
       <button onClick={() => updateSearchParams(structuredClone(filters))}>
         Применить фильтры
       </button>
