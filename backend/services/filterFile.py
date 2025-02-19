@@ -2,18 +2,28 @@ import math
 from typing import Optional, List
 from sqlalchemy import select, and_, or_, asc, desc, func, case
 from sqlalchemy.orm import Session, joinedload
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, Request
 from schemas import *
 from services import CategoryService
-from database import Article, Product, new_session, Category, Characteristic, Color
+from database import Article, Product, new_session, Category, Characteristic, Color, Wishlist
+from Function import Functions
 
 
 class FilterService:
     @classmethod
-    async def get_info_for_catalog_page(cls, category_id: int):
+    async def get_info_for_catalog_page(cls, category_id: int, request: Request):
+        try:
+            user_data = await Functions.get_user_data(request)
+        except HTTPException:
+            user_data = None
         query = select(Category).where(Category.id == category_id)
         async with new_session() as db:
             result = await db.execute(query)
+            if user_data is not None:
+                user_query = select(Wishlist).where(Wishlist.user_id == user_data["user_id"])
+                user_wishlist = await db.execute(user_query)
+                user_wishlist = user_wishlist.scalars().all()
+                user_wishlist_ids = [wishlist_elem.product_id for wishlist_elem in user_wishlist]
         result = result.scalars().first()
         if result is None:
             raise HTTPException(
@@ -55,13 +65,18 @@ class FilterService:
                 min_price = elem.price
             if elem.price > max_price:
                 max_price = elem.price
+            if user_data is not None and elem.id in user_wishlist_ids:
+                wishlist_state = True
+            else:
+                wishlist_state = False
             products.append(
-                ProductInCatalogInfo(product_id=elem.id, product_name=elem.name,
-                                     product_measured_in=elem.measured_in, product_price=elem.price,
+                ProductInCatalogInfo(product_id=elem.id, category_id=elem.category_id, product_name=elem.name,
+                                     product_measured_in=elem.measured_in,
+                                     product_in_stock=True if elem.amount > 0 else False, product_price=elem.price,
                                      product_new=elem.new, product_hit=elem.hit,
                                      product_promotion=elem.promotion,
                                      product_percent_promotion=elem.percent_promotion,
-                                     product_new_price=elem.new_price)
+                                     product_new_price=elem.new_price, product_in_wishlist=wishlist_state)
             )
         temp_unique_properties = sorted([GetCharacteristicResponse(**dict(t))
                                          for t in {frozenset(d.items())for d in properties}],
@@ -79,18 +94,23 @@ class FilterService:
                     break
             if flag:
                 unique_properties.append(PropertyFilter1(property_id=elem.property_id,
-                                                        property_name=elem.property_name,
-                                                        values=[elem.property_value]))
+                                                         property_name=elem.property_name,
+                                                         values=[elem.property_value]))
         for unique_property in unique_properties:
             unique_property.values = sorted(unique_property.values)
         return CatalogPageInfo(number_of_products=number_of_products, categories=categories,
                                min_price=min_price, max_price=max_price,
                                colors=unique_colors, properties=unique_properties, products=products)
+
     @classmethod
-    async def search_products_by_name(cls, search_term: str, sort_by: str = None):
+    async def search_products_by_name(cls, request: Request, search_term: str, sort_by: str = None):
         """
         Поиск товаров по названию с возможностью сортировки.
         """
+        try:
+            user_data = await Functions.get_user_data(request)
+        except HTTPException:
+            user_data = None
 
         # Формируем базовый запрос на получение продуктов
         query = select(Product).options(
@@ -124,36 +144,42 @@ class FilterService:
         async with new_session() as db:
             result = await db.execute(query)
             products = result.scalars().unique().all()
+            if user_data is not None:
+                user_query = select(Wishlist).where(Wishlist.user_id == user_data["user_id"])
+                user_wishlist = await db.execute(user_query)
+                user_wishlist = user_wishlist.scalars().all()
+                user_wishlist_ids = [wishlist_elem.product_id for wishlist_elem in user_wishlist]
 
-        return [GetProductResponseWithNames(
+        return [ProductInCatalogInfo(
             product_id=p.id,
             category_id=p.category_id,
-            category_name=p.category.name,
-            article_id=p.article_id,
-            color_id=p.color_id,
-            color_name=p.color.name if p.color else None,
             product_name=p.name,
-            product_description=p.description,
             product_measured_in=p.measured_in,
-            product_amount=p.amount,
+            product_in_stock=True if p.amount > 0 else False,
             product_price=p.price,
             product_new=p.new,
             product_hit=p.hit,
             product_promotion=p.promotion,
             product_percent_promotion=p.percent_promotion,
-            product_new_price=p.new_price
+            product_new_price=p.new_price,
+            product_in_wishlist=True if user_data is not None and p.id in user_wishlist_ids else False
         ).__dict__ for p in products]
 
     @classmethod
     async def get_products_by_category_id(
             cls,
+            request: Request,
             filters: CatalogFilters,
             sort_by: SortByEnum,
-            filter_by_params: FilterByParamsEnum
+            filter_by_params: FilterByParamsEnum,
     ):
         """
         Получает продукты по ID категории с применением фильтров и сортировки.
         """
+        try:
+            user_data = await Functions.get_user_data(request)
+        except HTTPException:
+            user_data = None
 
         # Получаем все подкатегории и саму категорию
         category_ids = await cls.get_all_subcategory_ids(filters.categoryID)
@@ -175,8 +201,6 @@ class FilterService:
         if filters:
             if filters.productOnlyInStock:
                 query = query.filter(Product.amount > 0)
-            elif filters.productOnlyInStock is False:
-                query = query.filter(Product.amount == 0)
 
             if filters.productPriceStart is not None:
                 query = query.filter(price_to_filter >= filters.productPriceStart)
@@ -230,27 +254,29 @@ class FilterService:
 
         async with new_session() as db:
             result = await db.execute(query)
+            if user_data is not None:
+                user_query = select(Wishlist).where(Wishlist.user_id == user_data["user_id"])
+                user_wishlist = await db.execute(user_query)
+                user_wishlist = user_wishlist.scalars().all()
+                user_wishlist_ids = [wishlist_elem.product_id for wishlist_elem in user_wishlist]
 
         products = result.scalars().unique().all()
 
-        return [GetProductResponseWithNames(
+        return [ProductInCatalogInfo(
             product_id=p.id,
             category_id=p.category_id,
-            category_name=p.category.name,
-            article_id=p.article_id,
-            color_id=p.color_id,
-            color_name=p.color.name if p.color else None,
             product_name=p.name,
-            product_description=p.description,
             product_measured_in=p.measured_in,
-            product_amount=p.amount,
+            product_in_stock=True if p.amount > 0 else False,
             product_price=p.price,
             product_new=p.new,
             product_hit=p.hit,
             product_promotion=p.promotion,
             product_percent_promotion=p.percent_promotion,
-            product_new_price=p.new_price
+            product_new_price=p.new_price,
+            product_in_wishlist=True if user_data is not None and p.id in user_wishlist_ids else False
         ).__dict__ for p in products]
+
     @classmethod
     async def get_all_subcategory_ids(cls, category_id: int) -> List[int]:
         """

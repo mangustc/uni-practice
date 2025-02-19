@@ -27,24 +27,27 @@ class ProductResponse(BaseModel):
     product_new_price: Optional[float]
 
 
-
 @router.get("get_info_for_catalog_page/{category_id}", response_model=CatalogPageInfo)
-async def get_info_for_catalog_page(category_id: int):
-    return await FilterService.get_info_for_catalog_page(category_id)
+async def get_info_for_catalog_page(category_id: int, request: Request):
+    return await FilterService.get_info_for_catalog_page(category_id, request)
 
 
-@router.get("/search/", response_model=List[ProductResponse])
-async def search_products(search_term: str = Query(..., title="Search Term"), sort_by: Optional[str] = Query(None, title="Sort By")):
+@router.get("/search/", response_model=List[ProductInCatalogInfo])
+async def search_products(
+        request: Request,
+        search_term: str = Query(..., title="Search Term"),
+        sort_by: Optional[str] = Query(None, title="Sort By")):
     """- ** sort_by **: Поле для сортировки(например, "price", "name", "-price", "-name"). products"""
-    products = await FilterService.search_products_by_name(search_term, sort_by)
+    products = await FilterService.search_products_by_name(request, search_term, sort_by)
     return products
 
 
-@router.post("/products/by-category", response_model=List[GetProductResponseWithNames])
+@router.post("/products/by-category", response_model=List[ProductInCatalogInfo])
 async def get_products_by_category(
+        request: Request,
         filters: CatalogFilters,
         sort_by: SortByEnum,
         filter_by_params: FilterByParamsEnum):
-    products = await FilterService.get_products_by_category_id(filters, sort_by, filter_by_params)
+    products = await FilterService.get_products_by_category_id(request, filters, sort_by, filter_by_params)
     return products
 
