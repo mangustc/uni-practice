@@ -1334,3 +1334,384 @@ async def get_products_by_category_name(cls, category_name: str, filters: dict =
     #         get_products_by_article=products_by_article,
     #         characteristics=characteristics
     #     )
+    @classmethod
+    async def get_products_by_category_name_true(cls, category_name: str, filters: dict = None,
+                                                 sort_by: str = None, filter_by_params: str = None):
+        # Получаем категорию по имени
+        query = select(Category).where(Category.name == category_name)
+        async with new_session() as db:
+            result = await db.execute(query)
+        result = result.scalars().first()
+
+        if result is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Категория с таким названием не найдена"
+            )
+
+        # Получаем все подкатегории и саму категорию
+        category_ids = [result.id]
+        categories = [result]
+
+        while categories:
+            temp = [elem.id for elem in categories]
+            query = select(Category).where(Category.parent_id.in_(temp))
+            async with new_session() as db:
+                result = await db.execute(query)
+            categories = result.scalars().all()
+            category_ids.extend([cat.id for cat in categories])
+
+        # Формируем базовый запрос на получение продуктов
+        query = select(Product).options(
+            joinedload(Product.category),
+            joinedload(Product.color),
+            joinedload(Product.characteristics)
+        ).where(Product.category_id.in_(category_ids))
+
+        # Применяем фильтры, если они заданы
+        if filters:
+            # Создаем подзапрос для фильтрации характеристик
+            characteristic_filters = []
+
+            for property_id, value in filters.items():
+                characteristic_filters.append(
+                    and_(
+                        Characteristic.product_id == Product.id,
+                        Characteristic.property_id == property_id,
+                        Characteristic.property_value == value
+                    )
+                )
+
+            # Используем GROUP BY и HAVING для фильтрации по всем характеристикам
+            if characteristic_filters:
+                subquery = (
+                    select(Characteristic.product_id)
+                    .filter(or_(*characteristic_filters))
+                    .group_by(Characteristic.product_id)
+                    .having(func.count(Characteristic.product_id) == len(filters))
+                ).subquery()
+
+                query = query.filter(Product.id.in_(subquery))
+
+        # Добавляем условие для фильтрации по параметрам (hit, promotion, new)
+        if filter_by_params:
+            if filter_by_params == 'new':
+                query = query.filter(Product.new.is_(True))
+            elif filter_by_params == 'hit':
+                query = query.filter(Product.hit.is_(True))
+            elif filter_by_params == 'promotion':
+                query = query.filter(Product.promotion.is_(True))
+
+        # Применяем сортировку, если она задана
+        if sort_by:
+            sort_direction = 'asc'  # По умолчанию - по возрастанию
+            if sort_by.startswith('-'):
+                sort_direction = 'desc'
+                sort_by = sort_by[1:]  # Убираем символ '-'
+
+            if sort_by == "price":
+                if sort_direction == 'asc':
+                    query = query.order_by(asc(Product.price))
+                else:
+                    query = query.order_by(desc(Product.price))
+            elif sort_by == "name":
+                if sort_direction == 'asc':
+                    query = query.order_by(asc(Product.name))
+                else:
+                    query = query.order_by(desc(Product.name))
+
+        async with new_session() as db:
+            result = await db.execute(query)
+
+        products = result.scalars().unique().all()
+
+        return [GetProductResponseWithNames(
+            product_id=p.id,
+            category_id=p.category_id,
+            category_name=p.category.name,
+            article_id=p.article_id,
+            color_id=p.color_id,
+            color_name=p.color.name if p.color else None,
+            product_name=p.name,
+            product_description=p.description,
+            product_measured_in=p.measured_in,
+            product_amount=p.amount,
+            product_price=p.price,
+            product_new=p.new,
+            product_hit=p.hit,
+            product_promotion=p.promotion,
+            product_percent_promotion=p.percent_promotion,
+            product_new_price=p.new_price
+        ).__dict__ for p in products]
+
+        # @router.get("/{category_name}", response_model=List[ProductResponse])
+# async def get_filter_products(
+#         category_name: str,
+#         filters: Optional[str] = Query(None),  # JSON строка с фильтрами
+#         sort_by: Optional[str] = Query(None),  # Поле для сортировки
+#         filter_by_params: Optional[str] = Query(None)  # Фильтрация по hit, promotion, new
+# ):
+#     """
+#     Получение товаров по имени категории с возможностью фильтрации и сортировки.
+#
+#     - **category_name**: Название категории товаров.
+#     - **filters**: JSON строка с фильтрами по характеристикам ({"property_id": "value"}).
+#     - **sort_by**: Поле для сортировки (например, "price", "name", "-price", "-name").
+#     - **filter_by_params**: Фильтрация по параметрам (hit, promotion, new).
+#     """
+#     # Преобразуем JSON строку в словарь, если она есть
+#     filters_dict = None
+#     if filters:
+#         try:
+#             filters_dict = json.loads(filters)
+#         except json.JSONDecodeError:
+#             raise HTTPException(status_code=400, detail="Invalid JSON format for filters")
+#
+#     products = await FilterService.get_products_by_category_name_true(category_name, filters_dict, sort_by, filter_by_params)
+#
+#     return products
+
+
+@classmethod
+    # async def get_products_by_category_id(
+    #         cls,
+    #         filters: CatalogFilters,
+    #         sort_by: SortByEnum,
+    #         filter_by_params: FilterByParamsEnum
+    # ):
+    #     """
+    #     Получает продукты по ID категории с применением фильтров и сортировки.
+    #     """
+    #
+    #     # Получаем все подкатегории и саму категорию
+    #     category_ids = await cls.get_all_subcategory_ids(filters.categoryID)
+    #
+    #     # Формируем базовый запрос на получение продуктов
+    #     query = select(Product).options(
+    #         joinedload(Product.category),
+    #         joinedload(Product.color),
+    #         joinedload(Product.characteristics)
+    #     ).where(Product.category_id.in_(category_ids))
+    #
+    #     # Применяем фильтры из объекта filters
+    #     if filters:
+    #         if filters.productOnlyInStock:
+    #             query = query.filter(Product.amount > 0)
+    #
+    #         if filters.productPriceStart is not None:
+    #             query = query.filter(Product.price >= filters.productPriceStart)
+    #
+    #         if filters.productPriceEnd is not None:
+    #             query = query.filter(Product.price <= filters.productPriceEnd)
+    #
+    #         if filters.colors:
+    #             query = query.filter(Product.color_id.in_(filters.colors))
+    #
+    #         if filters.properties:
+    #             characteristic_filters = []
+    #             for prop_filter in filters.properties:
+    #                 characteristic_filters.append(
+    #                     and_(
+    #                         Characteristic.product_id == Product.id,
+    #                         Characteristic.property_id == prop_filter.propertyID,
+    #                         Characteristic.property_value.in_(prop_filter.propertyValues)
+    #                     )
+    #                 )
+    #
+    #             if characteristic_filters:
+    #                 subquery = (
+    #                     select(Characteristic.product_id)
+    #                     .filter(or_(*characteristic_filters))
+    #                     .group_by(Characteristic.product_id)
+    #                     .having(func.count(Characteristic.product_id) == len(filters.properties))
+    #                 ).subquery()
+    #
+    #                 query = query.filter(Product.id.in_(subquery))
+    #
+    #     # Добавляем условие для фильтрации по параметрам (hit, promotion, new)
+    #     if filter_by_params:
+    #         if filter_by_params == FilterByParamsEnum.new:
+    #             query = query.filter(Product.new.is_(True))
+    #         elif filter_by_params == FilterByParamsEnum.hit:
+    #             query = query.filter(Product.hit.is_(True))
+    #         elif filter_by_params == FilterByParamsEnum.promotion:
+    #             query = query.filter(Product.promotion.is_(True))
+    #
+    #     # Применяем сортировку
+    #     if sort_by == SortByEnum.price_asc:
+    #         query = query.order_by(asc(Product.price))
+    #     elif sort_by == SortByEnum.price_desc:
+    #         query = query.order_by(desc(Product.price))
+    #     elif sort_by == SortByEnum.name_asc:
+    #         query = query.order_by(asc(Product.name))
+    #     elif sort_by == SortByEnum.name_desc:
+    #         query = query.order_by(desc(Product.name))
+    #
+    #     async with new_session() as db:
+    #         result = await db.execute(query)
+    #
+    #     products = result.scalars().unique().all()
+    #
+    #     return [GetProductResponseWithNames(
+    #         product_id=p.id,
+    #         category_id=p.category_id,
+    #         category_name=p.category.name,
+    #         article_id=p.article_id,
+    #         color_id=p.color_id,
+    #         color_name=p.color.name if p.color else None,
+    #         product_name=p.name,
+    #         product_description=p.description,
+    #         product_measured_in=p.measured_in,
+    #         product_amount=p.amount,
+    #         product_price=p.price,
+    #         product_new=p.new,
+    #         product_hit=p.hit,
+    #         product_promotion=p.promotion,
+    #         product_percent_promotion=p.percent_promotion,
+    #         product_new_price=p.new_price
+    #     ).__dict__ for p in products]
+
+
+    #ФИЛЬТРАЦИЯ ОТ 18.02.25
+    @router.get("test/{category_name}", response_model=List[ProductResponse])
+async def get_filter_products_test(
+        category_name: str,
+        filters: Optional[str] = Query(None),  # JSON строка с фильтрами
+        sort_by: Optional[str] = Query(None),  # Поле для сортировки
+        filter_by_params: Optional[str] = Query(None)  # Фильтрация по hit, promotion, new
+):
+    """
+    Получение товаров по имени категории с возможностью фильтрации и сортировки.
+
+    - **category_name**: Название категории товаров.
+    - **filters**: JSON строка с фильтрами по характеристикам ({"property_id": "value", "color_name": "Синий"}).
+    - **sort_by**: Поле для сортировки (например, "price", "name", "-price", "-name").
+    - **filter_by_params**: Фильтрация по параметрам (hit, promotion, new).
+    """
+    # Преобразуем JSON строку в словарь, если она есть
+    filters_dict = None
+    if filters:
+        try:
+            filters_dict = json.loads(filters)
+        except json.JSONDecodeError:
+            raise HTTPException(status_code=400, detail="Invalid JSON format for filters")
+
+    products = await FilterService.get_products_by_category_name_test(category_name, filters_dict, sort_by, filter_by_params)
+
+    return products
+
+    @classmethod
+    async def get_products_by_category_name_test(cls, category_name: str, filters: dict = None,
+                                                 sort_by: str = None, filter_by_params: str = None):
+        # Получаем категорию по имени
+        query = select(Category).where(Category.name == category_name)
+        async with new_session() as db:
+            result = await db.execute(query)
+        result = result.scalars().first()
+
+        if result is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Категория с таким названием не найдена"
+            )
+
+        # Получаем все подкатегории и саму категорию
+        category_ids = [result.id]
+        categories = [result]
+
+        while categories:
+            temp = [elem.id for elem in categories]
+            query = select(Category).where(Category.parent_id.in_(temp))
+            async with new_session() as db:
+                result = await db.execute(query)
+            categories = result.scalars().all()
+            category_ids.extend([cat.id for cat in categories])
+
+        # Формируем базовый запрос на получение продуктов
+        query = select(Product).options(
+            joinedload(Product.category),
+            joinedload(Product.color),
+            joinedload(Product.characteristics)
+        ).where(Product.category_id.in_(category_ids))
+
+        # Применяем фильтры, если они заданы
+        if filters:
+            # Извлекаем color_name из фильтров
+            color_name = filters.pop('color_name', None)  # Извлекаем color_name из фильтров
+
+            if color_name:
+                # Добавляем условие для фильтрации по цвету
+                query = query.join(Color, Product.color_id == Color.id).filter(Color.name == color_name)
+
+            # Создаем подзапрос для фильтрации характеристик
+            characteristic_filters = []
+
+            for property_id, value in filters.items():
+                characteristic_filters.append(
+                    and_(
+                        Characteristic.product_id == Product.id,
+                        Characteristic.property_id == property_id,
+                        Characteristic.property_value == value
+                    )
+                )
+
+            # Используем GROUP BY и HAVING для фильтрации по всем характеристикам
+            if characteristic_filters:
+                subquery = (
+                    select(Characteristic.product_id)
+                    .filter(or_(*characteristic_filters))
+                    .group_by(Characteristic.product_id)
+                    .having(func.count(Characteristic.product_id) == len(filters))
+                ).subquery()
+
+                query = query.filter(Product.id.in_(subquery))
+
+        # Добавляем условие для фильтрации по параметрам (hit, promotion, new)
+        if filter_by_params:
+            if filter_by_params == 'new':
+                query = query.filter(Product.new.is_(True))
+            elif filter_by_params == 'hit':
+                query = query.filter(Product.hit.is_(True))
+            elif filter_by_params == 'promotion':
+                query = query.filter(Product.promotion.is_(True))
+
+        # Применяем сортировку, если она задана
+        if sort_by:
+            sort_direction = 'asc'  # По умолчанию - по возрастанию
+            if sort_by.startswith('-'):
+                sort_direction = 'desc'
+                sort_by = sort_by[1:]  # Убираем символ '-'
+
+            if sort_by == "price":
+                if sort_direction == 'asc':
+                    query = query.order_by(asc(Product.price))
+                else:
+                    query = query.order_by(desc(Product.price))
+            elif sort_by == "name":
+                if sort_direction == 'asc':
+                    query = query.order_by(asc(Product.name))
+                else:
+                    query = query.order_by(desc(Product.name))
+
+        async with new_session() as db:
+            result = await db.execute(query)
+
+        products = result.scalars().unique().all()
+
+        return [GetProductResponseWithNames(
+            product_id=p.id,
+            category_id=p.category_id,
+            category_name=p.category.name,
+            article_id=p.article_id,
+            color_id=p.color_id,
+            color_name=p.color.name if p.color else None,
+            product_name=p.name,
+            product_description=p.description,
+            product_measured_in=p.measured_in,
+            product_amount=p.amount,
+            product_price=p.price,
+            product_new=p.new,
+            product_hit=p.hit,
+            product_promotion=p.promotion,
+            product_percent_promotion=p.percent_promotion,
+            product_new_price=p.new_price
+        ).__dict__ for p in products]
+
