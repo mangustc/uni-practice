@@ -86,17 +86,29 @@ export const Catalog = function () {
     );
   }
   function updateCategoryID(newCategoryID: number) {
-    setCurrentValues({
-      ...currentValues,
-      currentCategoryID: newCategoryID,
+    requests.GET_GetInfoForCatalogPage(newCategoryID).then((obj) => {
+      const newFilters = objects.NewCatalogFilters({});
+      const newSort = DEFAULT_SORT;
+      setCurrentValues({
+        ...currentValues,
+        currentCategoryID: newCategoryID,
+        currentFilters: newFilters,
+        currentSort: newSort,
+        categories: obj.categories,
+        colors: obj.colors,
+        properties: obj.properties,
+        priceMin: obj.priceMin,
+        priceMax: obj.priceMax,
+      });
+      setProducts(obj.productCatalogList);
+      setSearchParams(
+        createSearchParams({
+          currentFilters: JSON.stringify(newFilters),
+          currentSort: newSort,
+          currentCategoryID: String(newCategoryID),
+        }),
+      );
     });
-    setSearchParams(
-      createSearchParams({
-        currentFilters: JSON.stringify(currentValues.currentFilters),
-        currentSort: currentValues.currentSort,
-        currentCategoryID: String(newCategoryID),
-      }),
-    );
   }
   function updateSort(newSort: string) {
     setCurrentValues({
@@ -130,7 +142,9 @@ export const Catalog = function () {
         />
         <textarea
           value={
-            "filtering values:\n" +
+            "categoryID value: " +
+            JSON.stringify(currentValues.currentCategoryID, null, 2) +
+            "\nfiltering values:\n" +
             JSON.stringify(currentValues.currentFilters, null, 2) +
             "\nsorting value: " +
             JSON.stringify(currentValues.currentSort, null, 2)
