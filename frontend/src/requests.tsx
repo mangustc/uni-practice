@@ -6,6 +6,98 @@ const HEADER_JSON = {
   accept: "application/json",
 };
 
+// uncomment responses to get real values
+export async function GET_GetInfoForCatalogPage(
+  categoryID: number,
+): Promise<objects.CatalogPageValues> {
+  // let response = await fetch(
+  //   BACKEND_URL + `/filter/get_info_for_catalog_page/${categoryID}`,
+  //   {
+  //     method: "GET",
+  //     headers: HEADER_JSON,
+  //     credentials: "include",
+  //   },
+  // );
+  // const json: objects.CatalogPageInfoIn = await response.json();
+  //
+  // // TODO: HANDLE ERROR
+  // const status = response.status;
+  const json: objects.CatalogPageInfoIn = {
+    max_price: 1000,
+    min_price: 121,
+    products: [],
+    categories: [
+      {
+        category_id: 1,
+        category_name: "test",
+      },
+      {
+        category_id: 2,
+        category_name: "test2",
+      },
+      {
+        category_id: 3,
+        category_name: "test3",
+        category_parent_id: 1,
+      },
+      {
+        category_id: 4,
+        category_name: "test4",
+        category_parent_id: 1,
+      },
+      {
+        category_id: 5,
+        category_name: "test6",
+        category_parent_id: 1,
+      },
+      {
+        category_id: 6,
+        category_name: "testunder",
+        category_parent_id: 3,
+      },
+    ],
+    colors: [
+      {
+        color_id: 1,
+        color_name: "GREEEEN",
+      },
+      {
+        color_id: 2,
+        color_name: "Blue",
+      },
+      {
+        color_id: 3,
+        color_name: "yellaw",
+      },
+    ],
+    properties: [
+      {
+        property_id: 1,
+        property_name: "Shirina",
+        values: ["1m", "2m", "3mm"],
+      },
+      {
+        property_id: 2,
+        property_name: "Material",
+        values: ["nyandozite", "iron", "silver"],
+      },
+      {
+        property_id: 3,
+        property_name: "ueoa",
+        values: ["ueoa", "p.,'", "kjq;"],
+      },
+      {
+        property_id: 4,
+        property_name: "hsnt",
+        values: ["gclr", "hstn", "mzvw"],
+      },
+    ],
+    number_of_products: 1111111111111,
+  };
+
+  return objects.GetCatalogPageValues(json);
+}
+
 export async function GET_GetCategoryList() {
   // let response = await fetch(BACKEND_URL + "/dish/get_dishes", {
   //   method: "POST",

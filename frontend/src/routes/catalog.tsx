@@ -14,6 +14,9 @@ export const Catalog = function () {
     sorts: objects.CatalogSort[];
     currentFilters: objects.CatalogFilters;
     currentSort: string;
+    priceMin: number;
+    priceMax: number;
+    productAmount: number;
   }>({
     categories: [],
     properties: [],
@@ -36,35 +39,30 @@ export const Catalog = function () {
         sortName: "От Я до А",
       },
     ],
+    priceMin: 0,
+    priceMax: 0,
+    productAmount: 0,
     currentFilters: objects.NewCatalogFilters(
       JSON.parse(searchParams.get("currentFilters") ?? "{}"),
     ),
     currentSort: searchParams.get("currentSort") ?? "price",
   });
+  const [products, setProducts] = useState<objects.ProductCatalog[]>([]);
 
   useEffect(() => {
-    requests.GET_GetCategoryList().then((categories) => {
-      setCurrentValues({
-        ...currentValues,
-        categories: categories,
-        colors: [
-          { colorID: 1, colorName: "Green" },
-          { colorID: 2, colorName: "GREEEN" },
-        ],
-        properties: [
-          {
-            propertyID: 1,
-            propertyName: "Shirina",
-            propertyValues: ["long", "short", "extra long"],
-          },
-          {
-            propertyID: 2,
-            propertyName: "material",
-            propertyValues: ["gold", "silver", "copper"],
-          },
-        ],
+    requests
+      .GET_GetInfoForCatalogPage(currentValues.currentFilters.categoryID)
+      .then((obj) => {
+        setCurrentValues({
+          ...currentValues,
+          categories: obj.categories,
+          colors: obj.colors,
+          properties: obj.properties,
+          priceMin: obj.priceMin,
+          priceMax: obj.priceMax,
+        });
+        setProducts(obj.productCatalogList);
       });
-    });
   }, []);
 
   function updateSearchParams(
@@ -97,6 +95,8 @@ export const Catalog = function () {
           categories={currentValues.categories}
           properties={currentValues.properties}
           colors={currentValues.colors}
+          priceMax={currentValues.priceMax}
+          priceMin={currentValues.priceMin}
         />
         <textarea
           value={

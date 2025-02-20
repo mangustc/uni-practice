@@ -58,12 +58,16 @@ function CatalogFilter({
   categories,
   properties,
   colors,
+  priceMax,
+  priceMin,
 }: {
   initFilters: objects.CatalogFilters;
   updateFilters: (newFilters: objects.CatalogFilters) => void;
   categories: objects.Category[];
   properties: objects.Property[];
   colors: objects.Color[];
+  priceMax: number;
+  priceMin: number;
 }) {
   function JSX_PrintTree(treeObj: Tree) {
     return (
@@ -152,7 +156,10 @@ function CatalogFilter({
       <div style={{ display: "flex", flexDirection: "row" }}>
         <input
           type="number"
-          value={filters.productPriceStart}
+          placeholder={String(priceMin)}
+          value={
+            filters.productPriceStart === 0 ? "" : filters.productPriceStart
+          }
           onChange={(e) =>
             setFilters({
               ...filters,
@@ -162,7 +169,8 @@ function CatalogFilter({
         />
         <input
           type="number"
-          value={filters.productPriceEnd}
+          placeholder={String(priceMax)}
+          value={filters.productPriceEnd === 0 ? "" : filters.productPriceEnd}
           onChange={(e) =>
             setFilters({
               ...filters,
