@@ -54,13 +54,13 @@ function getCategoryTreeFromList(categories: objects.Category[]) {
 
 function CatalogFilter({
   initFilters,
-  updateSearchParams,
+  updateFilters: updateFilters,
   categories,
   properties,
   colors,
 }: {
   initFilters: objects.CatalogFilters;
-  updateSearchParams: (newFilters: objects.CatalogFilters) => any;
+  updateFilters: (newFilters: objects.CatalogFilters) => void;
   categories: objects.Category[];
   properties: objects.Property[];
   colors: objects.Color[];
@@ -74,7 +74,7 @@ function CatalogFilter({
               ...initFilters,
               categoryID: util.Num(treeObj.val.categoryID),
             };
-            updateSearchParams(newFilters);
+            updateFilters(newFilters);
             setFilters(newFilters);
           }}
           style={{ cursor: "pointer" }}
@@ -174,7 +174,10 @@ function CatalogFilter({
       <div style={{ display: "flex", flexDirection: "column" }}>
         <h5>Colors:</h5>
         {colors.map((color) => (
-          <div style={{ display: "flex", flexDirection: "row" }}>
+          <div
+            key={color.colorID}
+            style={{ display: "flex", flexDirection: "row" }}
+          >
             <label>{color.colorName}</label>
             <input
               type="checkbox"
@@ -207,10 +210,19 @@ function CatalogFilter({
           });
         }
         return (
-          <div style={{ display: "flex", flexDirection: "column" }}>
+          <div
+            key={property.propertyID}
+            style={{ display: "flex", flexDirection: "column" }}
+          >
             <h5>{property.propertyName}:</h5>
             {property.propertyValues.map((value) => (
-              <div style={{ display: "flex", flexDirection: "row" }}>
+              <div
+                key={
+                  String(filters.properties[filterPropertyIndex].propertyID) +
+                  value
+                }
+                style={{ display: "flex", flexDirection: "row" }}
+              >
                 <label>{value}</label>
                 <input
                   type="checkbox"
@@ -240,7 +252,7 @@ function CatalogFilter({
           </div>
         );
       })}
-      <button onClick={() => updateSearchParams(structuredClone(filters))}>
+      <button onClick={() => updateFilters(structuredClone(filters))}>
         Применить фильтры
       </button>
     </div>

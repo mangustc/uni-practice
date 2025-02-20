@@ -3,6 +3,7 @@ import * as objects from "../objects";
 import * as requests from "../requests";
 import CatalogFilter from "../components/catalog-filter";
 import { useEffect, useState } from "react";
+import CatalogSort from "../components/catalog-sort";
 
 export const Catalog = function () {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -10,14 +11,35 @@ export const Catalog = function () {
     categories: objects.Category[];
     properties: objects.Property[];
     colors: objects.Color[];
-    filters: objects.CatalogFilters;
+    sorts: objects.CatalogSort[];
+    currentFilters: objects.CatalogFilters;
+    currentSort: string;
   }>({
     categories: [],
     properties: [],
     colors: [],
-    filters: objects.NewCatalogFilters(
+    sorts: [
+      {
+        sortValue: "price",
+        sortName: "По возрастанию цены",
+      },
+      {
+        sortValue: "-price",
+        sortName: "По убыванию цены",
+      },
+      {
+        sortValue: "name",
+        sortName: "От А до Я",
+      },
+      {
+        sortValue: "-name",
+        sortName: "От Я до А",
+      },
+    ],
+    currentFilters: objects.NewCatalogFilters(
       JSON.parse(searchParams.get("currentFilters") ?? "{}"),
     ),
+    currentSort: searchParams.get("currentSort") ?? "price",
   });
 
   useEffect(() => {
@@ -45,10 +67,22 @@ export const Catalog = function () {
     });
   }, []);
 
-  function updateSearchParams(newFilters: objects.CatalogFilters) {
-    setCurrentValues({ ...currentValues, filters: newFilters });
+  function updateSearchParams(
+    newFilters?: objects.CatalogFilters,
+    newSort?: string,
+  ) {
+    const _newFilters = newFilters ?? currentValues.currentFilters;
+    const _newSort = newSort ?? currentValues.currentSort;
+    setCurrentValues({
+      ...currentValues,
+      currentFilters: _newFilters,
+      currentSort: _newSort,
+    });
     setSearchParams(
-      createSearchParams({ currentFilters: JSON.stringify(newFilters) }),
+      createSearchParams({
+        currentFilters: JSON.stringify(_newFilters),
+        currentSort: _newSort,
+      }),
     );
   }
 
@@ -56,8 +90,10 @@ export const Catalog = function () {
     <>
       <div style={{ display: "flex", flexDirection: "row" }}>
         <CatalogFilter
-          initFilters={currentValues.filters}
-          updateSearchParams={updateSearchParams}
+          initFilters={currentValues.currentFilters}
+          updateFilters={(newFilters: objects.CatalogFilters) =>
+            updateSearchParams(newFilters, undefined)
+          }
           categories={currentValues.categories}
           properties={currentValues.properties}
           colors={currentValues.colors}
@@ -65,10 +101,19 @@ export const Catalog = function () {
         <textarea
           value={
             "filtering values:\n" +
-            JSON.stringify(currentValues.filters, null, 2)
+            JSON.stringify(currentValues.currentFilters, null, 2) +
+            "\nsorting value: " +
+            JSON.stringify(currentValues.currentSort, null, 2)
           }
           readOnly
         ></textarea>
+        <CatalogSort
+          currentSort={currentValues.currentSort}
+          sorts={currentValues.sorts}
+          updateSort={(newSort: string) =>
+            updateSearchParams(undefined, newSort)
+          }
+        />
       </div>
     </>
   );

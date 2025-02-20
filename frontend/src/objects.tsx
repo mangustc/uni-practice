@@ -2,6 +2,11 @@ const DEFAULT_NUMBER = 0;
 const DEFAULT_STRING = "";
 const DEFAULT_BOOLEAN = false;
 
+export type CatalogSort = {
+  sortValue: string;
+  sortName: string;
+};
+
 export type Property = {
   propertyID: number;
   propertyName?: string;
