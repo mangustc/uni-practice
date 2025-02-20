@@ -1,18 +1,24 @@
-export default function Card() {
-    return(
+import * as objects from "../objects.tsx";
+
+export default function Card({productCatalog, photoSrc}: {
+    productCatalog: objects.ProductCatalog;
+    photoSrc: string;
+
+}) {
+    return (
         <div className="card-container">
             <div className="card-photo">
                 <div>
-                <div className="card-filter">Хит</div>
-                <div className="card-filter">Новинка</div>
-                <div className="card-filter">Акция</div>
+                    {productCatalog.productHit ? <div className="card-filter">Хит</div> : null}
+                    {productCatalog.productNew ? <div className="card-filter">Новинка</div> : null}
+                    {productCatalog.productPromotion ? <div className="card-filter">Акция</div> : null}
                 </div>
                 <div className="card-like"></div>
-                
+
             </div>
-            <span className="card-name">Text</span>
-            <span className="card-descr">Цена, м</span>
-            <span className="card-cost">14 Р</span>
+            <span className="card-name">{productCatalog.productName}</span>
+            <span className="card-descr">Цена, {productCatalog.productMeasuredIn}</span>
+            <span className="card-cost">{productCatalog.productPrice} ₽</span>
             <button className="card-add-btn">В корзину</button>
         </div>
     );
