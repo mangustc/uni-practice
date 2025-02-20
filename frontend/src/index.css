@@ -520,9 +520,9 @@ p {
   margin-bottom: 14px;
   background-color: rosybrown;
   display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: flex-end;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
 }
 
 .card-name {
@@ -557,10 +557,46 @@ p {
   color: #e32636;
   font-weight: var(--text-weight-h);
   font-size: var(--text-size-15px);
+  transition: all 200ms ease;
 }
 
 .card-add-btn:hover {
   background-color: #e32636;
   color: white;
+  cursor: pointer;
+}
+
+.card-like {
+  margin-top: 12px;
+  margin-right: 12px;
+  width: 24px;
+  height: 24px;
+  background-image: url("../public/red-heart.svg");
+  transition: all 200ms ease;
+}
+
+.card-like:hover {
+  background-image: url("../public/red-heart-fill.svg");
+}
+
+.card-filter {
+  height: 14px;
+  width: fit-content;
+  border-radius: 2px;
+  background-color: var(--text-color-red-main);
+  margin: 10px 0px 10px 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 5px 8px 5px 8px;
+  font-size: var(--text-size-12px);
+  font-weight: var(--text-weight-link);
+  color: white;
+  /* visibility: hidden; */
+}
+
+.card-filter:hover {
+  background-color: var(--text-color-red-main-hover);
   cursor: pointer;
 }
