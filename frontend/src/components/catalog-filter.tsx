@@ -1,24 +1,23 @@
-import { useEffect, useState } from "react";
-import * as requests from "../requests.tsx";
 import * as util from "../util.tsx";
 import * as objects from "../objects.tsx";
 
 function CatalogFilter({
-  initFilters,
+  filters,
+  setFilters,
   updateFilters: updateFilters,
   properties,
   colors,
   priceMax,
   priceMin,
 }: {
-  initFilters: objects.CatalogFilters;
+  filters: objects.CatalogFilters;
+  setFilters: React.Dispatch<any>;
   updateFilters: (newFilters: objects.CatalogFilters) => void;
   properties: objects.Property[];
   colors: objects.Color[];
   priceMax: number;
   priceMin: number;
 }) {
-  const [filters, setFilters] = useState(structuredClone(initFilters));
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
       <div style={{ display: "flex", flexDirection: "row", gap: "20px" }}>

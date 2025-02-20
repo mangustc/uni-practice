@@ -55,6 +55,7 @@ export const Catalog = function () {
     currentSort: searchParams.get("currentSort") ?? DEFAULT_SORT,
   });
   const [products, setProducts] = useState<objects.ProductCatalog[]>([]);
+  const [tempFilters, setTempFilters] = useState(currentValues.currentFilters);
 
   useEffect(() => {
     requests
@@ -89,6 +90,7 @@ export const Catalog = function () {
     requests.GET_GetInfoForCatalogPage(newCategoryID).then((obj) => {
       const newFilters = objects.NewCatalogFilters({});
       const newSort = DEFAULT_SORT;
+      setTempFilters(objects.NewCatalogFilters({}));
       setCurrentValues({
         ...currentValues,
         currentCategoryID: newCategoryID,
@@ -133,7 +135,8 @@ export const Catalog = function () {
           updateCategoryID={updateCategoryID}
         />
         <CatalogFilter
-          initFilters={currentValues.currentFilters}
+          filters={tempFilters}
+          setFilters={setTempFilters}
           updateFilters={updateFilters}
           properties={currentValues.properties}
           colors={currentValues.colors}
