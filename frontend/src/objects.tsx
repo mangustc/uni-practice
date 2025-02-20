@@ -179,3 +179,63 @@ export function GetCatalogPageValues(
     productAmount: obj.number_of_products ?? DEFAULT_NUMBER,
   };
 }
+
+export type ProductInCartIn = {
+  product_id?: number;
+  article_id?: number;
+  product_name?: string;
+  product_measured_in?: string;
+  product_amount?: number;
+  product_amount_in_cart?: number;
+  product_price?: number;
+  product_percent_promotion?: number | null;
+  product_new_price?: number | null;
+  total_price?: number;
+}
+
+export type CartIn = {
+  items?: ProductInCartIn[];
+  total_products_price?: number;
+  total_promotion_price?: number;
+  total_cart_price?: number;
+}
+
+export type ProductInCart = {
+  productID: number;
+  articleID: number;
+  productName: string;
+  productMeasuredIn: string;
+  productAmount: number;
+  productAmountInCart: number;
+  productPrice: number;
+  productPercentPromotion: number | null;
+  productNewPrice: number | null;
+  totalPrice: number;
+}
+
+export type Cart = {
+  items: ProductInCart[];
+  totalProductsPrice: number;
+  totalPromotionPrice: number;
+  totalCartPrice: number;
+}
+
+export function mapCart(obj: CartIn): Cart {
+  const cart: Cart = {items: [], totalProductsPrice: obj.total_products_price ?? DEFAULT_NUMBER,
+    totalPromotionPrice: obj.total_promotion_price ?? DEFAULT_NUMBER, totalCartPrice: obj.total_cart_price ?? DEFAULT_NUMBER};
+  for (const i of obj.items ?? []) {
+    cart.items.push({
+    productID: i.product_id ?? DEFAULT_NUMBER,
+    articleID: i.article_id ?? DEFAULT_NUMBER,
+    productName: i.product_name ?? DEFAULT_STRING,
+    productMeasuredIn: i.product_measured_in ?? DEFAULT_STRING,
+    productAmount: i.product_amount ?? DEFAULT_NUMBER,
+    productAmountInCart: i.product_amount_in_cart ?? DEFAULT_NUMBER,
+    productPrice: i.product_price ?? DEFAULT_NUMBER,
+    productPercentPromotion: i.product_percent_promotion ?? DEFAULT_NUMBER,
+    productNewPrice: i.product_new_price ?? DEFAULT_NUMBER,
+    totalPrice: i.total_price ?? DEFAULT_NUMBER
+    });
+  }
+  return cart;
+}

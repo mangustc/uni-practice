@@ -52,42 +52,46 @@ class CartService:
     @classmethod
     async def get_user_cart(cls, request: Request) -> CartResponse:
         user_data = await Functions.get_user_data(request)
+        query = select(Cart).options(
+            joinedload(Cart.product)).where(Cart.user_id == user_data["user_id"])
         async with new_session() as db:
-            query = select(Cart).where(Cart.user_id == user_data["user_id"])
             cart_items = await db.execute(query)
-            cart_items = cart_items.scalars().all()
+        cart_items = cart_items.scalars().all()
 
-            items: List[CartItem] = []
-            total_cart_price: float = 0.0
+        items: List[CartItem] = []
+        total_products_price: float = 0.0
+        total_promotion_price: float = 0.0
+        total_cart_price: float = 0.0
 
-            for cart_item in cart_items:
-                product_query = select(Product).where(Product.id == cart_item.product_id)
-                product_result = await db.execute(product_query)
-                product = product_result.scalars().first()
+        for cart_item in cart_items:
+            price = (cart_item.product.new_price if
+                     cart_item.product.promotion and cart_item.product.new_price is not None
+                     else cart_item.product.price)
+            total_products_price += cart_item.amount * cart_item.product.price
 
-                if product:
-                    # article_query = select(Article).where(Article.id == product.article_id)
-                    # article_result = await db.execute(article_query)
-                    # article = article_result.scalars().first()
+            total_price = cart_item.amount * price
+            if cart_item.product.new_price is not None:
+                total_promotion_price += cart_item.amount * cart_item.product.price - total_price
 
-                    # if article:
-                    price = product.new_price if product.promotion and product.new_price is not None else product.price
-
-                    total_price = cart_item.amount * price
-
-                    item = CartItem(
-                        product_id=cart_item.product_id,
-                        product_name=product.name,
-                        amount=cart_item.amount,
-                        total_price=total_price,
-                    )
-                    items.append(item)
-                    total_cart_price += total_price
-                else:
-                    await db.delete(cart_item)
-                    await db.commit()
-
-            return CartResponse(items=items, total_cart_price=total_cart_price)
+            item = CartItem(
+                product_id=cart_item.product_id,
+                article_id=cart_item.product.article_id,
+                product_name=cart_item.product.name,
+                product_measured_in=cart_item.product.measured_in,
+                product_amount=cart_item.product.amount,
+                product_amount_in_cart=cart_item.amount,
+                product_price=cart_item.product.price,
+                product_percent_promotion=cart_item.product.percent_promotion,
+                product_new_price=cart_item.product.new_price,
+                total_price=total_price
+            )
+            items.append(item)
+            total_cart_price += total_price
+        total_products_price = round(total_products_price, 2)
+        total_promotion_price = round(total_promotion_price, 2)
+        total_cart_price = round(total_cart_price, 2)
+        return CartResponse(items=items, total_products_price=total_products_price,
+                            total_promotion_price=total_promotion_price, total_cart_price=total_cart_price)
 
     @classmethod
     async def change_product_amount_in_cart(cls, request: Request, product_id: int, amount: float):
@@ -152,4 +156,22 @@ class CartService:
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail="Не удалось убрать продукт из корзины",
+                )
+
+    @classmethod
+    async def clear_cart(cls, request: Request):
+        user_data = await Functions.get_user_data(request)
+        query = select(Cart).where(Cart.user_id == user_data["user_id"])
+        async with new_session() as db:
+            result = await db.execute(query)
+            result = result.scalars().all()
+            await db.delete(result)
+            try:
+                await db.commit()
+                return {"message": "Продукты убраны из корзины"}  # Правильный формат
+            except IntegrityError:
+                await db.rollback()
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Не удалось убрать продукты из корзины",
                 )

@@ -5,6 +5,7 @@ import Root from "./routes/root";
 import "./index.css";
 import ErrorPage from "./error-page";
 import { Catalog } from "./routes/catalog";
+import { Cart } from "./routes/cart";
 
 const router = createBrowserRouter([
   {
@@ -16,6 +17,10 @@ const router = createBrowserRouter([
         path: "catalog",
         element: <Catalog />,
       },
+      {
+        path: "cart",
+        element: <Cart />,
+      }
     ],
   },
 ]);

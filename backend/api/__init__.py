@@ -12,7 +12,7 @@ from api.vacancyFile import router as vacancy_router
 from fastapi import APIRouter
 
 
-router = APIRouter()
+router = APIRouter(prefix="/api")
 router.include_router(user_router)
 router.include_router(product_router)
 router.include_router(category_router)

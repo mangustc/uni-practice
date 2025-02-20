@@ -206,3 +206,52 @@ export async function GET_GetCategoryList() {
     }),
   ];
 }
+
+export async function GET_GetCart() {
+   let response = await fetch(BACKEND_URL + "/cart/get_user_cart", {
+     method: "GET",
+     headers: HEADER_JSON,
+     credentials: "include",
+   });
+  return objects.mapCart(await response.json())
+  /*
+  return objects.mapCart({
+    items: [{
+      product_id: 1,
+      article_id: 262,
+      product_name: "test",
+      product_measured_in: "м",
+      product_amount: 5,
+      product_amount_in_cart: 2.5,
+      product_price: 110,
+      product_percent_promotion: null,
+      product_new_price: null,
+      total_price: 275
+    },
+    {
+      product_id: 7,
+      article_id: 631,
+      product_name: "test2",
+      product_measured_in: "шт",
+      product_amount: 7,
+      product_amount_in_cart: 1,
+      product_price: 230,
+      product_percent_promotion: 10,
+      product_new_price: 207,
+      total_price: 207
+    }
+  ],
+    total_products_price: 505,
+    total_promotion_price: 23,
+    total_cart_price: 482
+  });
+  */
+}
+
+export async function PUT_ChangeProductAmountInCart(productID: number, amount: number) {
+  await fetch(BACKEND_URL + `/cart/change_amount_in_cart/${productID}/${amount}`, {
+     method: "PUT",
+     headers: HEADER_JSON,
+     credentials: "include",
+  });
+}
