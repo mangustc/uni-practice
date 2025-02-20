@@ -30,7 +30,6 @@ export type Color = {
 };
 
 export type CatalogFiltersIn = {
-  categoryID?: number;
   productOnlyInStock?: boolean;
   productPriceStart?: number;
   productPriceEnd?: number;
@@ -39,7 +38,6 @@ export type CatalogFiltersIn = {
 };
 
 export type CatalogFilters = {
-  categoryID: number;
   productOnlyInStock: boolean;
   productPriceStart: number;
   productPriceEnd: number;
@@ -49,7 +47,6 @@ export type CatalogFilters = {
 
 export function NewCatalogFilters(obj: CatalogFiltersIn): CatalogFilters {
   return {
-    categoryID: obj.categoryID ?? DEFAULT_NUMBER,
     productOnlyInStock: obj.productOnlyInStock ?? DEFAULT_BOOLEAN,
     productPriceStart: obj.productPriceStart ?? DEFAULT_NUMBER,
     productPriceEnd: obj.productPriceEnd ?? DEFAULT_NUMBER,

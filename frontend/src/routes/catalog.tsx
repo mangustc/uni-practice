@@ -4,10 +4,12 @@ import * as requests from "../requests";
 import CatalogFilter from "../components/catalog-filter";
 import { useEffect, useState } from "react";
 import CatalogSort from "../components/catalog-sort";
+import { CatalogCategories } from "../components/catalog-categories";
 
 export const Catalog = function () {
   const [searchParams, setSearchParams] = useSearchParams();
   const [currentValues, setCurrentValues] = useState<{
+    currentCategoryID: number;
     categories: objects.Category[];
     properties: objects.Property[];
     colors: objects.Color[];
@@ -42,6 +44,9 @@ export const Catalog = function () {
     priceMin: 0,
     priceMax: 0,
     productAmount: 0,
+    currentCategoryID: searchParams.get("currentCategoryID")
+      ? Number(searchParams.get("currentCategoryID"))
+      : 0,
     currentFilters: objects.NewCatalogFilters(
       JSON.parse(searchParams.get("currentFilters") ?? "{}"),
     ),
@@ -51,7 +56,7 @@ export const Catalog = function () {
 
   useEffect(() => {
     requests
-      .GET_GetInfoForCatalogPage(currentValues.currentFilters.categoryID)
+      .GET_GetInfoForCatalogPage(currentValues.currentCategoryID)
       .then((obj) => {
         setCurrentValues({
           ...currentValues,
@@ -68,18 +73,22 @@ export const Catalog = function () {
   function updateSearchParams(
     newFilters?: objects.CatalogFilters,
     newSort?: string,
+    newCategoryID?: number,
   ) {
     const _newFilters = newFilters ?? currentValues.currentFilters;
     const _newSort = newSort ?? currentValues.currentSort;
+    const _newCategoryID = newCategoryID ?? currentValues.currentCategoryID;
     setCurrentValues({
       ...currentValues,
       currentFilters: _newFilters,
       currentSort: _newSort,
+      currentCategoryID: _newCategoryID,
     });
     setSearchParams(
       createSearchParams({
         currentFilters: JSON.stringify(_newFilters),
         currentSort: _newSort,
+        currentCategoryID: String(_newCategoryID),
       }),
     );
   }
@@ -87,12 +96,18 @@ export const Catalog = function () {
   return (
     <>
       <div style={{ display: "flex", flexDirection: "row" }}>
+        <CatalogCategories
+          categories={currentValues.categories}
+          currentCategoryID={currentValues.currentCategoryID}
+          updateCategoryID={(newCategoryID: number) =>
+            updateSearchParams(undefined, undefined, newCategoryID)
+          }
+        />
         <CatalogFilter
           initFilters={currentValues.currentFilters}
           updateFilters={(newFilters: objects.CatalogFilters) =>
-            updateSearchParams(newFilters, undefined)
+            updateSearchParams(newFilters, undefined, undefined)
           }
-          categories={currentValues.categories}
           properties={currentValues.properties}
           colors={currentValues.colors}
           priceMax={currentValues.priceMax}
@@ -111,7 +126,7 @@ export const Catalog = function () {
           currentSort={currentValues.currentSort}
           sorts={currentValues.sorts}
           updateSort={(newSort: string) =>
-            updateSearchParams(undefined, newSort)
+            updateSearchParams(undefined, newSort, undefined)
           }
         />
       </div>
