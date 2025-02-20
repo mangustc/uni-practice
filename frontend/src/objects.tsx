@@ -141,7 +141,7 @@ export function GetCatalogPageValues(
   for (const i of obj.properties ?? []) {
     properties.push({
       propertyID: i.property_id ?? DEFAULT_NUMBER,
-      propertyValues: structuredClone(i.values) ?? [],
+      propertyValues: structuredClone(i.values ?? []),
       propertyName: i.property_name ?? DEFAULT_STRING,
     });
   }
