@@ -43,7 +43,8 @@ class FilterService:
             query = select(Product).options(
                 joinedload(Product.characteristics)
                 .joinedload(Characteristic.property),
-                joinedload(Product.color)).where(Product.category_id.in_(category_ids))
+                joinedload(Product.color)).where(
+                Product.category_id.in_(category_ids)).order_by(asc(Product.price))
             result = await db.execute(query)
         result = result.scalars().unique()
         number_of_products = 0
