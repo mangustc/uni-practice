@@ -7,3 +7,4 @@ from services.classifierFile import *
 from services.cartFile import *
 from services.orderFile import *
 from services.feedbackFile import *
+from services.vacancyFile import *
