@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import CatalogSort from "../components/catalog-sort";
 import { CatalogCategories } from "../components/catalog-categories";
 
+const DEFAULT_SORT = "price";
+
 export const Catalog = function () {
   const [searchParams, setSearchParams] = useSearchParams();
   const [currentValues, setCurrentValues] = useState<{
@@ -50,7 +52,7 @@ export const Catalog = function () {
     currentFilters: objects.NewCatalogFilters(
       JSON.parse(searchParams.get("currentFilters") ?? "{}"),
     ),
-    currentSort: searchParams.get("currentSort") ?? "price",
+    currentSort: searchParams.get("currentSort") ?? DEFAULT_SORT,
   });
   const [products, setProducts] = useState<objects.ProductCatalog[]>([]);
 
@@ -70,25 +72,42 @@ export const Catalog = function () {
       });
   }, []);
 
-  function updateSearchParams(
-    newFilters?: objects.CatalogFilters,
-    newSort?: string,
-    newCategoryID?: number,
-  ) {
-    const _newFilters = newFilters ?? currentValues.currentFilters;
-    const _newSort = newSort ?? currentValues.currentSort;
-    const _newCategoryID = newCategoryID ?? currentValues.currentCategoryID;
+  function updateFilters(newFilters: objects.CatalogFilters) {
     setCurrentValues({
       ...currentValues,
-      currentFilters: _newFilters,
-      currentSort: _newSort,
-      currentCategoryID: _newCategoryID,
+      currentFilters: newFilters,
     });
     setSearchParams(
       createSearchParams({
-        currentFilters: JSON.stringify(_newFilters),
-        currentSort: _newSort,
-        currentCategoryID: String(_newCategoryID),
+        currentFilters: JSON.stringify(newFilters),
+        currentSort: currentValues.currentSort,
+        currentCategoryID: String(currentValues.currentCategoryID),
+      }),
+    );
+  }
+  function updateCategoryID(newCategoryID: number) {
+    setCurrentValues({
+      ...currentValues,
+      currentCategoryID: newCategoryID,
+    });
+    setSearchParams(
+      createSearchParams({
+        currentFilters: JSON.stringify(currentValues.currentFilters),
+        currentSort: currentValues.currentSort,
+        currentCategoryID: String(newCategoryID),
+      }),
+    );
+  }
+  function updateSort(newSort: string) {
+    setCurrentValues({
+      ...currentValues,
+      currentSort: newSort,
+    });
+    setSearchParams(
+      createSearchParams({
+        currentFilters: JSON.stringify(currentValues.currentFilters),
+        currentSort: newSort,
+        currentCategoryID: String(currentValues.currentCategoryID),
       }),
     );
   }
@@ -99,15 +118,11 @@ export const Catalog = function () {
         <CatalogCategories
           categories={currentValues.categories}
           currentCategoryID={currentValues.currentCategoryID}
-          updateCategoryID={(newCategoryID: number) =>
-            updateSearchParams(undefined, undefined, newCategoryID)
-          }
+          updateCategoryID={updateCategoryID}
         />
         <CatalogFilter
           initFilters={currentValues.currentFilters}
-          updateFilters={(newFilters: objects.CatalogFilters) =>
-            updateSearchParams(newFilters, undefined, undefined)
-          }
+          updateFilters={updateFilters}
           properties={currentValues.properties}
           colors={currentValues.colors}
           priceMax={currentValues.priceMax}
@@ -125,9 +140,7 @@ export const Catalog = function () {
         <CatalogSort
           currentSort={currentValues.currentSort}
           sorts={currentValues.sorts}
-          updateSort={(newSort: string) =>
-            updateSearchParams(undefined, newSort, undefined)
-          }
+          updateSort={updateSort}
         />
       </div>
     </>
