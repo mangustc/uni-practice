@@ -162,6 +162,29 @@ class Feedback(Base):
     is_processed = Column(Boolean, default=False)
 
 
+class Vacancy(Base):
+    __tablename__ = "vacancies"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, index=True)
+    description = Column(String)
+    requirements = Column(String)
+    responsibilities = Column(String)
+    salary = Column(String, nullable=True)
+
+
+class Resume(Base):
+    __tablename__ = "resumes"
+
+    id = Column(Integer, primary_key=True, index=True)
+    city = Column(String, nullable=False)
+    name = Column(String, nullable=False)
+    vacancy = Column(String, nullable=False)
+    phone = Column(String, nullable=False)
+    comment = Column(String, nullable=True)
+    file_name = Column(String, default="default_resume.pdf")
+
+
 async def create_tables():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)

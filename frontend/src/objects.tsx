@@ -2,10 +2,26 @@ const DEFAULT_NUMBER = 0;
 const DEFAULT_STRING = "";
 const DEFAULT_BOOLEAN = false;
 
+export type CatalogSort = {
+  sortValue: string;
+  sortName: string;
+};
+
+export type PropertyIn = {
+  property_id?: number;
+  property_name?: string;
+  values?: string[];
+};
+
 export type Property = {
   propertyID: number;
   propertyName?: string;
   propertyValues: string[];
+};
+
+export type ColorIn = {
+  color_id?: number;
+  color_name?: string;
 };
 
 export type Color = {
@@ -14,7 +30,6 @@ export type Color = {
 };
 
 export type CatalogFiltersIn = {
-  categoryID?: number;
   productOnlyInStock?: boolean;
   productPriceStart?: number;
   productPriceEnd?: number;
@@ -23,7 +38,6 @@ export type CatalogFiltersIn = {
 };
 
 export type CatalogFilters = {
-  categoryID: number;
   productOnlyInStock: boolean;
   productPriceStart: number;
   productPriceEnd: number;
@@ -33,7 +47,6 @@ export type CatalogFilters = {
 
 export function NewCatalogFilters(obj: CatalogFiltersIn): CatalogFilters {
   return {
-    categoryID: obj.categoryID ?? DEFAULT_NUMBER,
     productOnlyInStock: obj.productOnlyInStock ?? DEFAULT_BOOLEAN,
     productPriceStart: obj.productPriceStart ?? DEFAULT_NUMBER,
     productPriceEnd: obj.productPriceEnd ?? DEFAULT_NUMBER,
@@ -60,5 +73,109 @@ export function NewCategory(obj: CategoryIn): Category {
     categoryID: obj.category_id ?? DEFAULT_NUMBER,
     categoryName: obj.category_name ?? DEFAULT_STRING,
     categoryParentID: obj.category_parent_id ?? DEFAULT_NUMBER,
+  };
+}
+
+export type ProductCatalogIn = {
+  product_id?: number;
+  category_id?: number;
+  product_name?: string;
+  product_measured_in?: string;
+  product_in_stock?: boolean;
+  product_price?: number;
+  product_new?: boolean;
+  product_hit?: boolean;
+  product_promotion?: boolean;
+  product_percent_promotion?: number;
+  product_new_price?: number;
+  product_in_wishlist?: boolean;
+};
+
+export type ProductCatalog = {
+  productID: number;
+  categoryID: number;
+  productName: string;
+  productMeasuredIn: string;
+  productInStock: boolean;
+  productPrice: number;
+  productNew: boolean;
+  productHit: boolean;
+  productPromotion: boolean;
+  productPercentPromotion: number;
+  productNewPrice: number;
+  productInWishlist: boolean;
+};
+
+export type CatalogPageInfoIn = {
+  number_of_products?: number;
+  categories?: CategoryIn[];
+  min_price?: number;
+  max_price?: number;
+  colors?: ColorIn[];
+  properties?: PropertyIn[];
+  products?: ProductCatalogIn[];
+};
+
+export type CatalogPageValues = {
+  categories: Category[];
+  properties: Property[];
+  colors: Color[];
+  productCatalogList: ProductCatalog[];
+  priceMin: number;
+  priceMax: number;
+  productAmount: number;
+};
+
+export function GetCatalogPageValues(
+  obj: CatalogPageInfoIn,
+): CatalogPageValues {
+  const categories: Category[] = [];
+  for (const i of obj.categories ?? []) {
+    categories.push(NewCategory(i));
+  }
+
+  const properties: Property[] = [];
+  for (const i of obj.properties ?? []) {
+    properties.push({
+      propertyID: i.property_id ?? DEFAULT_NUMBER,
+      propertyValues: structuredClone(i.values ?? []),
+      propertyName: i.property_name ?? DEFAULT_STRING,
+    });
+  }
+
+  const colors: Color[] = [];
+  for (const i of obj.colors ?? []) {
+    colors.push({
+      colorID: i.color_id ?? DEFAULT_NUMBER,
+      colorName: i.color_name ?? DEFAULT_STRING,
+    });
+  }
+
+  const productCatalogList: ProductCatalog[] = [];
+  for (const i of obj.products ?? []) {
+    productCatalogList.push({
+      productHit: i.product_hit ?? DEFAULT_BOOLEAN,
+      productInStock: i.product_in_stock ?? DEFAULT_BOOLEAN,
+      productInWishlist: i.product_in_wishlist ?? DEFAULT_BOOLEAN,
+      productNew: i.product_new ?? DEFAULT_BOOLEAN,
+      productNewPrice: i.product_new_price ?? DEFAULT_NUMBER,
+      productPercentPromotion: i.product_percent_promotion ?? DEFAULT_NUMBER,
+      productPrice: i.product_price ?? DEFAULT_NUMBER,
+      productPromotion: i.product_promotion ?? DEFAULT_BOOLEAN,
+      productMeasuredIn: i.product_measured_in ?? DEFAULT_STRING,
+      productName: i.product_name ?? DEFAULT_STRING,
+      productID: i.product_id ?? DEFAULT_NUMBER,
+      categoryID: i.category_id ?? DEFAULT_NUMBER,
+    });
+  }
+
+  return {
+    categories: categories,
+    properties: properties,
+    colors: colors,
+    productCatalogList: productCatalogList,
+    priceMin: obj.min_price ?? DEFAULT_NUMBER,
+    priceMax: obj.max_price ?? DEFAULT_NUMBER,
+    productAmount: obj.number_of_products ?? DEFAULT_NUMBER,
   };
 }

@@ -120,7 +120,11 @@ class ProductService:
         )
 
     @classmethod
-    async def get_product_for_page(cls, product_id: int):
+    async def get_product_for_page(cls, product_id: int, request: Request):
+        try:
+            user_data = await Functions.get_user_data(request)
+        except HTTPException:
+            user_data = None
         query = select(Product).options(
             joinedload(Product.category),
             joinedload(Product.color),
@@ -135,6 +139,11 @@ class ProductService:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND, detail="Продукт не найден"
                 )
+            if user_data is not None:
+                user_query = select(Wishlist).where(Wishlist.user_id == user_data["user_id"])
+                user_wishlist = await db.execute(user_query)
+                user_wishlist = user_wishlist.scalars().all()
+                user_wishlist_ids = [wishlist_elem.product_id for wishlist_elem in user_wishlist]
 
             # Получаем товары с тем же артикулом (товары с разными цветами)
             products_with_same_article_query = select(Product).where(
@@ -163,46 +172,46 @@ class ProductService:
                          Product.article_id != product_field.article_id),
                     Product.id != product_field.id
                 )
-
                 parent_category_products_result = await db.execute(parent_category_products_query)
                 parent_category_products = parent_category_products_result.scalars().all()
                 similar_products.extend(parent_category_products)
 
-            characteristics = []
-            for characteristic in product_field.characteristics:
-                characteristics.append(GetCharacteristicResponse(property_id=characteristic.property_id,
-                                                                 property_name=characteristic.property.name,
-                                                                 property_value=characteristic.property_value))
+        characteristics = []
+        for characteristic in product_field.characteristics:
+            characteristics.append(GetCharacteristicResponse(property_id=characteristic.property_id,
+                                                             property_name=characteristic.property.name,
+                                                             property_value=characteristic.property_value))
 
-            products_by_article = []
-            for prod in products_with_same_article:
-                products_by_article.append(ProductInfo(product_id=prod.id, name=prod.name))
+        products_by_article = []
+        for prod in products_with_same_article:
+            products_by_article.append(ProductInfo(product_id=prod.id, name=prod.name))
 
-            similar_products_list = []
-            for prod in similar_products:
-                similar_products_list.append(ProductInfo(product_id=prod.id, name=prod.name))
+        similar_products_list = []
+        for prod in similar_products:
+            similar_products_list.append(ProductInfo(product_id=prod.id, name=prod.name))
 
-            return GetProductForPageResponse(
-                product_id=product_field.id,
-                category_id=product_field.category_id,
-                category_name=product_field.category.name,
-                article_id=product_field.article_id,
-                color_id=product_field.color_id,
-                color_name=product_field.color.name if product_field.color else None,
-                product_name=product_field.name,
-                product_description=product_field.description,
-                product_measured_in=product_field.measured_in,
-                product_amount=product_field.amount,
-                product_price=product_field.price,
-                product_new=product_field.new,
-                product_hit=product_field.hit,
-                product_promotion=product_field.promotion,
-                product_percent_promotion=product_field.percent_promotion,
-                product_new_price=product_field.new_price,
-                get_products_by_article=products_by_article,  # Товары с тем же артикулом
-                similar_products=similar_products_list,  # Похожие товары из той же и родительской категории
-                characteristics=characteristics
-            )
+        return GetProductForPageResponse(
+            product_id=product_field.id,
+            category_id=product_field.category_id,
+            category_name=product_field.category.name,
+            article_id=product_field.article_id,
+            color_id=product_field.color_id,
+            color_name=product_field.color.name if product_field.color else None,
+            product_name=product_field.name,
+            product_description=product_field.description,
+            product_measured_in=product_field.measured_in,
+            product_amount=product_field.amount,
+            product_price=product_field.price,
+            product_new=product_field.new,
+            product_hit=product_field.hit,
+            product_promotion=product_field.promotion,
+            product_percent_promotion=product_field.percent_promotion,
+            product_new_price=product_field.new_price,
+            product_in_wishlist=True if user_data is not None and product_field.id in user_wishlist_ids else False,
+            get_products_by_article=products_by_article,  # Товары с тем же артикулом
+            similar_products=similar_products_list,  # Похожие товары из той же и родительской категории
+            characteristics=characteristics
+        )
 
     @classmethod
     async def get_all_products(cls) -> List[GetProductResponse]:  # Add return type hint
@@ -237,14 +246,14 @@ class ProductService:
         return product_list
 
     @classmethod
-    async def get_products_by_category_name(cls, category_name: str):
-        query = select(Category).where(Category.name == category_name)
+    async def get_products_by_category_id(cls, category_id: int):
+        query = select(Category).where(Category.id == category_id)
         async with new_session() as db:
             result = await db.execute(query)
         result = result.scalars().first()
         if result is None:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Категория с таким названием не найдена"
+                status_code=status.HTTP_404_NOT_FOUND, detail="Категория с таким id не найдена"
             )
 
         category_ids = []

@@ -26,63 +26,28 @@ class ProductResponse(BaseModel):
     product_percent_promotion: Optional[float]
     product_new_price: Optional[float]
 
-# @router.get("/{category_name}", response_model=List[ProductResponse])
-# async def get_filter_products(
-#         category_name: str,
-#         filters: Optional[str] = Query(None),  # JSON строка с фильтрами
-#         sort_by: Optional[str] = Query(None),  # Поле для сортировки
-#         filter_by_params: Optional[str] = Query(None)  # Фильтрация по hit, promotion, new
-# ):
-#     """
-#     Получение товаров по имени категории с возможностью фильтрации и сортировки.
-#
-#     - **category_name**: Название категории товаров.
-#     - **filters**: JSON строка с фильтрами по характеристикам ({"property_id": "value"}).
-#     - **sort_by**: Поле для сортировки (например, "price", "name", "-price", "-name").
-#     - **filter_by_params**: Фильтрация по параметрам (hit, promotion, new).
-#     """
-#     # Преобразуем JSON строку в словарь, если она есть
-#     filters_dict = None
-#     if filters:
-#         try:
-#             filters_dict = json.loads(filters)
-#         except json.JSONDecodeError:
-#             raise HTTPException(status_code=400, detail="Invalid JSON format for filters")
-#
-#     products = await FilterService.get_products_by_category_name_true(category_name, filters_dict, sort_by, filter_by_params)
-#
-#     return products
 
-@router.get("test/{category_name}", response_model=List[ProductResponse])
-async def get_filter_products_test(
-        category_name: str,
-        filters: Optional[str] = Query(None),  # JSON строка с фильтрами
-        sort_by: Optional[str] = Query(None),  # Поле для сортировки
-        filter_by_params: Optional[str] = Query(None)  # Фильтрация по hit, promotion, new
-):
-    """
-    Получение товаров по имени категории с возможностью фильтрации и сортировки.
-
-    - **category_name**: Название категории товаров.
-    - **filters**: JSON строка с фильтрами по характеристикам ({"property_id": "value", "color_name": "Синий"}).
-    - **sort_by**: Поле для сортировки (например, "price", "name", "-price", "-name").
-    - **filter_by_params**: Фильтрация по параметрам (hit, promotion, new).
-    """
-    # Преобразуем JSON строку в словарь, если она есть
-    filters_dict = None
-    if filters:
-        try:
-            filters_dict = json.loads(filters)
-        except json.JSONDecodeError:
-            raise HTTPException(status_code=400, detail="Invalid JSON format for filters")
-
-    products = await FilterService.get_products_by_category_name_test(category_name, filters_dict, sort_by, filter_by_params)
-
-    return products
+@router.get("get_info_for_catalog_page/{category_id}", response_model=CatalogPageInfo)
+async def get_info_for_catalog_page(category_id: int, request: Request):
+    return await FilterService.get_info_for_catalog_page(category_id, request)
 
 
-@router.get("/search/", response_model=List[ProductResponse])
-async def search_products(search_term: str = Query(..., title="Search Term"), sort_by: Optional[str] = Query(None, title="Sort By")):
+@router.get("/search/", response_model=List[ProductInCatalogInfo])
+async def search_products(
+        request: Request,
+        search_term: str = Query(..., title="Search Term"),
+        sort_by: Optional[str] = Query(None, title="Sort By")):
     """- ** sort_by **: Поле для сортировки(например, "price", "name", "-price", "-name"). products"""
-    products = await FilterService.search_products_by_name(search_term, sort_by)
+    products = await FilterService.search_products_by_name(request, search_term, sort_by)
     return products
+
+
+@router.post("/products/by-category", response_model=List[ProductInCatalogInfo])
+async def get_products_by_category(
+        request: Request,
+        filters: CatalogFilters,
+        sort_by: SortByEnum,
+        filter_by_params: FilterByParamsEnum):
+    products = await FilterService.get_products_by_category_id(request, filters, sort_by, filter_by_params)
+    return products
+
