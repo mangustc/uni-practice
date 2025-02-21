@@ -5,6 +5,7 @@ import CatalogFilter from "../components/catalog-filter";
 import { useEffect, useState } from "react";
 import CatalogSort from "../components/catalog-sort";
 import { CatalogCategories } from "../components/catalog-categories";
+import { CatalogProducts } from "../components/catalog-products";
 
 const DEFAULT_SORT = "price";
 
@@ -159,6 +160,7 @@ export const Catalog = function () {
           sorts={currentValues.sorts}
           updateSort={updateSort}
         />
+        <CatalogProducts products={products} />
       </div>
     </>
   );

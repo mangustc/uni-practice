@@ -1,6 +1,6 @@
 import * as objects from "./objects.tsx";
 
-const BACKEND_URL: string = import.meta.env.VITE_BACKEND_URL;
+export const BACKEND_URL: string = import.meta.env.VITE_BACKEND_URL;
 const HEADER_JSON = {
   "Content-Type": "application/json",
   accept: "application/json",
@@ -25,7 +25,78 @@ export async function GET_GetInfoForCatalogPage(
   const json: objects.CatalogPageInfoIn = {
     max_price: 1000,
     min_price: 121,
-    products: [],
+    products: [
+      {
+        product_price: 100,
+        product_id: 2,
+        product_name: "ueao",
+        product_measured_in: "м",
+        product_hit: true,
+        product_new: false,
+        product_promotion: false,
+        product_percent_promotion: 0,
+        product_new_price: 0,
+        product_in_wishlist: false,
+        product_in_stock: true,
+        category_id: 1,
+      },
+      {
+        product_price: 100,
+        product_id: 1,
+        product_name: "fdsa",
+        product_measured_in: "м",
+        product_hit: true,
+        product_new: false,
+        product_promotion: false,
+        product_percent_promotion: 0,
+        product_new_price: 0,
+        product_in_wishlist: false,
+        product_in_stock: true,
+        category_id: 1,
+      },
+      {
+        product_price: 100,
+        product_id: 3,
+        product_name: "test",
+        product_measured_in: "м",
+        product_hit: true,
+        product_new: false,
+        product_promotion: false,
+        product_percent_promotion: 0,
+        product_new_price: 0,
+        product_in_wishlist: false,
+        product_in_stock: true,
+        category_id: 1,
+      },
+      {
+        product_price: 100,
+        product_id: 4,
+        product_name: "test2",
+        product_measured_in: "м",
+        product_hit: true,
+        product_new: false,
+        product_promotion: false,
+        product_percent_promotion: 0,
+        product_new_price: 0,
+        product_in_wishlist: false,
+        product_in_stock: true,
+        category_id: 1,
+      },
+      {
+        product_price: 100,
+        product_id: 1,
+        product_name: "test3",
+        product_measured_in: "м",
+        product_hit: true,
+        product_new: false,
+        product_promotion: false,
+        product_percent_promotion: 0,
+        product_new_price: 0,
+        product_in_wishlist: false,
+        product_in_stock: true,
+        category_id: 1,
+      },
+    ],
     categories: [
       {
         category_id: 1,
@@ -208,12 +279,12 @@ export async function GET_GetCategoryList() {
 }
 
 export async function GET_GetCart() {
-   let response = await fetch(BACKEND_URL + "/cart/get_user_cart", {
-     method: "GET",
-     headers: HEADER_JSON,
-     credentials: "include",
-   });
-  return objects.mapCart(await response.json())
+  let response = await fetch(BACKEND_URL + "/cart/get_user_cart", {
+    method: "GET",
+    headers: HEADER_JSON,
+    credentials: "include",
+  });
+  return objects.mapCart(await response.json());
   /*
   return objects.mapCart({
     items: [{
@@ -248,10 +319,17 @@ export async function GET_GetCart() {
   */
 }
 
-export async function PUT_ChangeProductAmountInCart(productID: number, amount: number) {
-  await fetch(BACKEND_URL + `/cart/change_amount_in_cart/${productID}/${amount}`, {
-     method: "PUT",
-     headers: HEADER_JSON,
-     credentials: "include",
-  });
+export async function PUT_ChangeProductAmountInCart(
+  productID: number,
+  amount: number,
+) {
+  await fetch(
+    BACKEND_URL + `/cart/change_amount_in_cart/${productID}/${amount}`,
+    {
+      method: "PUT",
+      headers: HEADER_JSON,
+      credentials: "include",
+    },
+  );
 }
+
