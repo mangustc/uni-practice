@@ -84,7 +84,7 @@ export async function GET_GetInfoForCatalogPage(
       },
       {
         product_price: 100,
-        product_id: 1,
+        product_id: 5,
         product_name: "test3",
         product_measured_in: "м",
         product_hit: true,
@@ -243,16 +243,89 @@ export async function GET_GetInfoForCatalogPage(
 export async function POST_GetProductsByCategory(
   catalogFilterSort: objects.CatalogFilterSortOut,
 ): Promise<objects.ProductCatalog[]> {
-  let response = await fetch(BACKEND_URL + `/filter/products/by-category`, {
-    method: "POST",
-    headers: HEADER_JSON,
-    body: JSON.stringify(catalogFilterSort),
-    credentials: "include",
-  });
-  const json: objects.ProductCatalogIn[] = await response.json();
+  // let response = await fetch(BACKEND_URL + `/filter/products/by-category`, {
+  //   method: "POST",
+  //   headers: HEADER_JSON,
+  //   body: JSON.stringify(catalogFilterSort),
+  //   credentials: "include",
+  // });
+  // const json: objects.ProductCatalogIn[] = await response.json();
+  //
+  // // TODO: HANDLE ERROR
+  // const status = response.status;
 
-  // TODO: HANDLE ERROR
-  const status = response.status;
+  const json: objects.ProductCatalogIn[] = [
+    {
+      product_price: 200,
+      product_id: 2,
+      product_name: "ueao",
+      product_measured_in: "м",
+      product_hit: true,
+      product_new: false,
+      product_promotion: false,
+      product_percent_promotion: 0,
+      product_new_price: 0,
+      product_in_wishlist: false,
+      product_in_stock: true,
+      category_id: 1,
+    },
+    {
+      product_price: 300,
+      product_id: 1,
+      product_name: "fdsa",
+      product_measured_in: "м",
+      product_hit: true,
+      product_new: false,
+      product_promotion: false,
+      product_percent_promotion: 0,
+      product_new_price: 0,
+      product_in_wishlist: false,
+      product_in_stock: true,
+      category_id: 1,
+    },
+    {
+      product_price: 400,
+      product_id: 3,
+      product_name: "test",
+      product_measured_in: "м",
+      product_hit: true,
+      product_new: false,
+      product_promotion: false,
+      product_percent_promotion: 0,
+      product_new_price: 0,
+      product_in_wishlist: false,
+      product_in_stock: true,
+      category_id: 1,
+    },
+    {
+      product_price: 500,
+      product_id: 4,
+      product_name: "test2",
+      product_measured_in: "м",
+      product_hit: true,
+      product_new: false,
+      product_promotion: false,
+      product_percent_promotion: 0,
+      product_new_price: 0,
+      product_in_wishlist: false,
+      product_in_stock: true,
+      category_id: 1,
+    },
+    {
+      product_price: 100,
+      product_id: 5,
+      product_name: "test3",
+      product_measured_in: "м",
+      product_hit: true,
+      product_new: false,
+      product_promotion: false,
+      product_percent_promotion: 0,
+      product_new_price: 0,
+      product_in_wishlist: false,
+      product_in_stock: true,
+      category_id: 1,
+    },
+  ];
 
   return objects.NewProductCatalogList(json);
 }
