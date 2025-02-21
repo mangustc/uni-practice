@@ -1,16 +1,6 @@
 import * as util from "../util.tsx";
 import * as objects from "../objects.tsx";
 
-function getCleanFilters(
-  filters: objects.CatalogFilters,
-): objects.CatalogFilters {
-  const newFilters = structuredClone(filters);
-  newFilters.properties = newFilters.properties.filter(
-    (property) => property.propertyValues.length > 0,
-  );
-  return newFilters;
-}
-
 function CatalogFilter({
   filters,
   setFilters,
@@ -190,7 +180,7 @@ function CatalogFilter({
           </div>
         );
       })}
-      <button onClick={() => updateFilters(getCleanFilters(filters))}>
+      <button onClick={() => updateFilters(structuredClone(filters))}>
         Применить фильтры
       </button>
     </div>
