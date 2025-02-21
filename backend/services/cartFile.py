@@ -59,9 +59,8 @@ class CartService:
         cart_items = cart_items.scalars().all()
 
         items: List[CartItem] = []
-        total_products_price: float = 0.0
-        total_promotion_price: float = 0.0
-        total_cart_price: float = 0.0
+        total_products_price: float = 0
+        total_promotion_price: float = 0
 
         for cart_item in cart_items:
             price = (cart_item.product.new_price if
@@ -86,10 +85,9 @@ class CartService:
                 total_price=total_price
             )
             items.append(item)
-            total_cart_price += total_price
         total_products_price = round(total_products_price, 2)
         total_promotion_price = round(total_promotion_price, 2)
-        total_cart_price = round(total_cart_price, 2)
+        total_cart_price = total_products_price - total_promotion_price
         return CartResponse(items=items, total_products_price=total_products_price,
                             total_promotion_price=total_promotion_price, total_cart_price=total_cart_price)
 
@@ -161,11 +159,9 @@ class CartService:
     @classmethod
     async def clear_cart(cls, request: Request):
         user_data = await Functions.get_user_data(request)
-        query = select(Cart).where(Cart.user_id == user_data["user_id"])
+        query = delete(Cart).where(Cart.user_id == user_data["user_id"])
         async with new_session() as db:
             result = await db.execute(query)
-            result = result.scalars().all()
-            await db.delete(result)
             try:
                 await db.commit()
                 return {"message": "Продукты убраны из корзины"}  # Правильный формат

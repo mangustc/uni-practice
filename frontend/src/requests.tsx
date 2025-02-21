@@ -129,6 +129,22 @@ export async function GET_GetCart() {
   */
 }
 
+export async function DELETE_deleteProductFromCart(productID: number) {
+  await fetch(BACKEND_URL + `/cart/delete_from_cart/${productID}`, {
+    method: "DELETE",
+    headers: HEADER_JSON,
+    credentials: "include",
+  });
+}
+
+export async function DELETE_clearCart() {
+  await fetch(BACKEND_URL + `/cart/clear_cart/`, {
+    method: "DELETE",
+    headers: HEADER_JSON,
+    credentials: "include",
+  });
+}
+
 export async function PUT_ChangeProductAmountInCart(
   productID: number,
   amount: number,

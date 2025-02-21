@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 
 export function CartProduct({
     productInfo,
-    changeProductAmount
+    changeProductAmount,
+    deleteProduct
 }: {
     productInfo: objects.ProductInCart;
     changeProductAmount: (productID: number, amount: number) => void;
+    deleteProduct: (productInfo: objects.ProductInCart) => void;
 }) {
     const [amount, setAmount] = useState<string>(productInfo.productAmountInCart.toString());
 
@@ -32,7 +34,6 @@ export function CartProduct({
             amountNumber = productInfo.productAmount;
           amountNumber = Number(amountNumber.toFixed(1));
           changeProductAmount(productInfo.productID, amountNumber);
-          setAmount(amountNumber.toString());
         }
       };
 
@@ -52,7 +53,6 @@ export function CartProduct({
             amountNumber = productInfo.productAmount;
         amountNumber = Number(amountNumber.toFixed(1));
         changeProductAmount(productInfo.productID, amountNumber);
-        setAmount(amountNumber.toString());
     };
 
     function downProductAmount() {
@@ -75,7 +75,6 @@ export function CartProduct({
                 return;
         }
         changeProductAmount(productInfo.productID, amountNumber);
-        setAmount(amountNumber.toString());
     }
 
     function upProductAmount() {
@@ -98,8 +97,11 @@ export function CartProduct({
                 return;
         }
         changeProductAmount(productInfo.productID, amountNumber);
-        setAmount(amountNumber.toString());
     }
+
+    useEffect(() => {
+        setAmount(productInfo.productAmountInCart.toString());
+      }, [productInfo]);
 
     return (
         <div style={{ padding: "10px", display: "flex" }}>
@@ -107,6 +109,7 @@ export function CartProduct({
             <button onClick={downProductAmount}>-</button>
             <input value={amount} onChange={handleChange} onKeyDown={handleKeyDown} onBlur={handleBlur}></input>
             <button onClick={upProductAmount}>+</button>
+            <button onClick={() => {deleteProduct(productInfo)}}>Удалить</button>
         </div>
     )
 }

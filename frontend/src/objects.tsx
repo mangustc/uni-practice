@@ -1,6 +1,6 @@
-const DEFAULT_NUMBER = 0;
-const DEFAULT_STRING = "";
-const DEFAULT_BOOLEAN = false;
+export const DEFAULT_NUMBER = 0;
+export const DEFAULT_STRING = "";
+export const DEFAULT_BOOLEAN = false;
 
 export type CatalogSort = {
   sortValue: string;
@@ -246,8 +246,8 @@ export type ProductInCartIn = {
   product_amount?: number;
   product_amount_in_cart?: number;
   product_price?: number;
-  product_percent_promotion?: number | null;
-  product_new_price?: number | null;
+  product_percent_promotion?: number;
+  product_new_price?: number;
   total_price?: number;
 }
 
@@ -266,8 +266,8 @@ export type ProductInCart = {
   productAmount: number;
   productAmountInCart: number;
   productPrice: number;
-  productPercentPromotion: number | null;
-  productNewPrice: number | null;
+  productPercentPromotion: number;
+  productNewPrice: number;
   totalPrice: number;
 }
 
