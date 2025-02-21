@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, File, status
 from schemas import *
 from services import VacancyService
 from services import VacancyService
@@ -22,7 +22,7 @@ async def read_vacancy(vacancy_id: int):
 async def update_vacancy_endpoint(request: Request, vacancy_id: int, vacancy_update: VacancyUpdate):
     return await VacancyService.update_vacancy(request=request, vacancy_id=vacancy_id, vacancy_update=vacancy_update)
 
-@router.delete("/vacancies/{vacancy_id}")
+@router.delete("/vacancies/{vacancy_id}", response_model=Message, status_code=status.HTTP_200_OK)
 async def delete_vacancy_endpoint(request: Request, vacancy_id: int):
     return await VacancyService.delete_vacancy(request=request, vacancy_id=vacancy_id)
 

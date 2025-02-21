@@ -639,52 +639,6 @@ class ProductService:
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail="Не удалось добавить продукт в избранное",
                 )
-
-
-    @classmethod
-    async def get_delivery_service(cls, delivery_service_id: int):
-        async with new_session() as db:
-            result = await db.execute(  # Await the execution
-                select(DeliveryService).where(DeliveryService.id == delivery_service_id)
-            )
-            delivery_service = result.scalar_one_or_none()
-            if not delivery_service:
-                raise HTTPException(status_code=404, detail="Delivery service not found")
-            return delivery_service
-
-    @classmethod
-    async def list_delivery_services(cls):
-        async with new_session() as db:
-            result = await db.execute(select(DeliveryService))
-            delivery_services = result.scalars().all()
-            return delivery_services
-
-    @classmethod
-    async def create_delivery_service(cls, request: Request, delivery_service: DeliveryServiceCreate):
-        user_data = await Functions.get_user_data(request)
-        if user_data["user_role"] != "Админ":
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN, detail="Только администраторы могут создавать службы доставки"
-            )
-
-        async with new_session() as db:
-            new_delivery_service = DeliveryService(**delivery_service.dict())
-            db.add(new_delivery_service)
-            try:
-                await db.commit()
-                await db.refresh(new_delivery_service)
-                return new_delivery_service
-            except IntegrityError:
-                await db.rollback()
-                raise HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail="Не удалось создать службу доставки",
-                )
-
-
-
-
-
     @classmethod
     async def set_product_new(cls, request: Request, product_id: int, is_new: bool):
         user_data = await Functions.get_user_data(request)

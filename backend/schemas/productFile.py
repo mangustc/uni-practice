@@ -124,6 +124,10 @@ class DeliveryServiceBase(BaseModel):
     description: Optional[str] = None
     price: PositiveFloat
 
+class DeliveryUpdate(BaseModel):
+    name: str
+    description: Optional[str]
+    price: PositiveFloat
 
 class DeliveryServiceCreate(DeliveryServiceBase):
     pass
@@ -134,6 +138,21 @@ class DeliveryServiceResponse(DeliveryServiceBase):
 
     class Config:
         orm_mode = True
+
+class DeliveryServiceResponseUpdate(DeliveryServiceBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+    @classmethod
+    def from_orm(cls, delivery_service):
+        return cls(
+            id=delivery_service.id,
+            name=delivery_service.name,
+            description=delivery_service.description,
+            price=delivery_service.price
+        )
 
 #
 #

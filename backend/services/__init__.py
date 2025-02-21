@@ -8,3 +8,5 @@ from services.cartFile import *
 from services.orderFile import *
 from services.feedbackFile import *
 from services.vacancyFile import *
+from services.deliveryFile import *
+from services.contactsFile import *

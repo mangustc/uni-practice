@@ -185,6 +185,26 @@ class Resume(Base):
     file_name = Column(String, default="default_resume.pdf")
 
 
+class Contact(Base):
+    __tablename__ = "contacts"
+    id = Column(Integer, primary_key=True, index=True)
+    office_phone = Column(String, nullable=True)
+    office_email = Column(String, nullable=True)
+    office_workhours = Column(String, nullable=True)
+    sales_phone = Column(String, nullable=True)
+    sales_email = Column(String, nullable=True)
+    purchase_phone = Column(String, nullable=True)
+    purchase_email = Column(String, nullable=True)
+    purchase_extension = Column(String, nullable=True)
+    purchase_addition = Column(String, nullable=True)
+    commercial_email = Column(String, nullable=True)
+    general_email = Column(String, nullable=True)
+    legal_address = Column(String, nullable=True)
+    ogrn = Column(String, nullable=True)
+    inn = Column(String, nullable=True)
+    kpp = Column(String, nullable=True)
+
+
 async def create_tables():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
