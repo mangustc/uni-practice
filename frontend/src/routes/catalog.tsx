@@ -80,6 +80,40 @@ export const Catalog = function () {
   const [products, setProducts] = useState<objects.ProductCatalog[]>([]);
   const [tempFilters, setTempFilters] = useState(currentValues.currentFilters);
 
+  // used for filters on the same category
+  function updateSearch(
+    newFilters: objects.CatalogFilters,
+    newSort: string,
+    newFilterByParam: string,
+  ) {
+    setCurrentValues({
+      ...currentValues,
+      currentFilters: newFilters,
+      currentFilterByParam: newFilterByParam,
+      currentSort: newSort,
+    });
+    setSearchParams(
+      createSearchParams({
+        currentFilters: JSON.stringify(newFilters),
+        currentSort: newSort,
+        currentFilterByParam: newFilterByParam,
+        currentCategoryID: String(currentValues.currentCategoryID),
+      }),
+    );
+    requests
+      .POST_GetProductsByCategory(
+        objects.GetCatalogFilterSortOut(
+          newFilters,
+          currentValues.currentCategoryID,
+          newSort,
+          newFilterByParam,
+        ),
+      )
+      .then((obj2) => {
+        setProducts(obj2);
+      });
+  }
+
   useEffect(() => {
     requests
       .GET_GetInfoForCatalogPage(currentValues.currentCategoryID)
@@ -92,22 +126,26 @@ export const Catalog = function () {
           priceMin: obj.priceMin,
           priceMax: obj.priceMax,
         });
-        setProducts(obj.productCatalogList);
+        requests
+          .POST_GetProductsByCategory(
+            objects.GetCatalogFilterSortOut(
+              currentValues.currentFilters,
+              currentValues.currentCategoryID,
+              currentValues.currentSort,
+              currentValues.currentFilterByParam,
+            ),
+          )
+          .then((obj2) => {
+            setProducts(obj2);
+          });
       });
   }, []);
 
   function updateFilters(newFilters: objects.CatalogFilters) {
-    setCurrentValues({
-      ...currentValues,
-      currentFilters: newFilters,
-    });
-    setSearchParams(
-      createSearchParams({
-        currentFilters: JSON.stringify(newFilters),
-        currentSort: currentValues.currentSort,
-        currentFilterByParam: currentValues.currentFilterByParam,
-        currentCategoryID: String(currentValues.currentCategoryID),
-      }),
+    updateSearch(
+      newFilters,
+      currentValues.currentSort,
+      currentValues.currentFilterByParam,
     );
   }
   function updateCategoryID(newCategoryID: number) {
@@ -139,19 +177,7 @@ export const Catalog = function () {
     });
   }
   function updateSort(newSort: string, newFilterByParam: string) {
-    setCurrentValues({
-      ...currentValues,
-      currentSort: newSort,
-      currentFilterByParam: newFilterByParam,
-    });
-    setSearchParams(
-      createSearchParams({
-        currentFilters: JSON.stringify(currentValues.currentFilters),
-        currentSort: newSort,
-        currentCategoryID: String(currentValues.currentCategoryID),
-        currentFilterByParam: newFilterByParam,
-      }),
-    );
+    updateSearch(currentValues.currentFilters, newSort, newFilterByParam);
   }
 
   return (
