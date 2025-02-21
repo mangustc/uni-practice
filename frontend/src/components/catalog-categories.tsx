@@ -62,7 +62,11 @@ export function CatalogCategories({
     return (
       <ul key={treeObj.val.categoryID}>
         <span
-          onClick={() => updateCategoryID(treeObj.val.categoryID)}
+          onClick={
+            treeObj.val.categoryID != 0
+              ? () => updateCategoryID(treeObj.val.categoryID)
+              : () => {}
+          }
           style={{ cursor: "pointer" }}
         >
           {currentCategoryID == treeObj.val.categoryID ? (
