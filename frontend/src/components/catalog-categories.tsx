@@ -65,7 +65,11 @@ export function CatalogCategories({
           onClick={() => updateCategoryID(treeObj.val.categoryID)}
           style={{ cursor: "pointer" }}
         >
-          {treeObj.val.categoryName}
+          {currentCategoryID == treeObj.val.categoryID ? (
+            <h6>{treeObj.val.categoryName}</h6>
+          ) : (
+            treeObj.val.categoryName
+          )}
         </span>
         {treeObj.children.map((childTreeObj) => JSX_PrintTree(childTreeObj))}
       </ul>
