@@ -14,11 +14,6 @@ export const Cart = function () {
         setCart({...obj});
     });
   }, []);
-  
-  function round(number: number, precision: number) {
-    var factor = Math.pow(10, precision);
-    return Math.round(number * factor) / factor;
-  }
 
   function changeProductAmount(productID: number, amount: number) {
     requests.PUT_ChangeProductAmountInCart(productID, amount);
@@ -96,9 +91,9 @@ export const Cart = function () {
     ))}
     <div style={{ paddingLeft: "10px" }}>
       <button onClick={clearCart}>Очистить корзину</button>
-      <p>Товары: {round(cart.totalProductsPrice, 2)} ₽</p>
-      <p>Скидка: {round(cart.totalPromotionPrice, 2)} ₽</p>
-      <p>Итоговая цена: {round(cart.totalCartPrice, 2)} ₽</p>
+      <p>Товары: {cart.totalProductsPrice.toFixed(2)} ₽</p>
+      <p>Скидка: {cart.totalPromotionPrice.toFixed(2)} ₽</p>
+      <p>Итоговая цена: {cart.totalCartPrice.toFixed(2)} ₽</p>
     </div>
     </>
 );
