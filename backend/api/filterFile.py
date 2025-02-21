@@ -27,7 +27,7 @@ class ProductResponse(BaseModel):
     product_new_price: Optional[float]
 
 
-@router.get("get_info_for_catalog_page/{category_id}", response_model=CatalogPageInfo)
+@router.get("/get_info_for_catalog_page/{category_id}", response_model=CatalogPageInfo)
 async def get_info_for_catalog_page(category_id: int, request: Request):
     return await FilterService.get_info_for_catalog_page(category_id, request)
 
@@ -50,4 +50,3 @@ async def get_products_by_category(
         filter_by_params: FilterByParamsEnum):
     products = await FilterService.get_products_by_category_id(request, filters, sort_by, filter_by_params)
     return products
-
