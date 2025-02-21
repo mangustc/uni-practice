@@ -11,6 +11,7 @@
   --text-color-black-main-70: #1a1a1ab3;
   --text-color-black-main-50: #1a1a1a80;
   --text-color-black-main-20: #1a1a1a33;
+  --text-color-black-main-10: #1A1A1A1A;
 
   --text-weight-h: 700;
   --text-weight-p: 400;
@@ -599,4 +600,76 @@ p {
 .card-filter:hover {
   background-color: var(--text-color-red-main-hover);
   cursor: pointer;
+}
+
+/* CATALOG */
+
+.catalog-filter-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 251px;
+  /* border: 1px solid blue; */
+}
+
+.catalog-filter-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  /* border: 1px solid red; */
+  gap: 22px;
+  margin-bottom: 34px;
+}
+
+.catalog-filter-line {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.price-input {
+  width: 114px;
+  height: 46px;
+  border: 1px solid var(--text-color-black-main-10);
+}
+
+.price-input:hover {
+  border: 1px solid var(--text-color-black-main-50);
+}
+
+.catalog-filter-btn-done {
+  width: 251px;
+  height: 50px;
+  border-radius: 2px;
+  border: 1px solid var(--text-color-red-main);
+  background-color: var(--text-color-red-main);
+  text-align: center;
+  color: white;
+  transition: all 200ms ease;
+  margin-bottom: 20px;
+}
+.catalog-filter-btn-done:hover {
+  cursor: pointer;
+  background-color: var(--text-color-red-main-hover);
+  border: 1px solid var(--text-color-red-main-hover);
+}
+
+.catalog-filter-btn-reset {
+  width: 251px;
+  height: 50px;
+  border-radius: 2px;
+  border: 1px solid var(--text-color-black-main-50);
+  background-color: white;
+  text-align: center;
+  color: var(--text-color-black-main-50);
+  transition: all 200ms ease;
+}
+.catalog-filter-btn-reset:hover {
+  cursor: pointer;
+  background-color: var(--text-color-red-main);
+  color: white;
+  border: 1px solid var(--text-color-red-main);
 }

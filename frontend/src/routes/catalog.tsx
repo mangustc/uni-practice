@@ -197,19 +197,7 @@ export const Catalog = function () {
           priceMax={currentValues.priceMax}
           priceMin={currentValues.priceMin}
         />
-        <textarea
-          value={
-            "categoryID value: " +
-            JSON.stringify(currentValues.currentCategoryID, null, 2) +
-            "\nfiltering values:\n" +
-            JSON.stringify(currentValues.currentFilters, null, 2) +
-            "\nsorting value: " +
-            JSON.stringify(currentValues.currentSort, null, 2) +
-            "\nfilterByParam value: " +
-            JSON.stringify(currentValues.currentFilterByParam, null, 2)
-          }
-          readOnly
-        ></textarea>
+        
         <CatalogSort
           currentSort={currentValues.currentSort}
           currentFilterByParam={currentValues.currentFilterByParam}

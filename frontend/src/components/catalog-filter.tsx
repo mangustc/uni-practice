@@ -19,14 +19,21 @@ function CatalogFilter({
   priceMin: number;
 }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column" }}>
-      <div style={{ display: "flex", flexDirection: "row", gap: "20px" }}>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
+    <div className="catalog-filter-container">
+      <div className="catalog-filter-block">
+        <h6>Наличие товара</h6>
+        <div className="catalog-filter-line" style={{gap: "12px"}}>
+          <input
+            type="radio"
+            checked={!filters.productOnlyInStock}
+            onChange={(e) => {
+              if (e.target.checked)
+                setFilters({
+                  ...filters,
+                  productOnlyInStock: false,
+                });
+            }}
+          />
           <label
             onClick={() =>
               setFilters({
@@ -37,19 +44,20 @@ function CatalogFilter({
           >
             Все товары
           </label>
-          <input
-            type="checkbox"
-            checked={!filters.productOnlyInStock}
+          
+        </div>
+        <div className="catalog-filter-line" style={{gap: "12px"}}>
+        <input
+            type="radio"
+            checked={filters.productOnlyInStock}
             onChange={(e) => {
               if (e.target.checked)
                 setFilters({
                   ...filters,
-                  productOnlyInStock: false,
+                  productOnlyInStock: true,
                 });
             }}
           />
-        </div>
-        <div style={{ display: "flex", flexDirection: "column" }}>
           <label
             onClick={() =>
               setFilters({
@@ -60,22 +68,15 @@ function CatalogFilter({
           >
             В наличии
           </label>
-          <input
-            type="checkbox"
-            checked={filters.productOnlyInStock}
-            onChange={(e) => {
-              if (e.target.checked)
-                setFilters({
-                  ...filters,
-                  productOnlyInStock: true,
-                });
-            }}
-          />
+          
         </div>
       </div>
-      <div style={{ display: "flex", flexDirection: "row" }}>
+      <div className="catalog-filter-block">
+        <h6>Цена, руб</h6>
+        <div className="catalog-filter-line" style={{gap: "12px"}}>
         <input
           type="number"
+          className="price-input"
           placeholder={String(priceMin)}
           value={
             filters.productPriceStart === 0 ? "" : filters.productPriceStart
@@ -89,6 +90,7 @@ function CatalogFilter({
         />
         <input
           type="number"
+          className="price-input"
           placeholder={String(priceMax)}
           value={filters.productPriceEnd === 0 ? "" : filters.productPriceEnd}
           onChange={(e) =>
@@ -98,15 +100,15 @@ function CatalogFilter({
             })
           }
         />
+        </div>
       </div>
-      <div style={{ display: "flex", flexDirection: "column" }}>
-        <h5>Colors:</h5>
+      <div className="catalog-filter-block">
+        <h6>Цвет</h6>
         {colors.map((color) => (
           <div
             key={color.colorID}
-            style={{ display: "flex", flexDirection: "row" }}
+            className="catalog-filter-line" style={{gap:"12px"}}
           >
-            <label>{color.colorName}</label>
             <input
               type="checkbox"
               checked={filters.colors.includes(color.colorID)}
@@ -119,6 +121,8 @@ function CatalogFilter({
                 setFilters({ ...filters, colors: newColors });
               }}
             />
+            <label>{color.colorName}</label>
+            
           </div>
         ))}
       </div>
@@ -138,20 +142,20 @@ function CatalogFilter({
           });
         }
         return (
-          <div
+          <div className="catalog-filter-block"
             key={property.propertyID}
             style={{ display: "flex", flexDirection: "column" }}
           >
-            <h5>{property.propertyName}:</h5>
+            <h6>{property.propertyName}</h6>
             {property.propertyValues.map((value) => (
               <div
                 key={
                   String(filters.properties[filterPropertyIndex].propertyID) +
                   value
                 }
-                style={{ display: "flex", flexDirection: "row" }}
+                className="catalog-filter-line" style={{gap:"12px"}}
               >
-                <label>{value}</label>
+                
                 <input
                   type="checkbox"
                   checked={filters.properties[
@@ -175,14 +179,16 @@ function CatalogFilter({
                     setFilters({ ...filters, properties: newProperties });
                   }}
                 />
+                <label>{value}</label>
               </div>
             ))}
           </div>
         );
       })}
-      <button onClick={() => updateFilters(structuredClone(filters))}>
-        Применить фильтры
+      <button onClick={() => updateFilters(structuredClone(filters))} className="catalog-filter-btn-done">
+        Применить
       </button>
+      <button className="catalog-filter-btn-reset">Сбросить</button>
     </div>
   );
 }
