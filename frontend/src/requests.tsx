@@ -244,7 +244,7 @@ export async function POST_GetProductsByCategory(
   catalogFilterSort: objects.CatalogFilterSortOut,
 ): Promise<objects.ProductCatalog[]> {
   let response = await fetch(BACKEND_URL + `/filter/products/by-category`, {
-    method: "GET",
+    method: "POST",
     headers: HEADER_JSON,
     body: JSON.stringify(catalogFilterSort),
     credentials: "include",
