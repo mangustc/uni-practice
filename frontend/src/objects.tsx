@@ -45,6 +45,50 @@ export type CatalogFilters = {
   colors: number[];
 };
 
+export type CatalogFilterSortOut = {
+  filters: {
+    categoryID: number;
+    productOnlyInStock: boolean;
+    productPriceStart?: number;
+    productPriceEnd?: number;
+    properties: {
+      propertyID: number;
+      propertyValues: string[];
+    }[];
+    colors: number[];
+  };
+  sort_by: string;
+  filter_by_params: string;
+};
+
+export function GetCatalogFilterSortOut(
+  _filters: CatalogFilters,
+  categoryID: number,
+  sort: string,
+  filterByParams: string,
+): CatalogFilterSortOut {
+  const filters = structuredClone(_filters);
+  const obj: CatalogFilterSortOut = {
+    filters: {
+      categoryID: categoryID,
+      productOnlyInStock: filters.productOnlyInStock,
+      properties: filters.properties.filter(
+        (property) => property.propertyValues.length > 0,
+      ),
+      colors: filters.colors,
+    },
+    sort_by: sort,
+    filter_by_params: filterByParams,
+  };
+  if (filters.productPriceEnd > 0) {
+    obj.filters.productPriceEnd = filters.productPriceEnd;
+  }
+  if (filters.productPriceStart > 0) {
+    obj.filters.productPriceStart = filters.productPriceStart;
+  }
+  return obj;
+}
+
 export function NewCatalogFilters(obj: CatalogFiltersIn): CatalogFilters {
   return {
     productOnlyInStock: obj.productOnlyInStock ?? DEFAULT_BOOLEAN,
@@ -106,6 +150,29 @@ export type ProductCatalog = {
   productInWishlist: boolean;
 };
 
+export function NewProductCatalogList(
+  objs: ProductCatalogIn[],
+): ProductCatalog[] {
+  const productCatalogList: ProductCatalog[] = [];
+  for (const i of objs ?? []) {
+    productCatalogList.push({
+      productHit: i.product_hit ?? DEFAULT_BOOLEAN,
+      productInStock: i.product_in_stock ?? DEFAULT_BOOLEAN,
+      productInWishlist: i.product_in_wishlist ?? DEFAULT_BOOLEAN,
+      productNew: i.product_new ?? DEFAULT_BOOLEAN,
+      productNewPrice: i.product_new_price ?? DEFAULT_NUMBER,
+      productPercentPromotion: i.product_percent_promotion ?? DEFAULT_NUMBER,
+      productPrice: i.product_price ?? DEFAULT_NUMBER,
+      productPromotion: i.product_promotion ?? DEFAULT_BOOLEAN,
+      productMeasuredIn: i.product_measured_in ?? DEFAULT_STRING,
+      productName: i.product_name ?? DEFAULT_STRING,
+      productID: i.product_id ?? DEFAULT_NUMBER,
+      categoryID: i.category_id ?? DEFAULT_NUMBER,
+    });
+  }
+  return productCatalogList;
+}
+
 export type CatalogPageInfoIn = {
   number_of_products?: number;
   categories?: CategoryIn[];
@@ -151,23 +218,9 @@ export function GetCatalogPageValues(
     });
   }
 
-  const productCatalogList: ProductCatalog[] = [];
-  for (const i of obj.products ?? []) {
-    productCatalogList.push({
-      productHit: i.product_hit ?? DEFAULT_BOOLEAN,
-      productInStock: i.product_in_stock ?? DEFAULT_BOOLEAN,
-      productInWishlist: i.product_in_wishlist ?? DEFAULT_BOOLEAN,
-      productNew: i.product_new ?? DEFAULT_BOOLEAN,
-      productNewPrice: i.product_new_price ?? DEFAULT_NUMBER,
-      productPercentPromotion: i.product_percent_promotion ?? DEFAULT_NUMBER,
-      productPrice: i.product_price ?? DEFAULT_NUMBER,
-      productPromotion: i.product_promotion ?? DEFAULT_BOOLEAN,
-      productMeasuredIn: i.product_measured_in ?? DEFAULT_STRING,
-      productName: i.product_name ?? DEFAULT_STRING,
-      productID: i.product_id ?? DEFAULT_NUMBER,
-      categoryID: i.category_id ?? DEFAULT_NUMBER,
-    });
-  }
+  const productCatalogList: ProductCatalog[] = NewProductCatalogList(
+    obj.products ?? [],
+  );
 
   return {
     categories: categories,

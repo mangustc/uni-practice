@@ -240,6 +240,23 @@ export async function GET_GetInfoForCatalogPage(
   return objects.GetCatalogPageValues(json);
 }
 
+export async function POST_GetProductsByCategory(
+  catalogFilterSort: objects.CatalogFilterSortOut,
+): Promise<objects.ProductCatalog[]> {
+  let response = await fetch(BACKEND_URL + `/filter/products/by-category`, {
+    method: "GET",
+    headers: HEADER_JSON,
+    body: JSON.stringify(catalogFilterSort),
+    credentials: "include",
+  });
+  const json: objects.ProductCatalogIn[] = await response.json();
+
+  // TODO: HANDLE ERROR
+  const status = response.status;
+
+  return objects.NewProductCatalogList(json);
+}
+
 export async function GET_GetCategoryList() {
   // let response = await fetch(BACKEND_URL + "/dish/get_dishes", {
   //   method: "POST",
