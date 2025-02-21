@@ -68,9 +68,9 @@ class CartService:
                      else cart_item.product.price)
             total_products_price += cart_item.amount * cart_item.product.price
 
-            total_price = cart_item.amount * price
+            total_price = round(cart_item.amount * price, 2)
             if cart_item.product.new_price is not None:
-                total_promotion_price += cart_item.amount * cart_item.product.price - total_price
+                total_promotion_price += round(cart_item.amount * cart_item.product.price, 2) - total_price
 
             item = CartItem(
                 product_id=cart_item.product_id,
@@ -87,7 +87,7 @@ class CartService:
             items.append(item)
         total_products_price = round(total_products_price, 2)
         total_promotion_price = round(total_promotion_price, 2)
-        total_cart_price = total_products_price - total_promotion_price
+        total_cart_price = round(total_products_price - total_promotion_price, 2)
         return CartResponse(items=items, total_products_price=total_products_price,
                             total_promotion_price=total_promotion_price, total_cart_price=total_cart_price)
 

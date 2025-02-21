@@ -15,6 +15,10 @@ export const Cart = function () {
     });
   }, []);
 
+  var rounded = function(number: number){
+    return +number.toFixed(2);
+  }
+
   function changeProductAmount(productID: number, amount: number) {
     requests.PUT_ChangeProductAmountInCart(productID, amount);
     let totalProductsPrice = 0, totalPromotionPrice = 0, totalCartPrice = 0,
@@ -22,12 +26,12 @@ export const Cart = function () {
 
     const newItems = cart.items.map((item) => {
       if (item.productID == productID) {
-        priceDifference = item.productPrice * amount - item.productPrice * item.productAmountInCart;
+        priceDifference = rounded(item.productPrice * amount) - rounded(item.productPrice * item.productAmountInCart);
         totalProductsPrice = cart.totalProductsPrice + priceDifference;
 
         if (item.productNewPrice != objects.DEFAULT_NUMBER) {
-          promotionDifference = item.productPrice * amount - item.productNewPrice * amount;
-          promotionDifference -= item.productPrice * item.productAmountInCart - item.productNewPrice * item.productAmountInCart;
+          promotionDifference = rounded(item.productPrice * amount) - rounded(item.productNewPrice * amount);
+          promotionDifference -= rounded(item.productPrice * item.productAmountInCart) - rounded(item.productNewPrice * item.productAmountInCart);
           totalPromotionPrice = cart.totalPromotionPrice + promotionDifference;
           itemPrice = item.productNewPrice;
         } else {
@@ -35,7 +39,7 @@ export const Cart = function () {
           itemPrice = item.productPrice;
         }
 
-        totalPrice = itemPrice * amount;
+        totalPrice = rounded(itemPrice * amount);
         totalCartPrice = totalProductsPrice - totalPromotionPrice;
         
         const newProductInCart: objects.ProductInCart = {
@@ -51,9 +55,9 @@ export const Cart = function () {
 
     const newCart: objects.Cart = {
       items: newItems,
-      totalProductsPrice: totalProductsPrice,
-      totalPromotionPrice: totalPromotionPrice,
-      totalCartPrice: totalCartPrice
+      totalProductsPrice: rounded(totalProductsPrice),
+      totalPromotionPrice: rounded(totalPromotionPrice),
+      totalCartPrice: rounded(totalCartPrice)
     };
     setCart(newCart);
   }
@@ -61,10 +65,10 @@ export const Cart = function () {
   function deleteProduct(productInfo: objects.ProductInCart) {
     requests.DELETE_deleteProductFromCart(productInfo.productID);
 
-    let totalProductsPrice = cart.totalProductsPrice - productInfo.productPrice * productInfo.productAmountInCart;
+    let totalProductsPrice = cart.totalProductsPrice - rounded(productInfo.productPrice * productInfo.productAmountInCart);
     let totalPromotionPrice;
     if (productInfo.productNewPrice != objects.DEFAULT_NUMBER) {
-      let priceDifference = productInfo.productPrice * productInfo.productAmountInCart - productInfo.productNewPrice * productInfo.productAmountInCart;
+      let priceDifference = rounded(productInfo.productPrice * productInfo.productAmountInCart) - rounded(productInfo.productNewPrice * productInfo.productAmountInCart);
       totalPromotionPrice = cart.totalPromotionPrice - priceDifference;
     } else {
       totalPromotionPrice = cart.totalPromotionPrice;
@@ -72,9 +76,9 @@ export const Cart = function () {
     let totalCartPrice = totalProductsPrice - totalPromotionPrice;
     const newCart = {
       items: cart.items.filter(a => a.productID !== productInfo.productID),
-      totalProductsPrice: totalProductsPrice,
-      totalPromotionPrice: totalPromotionPrice,
-      totalCartPrice: totalCartPrice
+      totalProductsPrice: rounded(totalProductsPrice),
+      totalPromotionPrice: rounded(totalPromotionPrice),
+      totalCartPrice: rounded(totalCartPrice)
     }
     setCart(newCart);
   }
@@ -91,9 +95,9 @@ export const Cart = function () {
     ))}
     <div style={{ paddingLeft: "10px" }}>
       <button onClick={clearCart}>Очистить корзину</button>
-      <p>Товары: {cart.totalProductsPrice.toFixed(2)} ₽</p>
-      <p>Скидка: {cart.totalPromotionPrice.toFixed(2)} ₽</p>
-      <p>Итоговая цена: {cart.totalCartPrice.toFixed(2)} ₽</p>
+      <p>Товары: {cart.totalProductsPrice} ₽</p>
+      <p>Скидка: {cart.totalPromotionPrice} ₽</p>
+      <p>Итоговая цена: {cart.totalCartPrice} ₽</p>
     </div>
     </>
 );
