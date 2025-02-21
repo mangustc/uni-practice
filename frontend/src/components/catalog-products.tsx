@@ -11,6 +11,7 @@ export function CatalogProducts({
     <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
       {products.map((product) => (
         <Card
+          key={product.productID}
           productCatalog={product}
           photoSrc={`${requests.BACKEND_URL}/product/get_photo/${product.productID}`}
         />
