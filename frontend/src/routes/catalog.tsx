@@ -8,6 +8,7 @@ import { CatalogCategories } from "../components/catalog-categories";
 import { CatalogProducts } from "../components/catalog-products";
 
 const DEFAULT_SORT = "price";
+const DEFAULT_FILTER_BY_PARAM = "none";
 
 export const Catalog = function () {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -19,9 +20,11 @@ export const Catalog = function () {
     sorts: objects.CatalogSort[];
     currentFilters: objects.CatalogFilters;
     currentSort: string;
+    currentFilterByParam: string;
     priceMin: number;
     priceMax: number;
     productAmount: number;
+    filterByParams: objects.CatalogFilterByParam[];
   }>({
     categories: [],
     properties: [],
@@ -44,6 +47,25 @@ export const Catalog = function () {
         sortName: "От Я до А",
       },
     ],
+    filterByParams: [
+      {
+        filterByParamValue: "new",
+        filterByParamName: "Новинки",
+      },
+      {
+        filterByParamValue: "hit",
+        filterByParamName: "Хиты",
+      },
+      {
+        filterByParamValue: "promotion",
+        filterByParamName: "Акция",
+      },
+      {
+        filterByParamValue: "none",
+        filterByParamName: "-",
+      },
+    ],
+    currentFilterByParam: DEFAULT_FILTER_BY_PARAM,
     priceMin: 0,
     priceMax: 0,
     productAmount: 0,
@@ -83,6 +105,7 @@ export const Catalog = function () {
       createSearchParams({
         currentFilters: JSON.stringify(newFilters),
         currentSort: currentValues.currentSort,
+        currentFilterByParam: currentValues.currentFilterByParam,
         currentCategoryID: String(currentValues.currentCategoryID),
       }),
     );
@@ -91,6 +114,7 @@ export const Catalog = function () {
     requests.GET_GetInfoForCatalogPage(newCategoryID).then((obj) => {
       const newFilters = objects.NewCatalogFilters({});
       const newSort = DEFAULT_SORT;
+      const newFilterByParam = DEFAULT_FILTER_BY_PARAM;
       setTempFilters(objects.NewCatalogFilters({}));
       setCurrentValues({
         ...currentValues,
@@ -109,20 +133,23 @@ export const Catalog = function () {
           currentFilters: JSON.stringify(newFilters),
           currentSort: newSort,
           currentCategoryID: String(newCategoryID),
+          currentFilterByParam: newFilterByParam,
         }),
       );
     });
   }
-  function updateSort(newSort: string) {
+  function updateSort(newSort: string, newFilterByParam: string) {
     setCurrentValues({
       ...currentValues,
       currentSort: newSort,
+      currentFilterByParam: newFilterByParam,
     });
     setSearchParams(
       createSearchParams({
         currentFilters: JSON.stringify(currentValues.currentFilters),
         currentSort: newSort,
         currentCategoryID: String(currentValues.currentCategoryID),
+        currentFilterByParam: newFilterByParam,
       }),
     );
   }
@@ -151,12 +178,16 @@ export const Catalog = function () {
             "\nfiltering values:\n" +
             JSON.stringify(currentValues.currentFilters, null, 2) +
             "\nsorting value: " +
-            JSON.stringify(currentValues.currentSort, null, 2)
+            JSON.stringify(currentValues.currentSort, null, 2) +
+            "\nfilterByParam value: " +
+            JSON.stringify(currentValues.currentFilterByParam, null, 2)
           }
           readOnly
         ></textarea>
         <CatalogSort
           currentSort={currentValues.currentSort}
+          currentFilterByParam={currentValues.currentFilterByParam}
+          filterByParams={currentValues.filterByParams}
           sorts={currentValues.sorts}
           updateSort={updateSort}
         />

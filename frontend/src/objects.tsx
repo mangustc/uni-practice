@@ -7,6 +7,11 @@ export type CatalogSort = {
   sortName: string;
 };
 
+export type CatalogFilterByParam = {
+  filterByParamValue: string;
+  filterByParamName: string;
+};
+
 export type PropertyIn = {
   property_id?: number;
   property_name?: string;
