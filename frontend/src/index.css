@@ -630,6 +630,39 @@ p {
   justify-content: flex-start;
 }
 
+.catalog-radio-line {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+input[type="radio"] {
+  margin: 0 0 0 0;
+  background-color: transparent;
+  border: 2px solid var(--text-color-black-main);
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 5px white;
+  cursor: pointer;
+  height: 20px;
+  outline: none;
+  width: 20px;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  &:checked {
+    border: 2px solid var(--text-color-red-main);
+    background-color: var(--text-color-red-main);
+    box-shadow: inset 0 0 0 5px white;
+    transition: all 200ms ease; 
+  }
+}
+#radio-label {
+  font-size: var(--text-size-14px);
+  height: 16px;
+  font-weight: var(--text-weight-link);
+  color: var(--text-color-black-main);
+}
+
 .price-input {
   width: 114px;
   height: 46px;
@@ -674,6 +707,16 @@ p {
   border: 1px solid var(--text-color-red-main);
 }
 
+
+
+.catalog-categories-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 251px;
+  border: 1px solid blue;
+}
 
 /* LOGINPAGE */
 

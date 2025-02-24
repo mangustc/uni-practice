@@ -22,7 +22,7 @@ function CatalogFilter({
     <div className="catalog-filter-container">
       <div className="catalog-filter-block">
         <h6>Наличие товара</h6>
-        <div className="catalog-filter-line" style={{gap: "12px"}}>
+        <div className="catalog-radio-line" style={{gap: "12px"}}>
           <input
             type="radio"
             checked={!filters.productOnlyInStock}
@@ -35,6 +35,7 @@ function CatalogFilter({
             }}
           />
           <label
+          id="radio-label"
             onClick={() =>
               setFilters({
                 ...filters,
@@ -46,7 +47,7 @@ function CatalogFilter({
           </label>
           
         </div>
-        <div className="catalog-filter-line" style={{gap: "12px"}}>
+        <div className="catalog-radio-line" style={{gap: "12px"}}>
         <input
             type="radio"
             checked={filters.productOnlyInStock}
@@ -59,6 +60,7 @@ function CatalogFilter({
             }}
           />
           <label
+          id="radio-label"
             onClick={() =>
               setFilters({
                 ...filters,

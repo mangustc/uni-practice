@@ -82,7 +82,7 @@ export function CatalogCategories({
 
   const categoryTree = getCategoryTreeFromList(categories);
   return (
-    <div style={{ display: "flex", flexDirection: "column" }}>
+    <div className="catalog-categories-container">
       <div>
         {JSX_PrintTree({
           val: objects.NewCategory({ category_name: "Категории" }),

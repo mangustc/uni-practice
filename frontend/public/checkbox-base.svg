@@ -1,0 +1,12 @@
+<svg width="24.000000" height="24.000000" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+
+	<defs>
+		<clipPath id="clip5712_127924">
+			<rect id="u:check-square" rx="0.000000" width="23.000000" height="23.000000" transform="translate(0.500000 0.500000)" fill="white" fill-opacity="0"/>
+		</clipPath>
+	</defs>
+	<rect id="u:check-square" rx="0.000000" width="23.000000" height="23.000000" transform="translate(0.500000 0.500000)" fill="#FFFFFF" fill-opacity="0"/>
+	<g clip-path="url(#clip5712_127924)">
+		<path id="Vector" d="M21 2L3 2C2.73 2 2.48 2.1 2.29 2.29C2.1 2.48 2 2.73 2 3L2 21C2 21.26 2.1 21.51 2.29 21.7C2.48 21.89 2.73 22 3 22L21 22C21.26 22 21.51 21.89 21.7 21.7C21.89 21.51 22 21.26 22 21L22 3C22 2.73 21.89 2.48 21.7 2.29C21.51 2.1 21.26 2 21 2ZM20 20L4 20L4 4L20 4L20 20Z" fill="#1A1A1A" fill-opacity="1.000000" fill-rule="nonzero"/>
+	</g>
+</svg>
