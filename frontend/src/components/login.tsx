@@ -1,21 +1,34 @@
+import * as requests from "../requests";
 import React, { useState } from 'react';
 import '../index.css';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
   const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(event.target.value);
+    if (error != '')
+      setError('');
   };
 
   const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(event.target.value);
+    if (error != '')
+      setError('');
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    // Отправка данных на сервер
+    requests.PUT_Login(email, password)
+    .then((obj) => {
+      if (obj.status != 200) {
+        setError(obj.detail);
+      } else {
+        setError(obj.detail); // изменить на переход в личный кабинет
+      }
+    })
   };
 
   return (
@@ -61,6 +74,7 @@ const Login = () => {
 
           <div className="login__links">
             <a href="/customer/restore" className="login__link">Забыли пароль?</a>
+            <p>{error}</p> {/*добавлено для тестирования, показ ошибки изменить*/}
           </div>
         </form>
       </div>

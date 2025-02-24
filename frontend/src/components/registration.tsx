@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import * as requests from "../requests";
+import React, { useState, useEffect } from 'react';
 import '../index.css';
 import { Link } from 'react-router-dom';
+import IMask from 'imask';
 
 const Registration = () => {
   const [email, setEmail] = useState('');
@@ -8,40 +10,96 @@ const Registration = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [phone, setPhone] = useState('');
   const [accountType, setAccountType] = useState('individual');
-    const [organizationName, setOrganizationName] = useState('');
+  const [organizationName, setOrganizationName] = useState('');
   const [inn, setInn] = useState('');
+  const [error, setError] = useState('');
+
+  window.onload = function () {
+    const phoneMask = document.querySelector("input[type='tel']");
+    if (phoneMask)
+      IMask(phoneMask as HTMLInputElement, {mask: "+{7} (000) 000 00 00"});
+  };
+
+  useEffect(() => {
+    const phoneMask = document.querySelector("input[type='tel']");
+    if (phoneMask)
+      IMask(phoneMask as HTMLInputElement, {mask: "+{7} (000) 000 00 00"});
+  }, [accountType]);
 
   const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(event.target.value);
+    if (error != '')
+      setError('');
   };
 
   const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(event.target.value);
+    if (error != '')
+      setError('');
   };
 
   const handleConfirmPasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setConfirmPassword(event.target.value);
+    if (error != '')
+      setError('');
   };
 
   const handlePhoneChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setPhone(event.target.value);
+    if (error != '')
+      setError('');
   };
 
    const handleOrganizationNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setOrganizationName(event.target.value);
+    if (error != '')
+      setError('');
   };
 
   const handleInnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInn(event.target.value);
+    if (error != '')
+      setError('');
   };
 
   const handleAccountTypeChange = (type: string) => {
     setAccountType(type);
+    if (error != '')
+      setError('');
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    // Логика отправки данных на сервер
+    if (accountType == "individual") {
+      requests.POST_Register(email, password, confirmPassword, phone)
+      .then((obj) => {
+        if (obj.status != 201) {
+          setError(obj.detail);
+        } else {
+          setError(obj.detail); // изменить на переход в личный кабинет
+        }
+      })
+    }
+    if (accountType == "legal") {
+      requests.POST_RegisterLegal(email, password, confirmPassword, phone, organizationName, inn)
+      .then((obj) => {
+        if (obj.status != 201) {
+          setError(obj.detail);
+        } else {
+          setError(obj.detail); // изменить на переход в личный кабинет
+        }
+      })
+    }
+    if (accountType == "ip") {
+      requests.POST_RegisterIP(email, password, confirmPassword, phone, organizationName, inn)
+      .then((obj) => {
+        if (obj.status != 201) {
+          setError(obj.detail);
+        } else {
+          setError(obj.detail); // изменить на переход в личный кабинет
+        }
+      })
+    }
   };
 
   return (
@@ -98,7 +156,7 @@ const Registration = () => {
                     className="field__input"
                     type="tel"
                     value={phone}
-                    placeholder="+7 (___) ___-__-__"
+                    placeholder="+7 (___) ___ __ __"
                     name="phone"
                     //required=""
                     onChange={handlePhoneChange}
@@ -172,6 +230,7 @@ const Registration = () => {
               Нажимая на кнопку, вы соглашаетесь с
               <a href="#" className="registration__link"> Политикой конфиденциальности</a>
             </p>
+            <p>{error}</p> {/*добавлено для тестирования, показ ошибки изменить*/}
           </form>
         )}
            {accountType === 'individual' && (
@@ -199,7 +258,7 @@ const Registration = () => {
                     className="field__input"
                     type="tel"
                     value={phone}
-                    placeholder="+7 (___) ___-__-__"
+                    placeholder="+7 (___) ___ __ __"
                     name="phone"
                     //required=""
                     onChange={handlePhoneChange}
@@ -244,6 +303,7 @@ const Registration = () => {
               Нажимая на кнопку, вы соглашаетесь с
               <a href="#" className="registration__link"> Политикой конфиденциальности</a>
             </p>
+            <p>{error}</p> {/*добавлено для тестирования, показ ошибки изменить*/}
           </form>
         )}
       </div>

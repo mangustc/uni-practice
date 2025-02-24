@@ -297,3 +297,8 @@ export function mapCart(obj: CartIn): Cart {
   }
   return cart;
 }
+
+export type ResponseInfo = {
+  status: number;
+  detail: string;
+}

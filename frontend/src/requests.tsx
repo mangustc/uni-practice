@@ -1,4 +1,5 @@
 import * as objects from "./objects.tsx";
+import { ResponseInfoFromResponse } from "./util.tsx";
 
 export const BACKEND_URL: string = import.meta.env.VITE_BACKEND_URL;
 const HEADER_JSON = {
@@ -151,3 +152,78 @@ export async function PUT_ChangeProductAmountInCart(
   );
 }
 
+export async function PUT_Login(
+  email: string,
+  password: string
+) {
+  const request = {email: email, password: password};
+  const response = await fetch(BACKEND_URL + `/user/login`, {
+    method: "PUT",
+    headers: HEADER_JSON,
+    body: JSON.stringify(request),
+    credentials: "include",
+  });
+
+  const info = await ResponseInfoFromResponse(response);
+  return(info);
+}
+
+export async function POST_Register(
+  email: string,
+  password: string,
+  confirmPassword: string,
+  phone: string
+) {
+  const request = {email: email, password: password, re_password: confirmPassword, number: phone};
+  const response = await fetch(BACKEND_URL + `/user/register`, {
+    method: "POST",
+    headers: HEADER_JSON,
+    body: JSON.stringify(request),
+    credentials: "include",
+  });
+  
+  const info = await ResponseInfoFromResponse(response);
+  return(info);
+}
+
+export async function POST_RegisterLegal(
+  email: string,
+  password: string,
+  confirmPassword: string,
+  phone: string,
+  organizationName: string,
+  inn: string
+) {
+  const request = {email: email, password: password, re_password: confirmPassword,
+    number: phone, organization_name: organizationName, INN: inn};
+  const response = await fetch(BACKEND_URL + `/user/register_legal_entity`, {
+    method: "POST",
+    headers: HEADER_JSON,
+    body: JSON.stringify(request),
+    credentials: "include",
+  });
+  
+  const info = await ResponseInfoFromResponse(response);
+  return(info);
+}
+
+export async function POST_RegisterIP(
+  email: string,
+  password: string,
+  confirmPassword: string,
+  phone: string,
+  organizationName: string,
+  inn: string
+) {
+  const request = {email: email, password: password, re_password: confirmPassword,
+    number: phone, organization_name: organizationName, INN: inn};
+  const response = await fetch(BACKEND_URL + `/user/register_ip`, {
+    method: "POST",
+    headers: HEADER_JSON,
+    body: JSON.stringify(request),
+    credentials: "include",
+  });
+  
+  const info = await ResponseInfoFromResponse(response);
+  return(info);
+}
