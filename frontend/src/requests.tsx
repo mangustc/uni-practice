@@ -145,6 +145,20 @@ export async function DELETE_clearCart() {
   });
 }
 
+export async function POST_AddInCart(productID: number, amount: number): Promise<any> {
+  let response = await fetch(
+    BACKEND_URL + `/cart/add_in_cart/${productID}/${amount}`,
+    {
+      method: "POST",
+      headers: HEADER_JSON,
+      credentials: "include",
+    },
+  );
+  // TODO: Handle error or success
+
+  return await response.json();
+}
+
 export async function PUT_ChangeProductAmountInCart(
   productID: number,
   amount: number,
