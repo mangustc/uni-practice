@@ -90,6 +90,8 @@ export const Cart = function () {
 
   return (
     <>
+    {cart.items.length == 0 && <p>Корзина пуста</p>}
+    {cart.items.length > 0 && <>
     {cart.items.map((item, index) => (
         <CartProduct key={index} productInfo={item} changeProductAmount={changeProductAmount} deleteProduct={deleteProduct}/>
     ))}
@@ -99,6 +101,7 @@ export const Cart = function () {
       <p>Скидка: {cart.totalPromotionPrice} ₽</p>
       <p>Итоговая цена: {cart.totalCartPrice} ₽</p>
     </div>
+    </>}
     </>
 );
 };
