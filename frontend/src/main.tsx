@@ -7,6 +7,7 @@ import ErrorPage from "./error-page";
 import { Catalog } from "./routes/catalog";
 import { Cart } from "./routes/cart";
 import LoginPage from "./routes/login";
+import RegistrationPage from "./routes/registration";
 
 const router = createBrowserRouter([
   {
@@ -25,6 +26,10 @@ const router = createBrowserRouter([
       {
         path: "login",
         element: <LoginPage />,
+      },
+      {
+        path: "registration",
+        element: <RegistrationPage />,
       }
     ],
   },

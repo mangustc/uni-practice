@@ -863,3 +863,263 @@ font-style: normal;
   color: #777;
   text-decoration: none;
 }
+
+
+
+
+/* Стили для Registration */
+.registration-container-main {
+  line-height: 1.15;
+  color: #1a1a1a;
+  font-weight: 400;
+  font-style: normal;
+  font-family: "Roboto", sans-serif;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  padding: 25px 0 60px;
+  box-sizing: border-box;
+  justify-content: center;
+}
+
+.registration-container {
+  line-height: 1.15;
+  color: #1a1a1a;
+  font-weight: 400;
+  font-style: normal;
+  font-family: "Roboto", sans-serif;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  flex-direction: column;
+  -webkit-box-align: center;
+  align-items: center;
+  max-width: 650px;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+.login-header1 {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  margin-bottom: 40px;
+  justify-content: center;
+  width: 100%; 
+}
+
+.registration__top-link {
+  line-height: 1.15;
+  color: #1a1a1a;
+  font-weight: 400;
+  font-style: normal;
+  font-family: "Roboto", sans-serif;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  margin-right: 30px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  cursor: pointer;
+  min-height: 32px;
+  text-decoration: none;
+  color: rgba(26, 26, 26, 0.7);
+}
+
+.registration__top-link--active {
+  line-height: 1.15;
+  color: #1a1a1a;
+  font-weight: 1200;
+  font-style: normal;
+  font-family: "Roboto", sans-serif;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  margin-right: 30px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  cursor: pointer;
+  min-height: 32px;
+}
+
+
+
+/* Тип лица (Физическое/Юридическое/ИП) */
+.registration__type {
+  line-height: 1.15;
+  color: #1a1a1a;
+  font-weight: 400;
+  font-style: normal;
+  font-family: "Roboto", sans-serif;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  display: flex;
+  -webkit-box-pack: start;
+  justify-content: flex-start;
+  /* Выравниваем по левому краю */
+  -webkit-box-align: center;
+  align-items: center;
+  flex-wrap: nowrap;
+  margin-bottom: 20px;
+  gap: 20px;
+}
+
+.registration__type-link {
+  line-height: 1.15;
+  --swiper-theme-color: #007aff;
+  --swiper-navigation-size: 44px;
+  --edost_color: #27b;
+  font-style: normal;
+  font-family: "Roboto", sans-serif;
+  -webkit-text-size-adjust: 100%;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.125;
+  color: rgba(26, 26, 26, 0.7);
+  transition: color 0.2s;
+  padding-top: 1px;
+  padding-bottom: 0;
+}
+
+.registration__type-link.registration__type-link--active {
+  color: #e32636;
+  text-decoration: underline;
+}
+
+/* Стили для формы */
+.registration__form {
+  line-height: 1.15;
+  color: #1a1a1a;
+  font-weight: 400;
+  font-style: normal;
+  font-family: "Roboto", sans-serif;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  display: flex;
+  flex-direction: column; /* Change to column */
+  -webkit-box-align: start;
+  align-items: flex-start;
+  -webkit-box-pack: justify;
+  justify-content: space-between;
+  /* margin-bottom: 10px; */
+  margin-top: 10px;
+}
+
+.registration-fields-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.registration-new-field {
+  line-height: 1.15;
+  color: #1a1a1a;
+  font-weight: 400;
+  font-style: normal;
+  font-family: "Roboto", sans-serif;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  flex-direction: column;
+  width: calc(50% - 15px); /* Два поля в ряд */
+  margin: 0 0 18px;
+}
+
+.registration-new-field__label {
+  line-height: 1.15;
+  --swiper-theme-color: #007aff;
+  --swiper-navigation-size: 44px;
+  --edost_color: #27b;
+  font-style: normal;
+  font-family: "Roboto", sans-serif;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 1.17;
+  margin: 0 0 10px;
+  color: rgba(26, 26, 26, 0.7);
+  cursor: default;
+}
+
+.field__wrapper {
+  position: relative;
+}
+
+.registration-new-field__input {
+  --swiper-theme-color: #007aff;
+ --swiper-navigation-size: 44px;
+ --edost_color: #27b;
+ -webkit-text-size-adjust: 100%;
+ -webkit-tap-highlight-color: transparent;
+ margin: 0;
+ box-shadow: none;
+ outline: 0;
+ color: #1a1a1a;
+ font-family: "Roboto",sans-serif;
+ box-sizing: border-box;
+ border-radius: 2px;
+ border: 1px solid rgba(26,26,26,.15);
+ width: 100%;
+ transition: border-color .2s;
+ font-size: 14px;
+ line-height: 1.17;
+ font-weight: 500;
+ height: 50px;
+ padding: 17px 15px;
+   text-align: left; /* Добавлено: сдвинуть текст влево */
+   background-color: #fff; /* Добавлено: убрать серый фон */
+}
+
+.registration__form-submit {
+  line-height: 1.15;
+  --swiper-theme-color: #007aff;
+  --swiper-navigation-size: 44px;
+  --edost_color: #27b;
+  font-weight: 400;
+  font-style: normal;
+  font-family: "Roboto", sans-serif;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  margin-top: 20px;
+  max-width: 100%;
+  width: 100%;
+}
+
+/* Соглашение */
+.registration__agreement {
+  line-height: 1.15;
+  --swiper-theme-color: #007aff;
+  --swiper-navigation-size: 44px;
+  --edost_color: #27b;
+  font-weight: 400;
+  font-style: normal;
+  font-family: "Roboto", sans-serif;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  margin-top: 20px;
+  max-width: 100%;
+  font-size: 12px;
+  line-height: 1.17;
+  color: rgba(26, 26, 26, 0.7);
+  align-self: flex-start;
+  width: 100%;
+  text-align: left;
+}
+
+.registration__link {
+  color: #e32636;
+}
