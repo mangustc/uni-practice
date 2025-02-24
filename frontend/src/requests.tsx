@@ -138,7 +138,7 @@ export async function DELETE_deleteProductFromCart(productID: number) {
 }
 
 export async function DELETE_clearCart() {
-  await fetch(BACKEND_URL + `/cart/clear_cart/`, {
+  await fetch(BACKEND_URL + `/cart/clear_cart`, {
     method: "DELETE",
     headers: HEADER_JSON,
     credentials: "include",
