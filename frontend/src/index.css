@@ -680,9 +680,9 @@ p {
 
 /* Стили для основного контейнера */
 .login-container-main {
-  width: 100%;
-  min-height: 100vh;
-  padding: 134px 0 0; /* Отступ сверху до хедера*/
+  width: 100%; 
+  min-height: calc(100vh - 194px);
+  padding: 0px 0 0; /* Отступ сверху до хедера*/
   display: flex;
   justify-content: center;
   align-items: flex-start; /* Изменено */
