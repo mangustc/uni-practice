@@ -520,6 +520,7 @@ p {
   border-radius: 2px;
   margin-bottom: 14px;
   background-color: rosybrown;
+  background-size: cover;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -578,6 +579,15 @@ p {
 
 .card-like:hover {
   background-image: url("../public/red-heart-fill.svg");
+}
+
+.card-like-wishlist {
+  margin-top: 12px;
+  margin-right: 12px;
+  width: 24px;
+  height: 24px;
+  background-image: url("../public/red-heart-fill.svg");
+  transition: all 200ms ease;
 }
 
 .card-filter {
