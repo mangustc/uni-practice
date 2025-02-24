@@ -82,7 +82,7 @@ async def delete_product(request: Request, product_id: int):
     return await ProductService.delete_product(request, product_id)
 
 
-@router.put("/change_wishlist_state/{product_id}", response_model=Message, status_code=status.HTTP_200_OK)
+@router.put("/change_wishlist_state/{product_id}", response_model=WishlistUpdateResponse, status_code=status.HTTP_200_OK)
 async def change_wishlist_state(request: Request, product_id: int):
     return await ProductService.change_wishlist_state(request, product_id)
 

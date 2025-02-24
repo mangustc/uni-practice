@@ -172,3 +172,7 @@ class OrderHistoryResponse(BaseModel):
     order_date: datetime
     total_amount: PositiveFloat
     payment_status: str
+
+class WishlistUpdateResponse(BaseModel):
+    message: str
+    status: bool # true if in wishlist
