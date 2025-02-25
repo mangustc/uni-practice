@@ -9,8 +9,8 @@ class AddProperty(BaseModel):
 
     @field_validator('name')
     def validate_name(cls, name: str) -> str:
-        if not re.match(r"^[\w\sа-яА-ЯёЁ]+$", name):
-            raise ValueError('Property name cannot contain special characters')
+        if not re.match(r"^[\w\sа-яА-ЯёЁ(),]+$", name):
+            raise ValueError('Property name cannot contain special characters except for parentheses and commas')
         if len(name) > 50:
             raise ValueError('Property name must be less than 50 characters')
         return name

@@ -12,7 +12,7 @@ class CreateProduct(BaseModel):
 
     @field_validator('category_name')
     def validate_category_name(cls, name: str) -> str:
-        if not re.match(r"^[\w\sа-яА-ЯёЁ]+$", name):
+        if not re.match(r"^[\w\sа-яА-ЯёЁ(),]+$", name):
             raise ValueError('Category name cannot contain special characters')
         return name
     article_id: PositiveInt
@@ -20,7 +20,7 @@ class CreateProduct(BaseModel):
 
     @field_validator('name')
     def validate_product_name(cls, name: str) -> str:
-        if not re.match(r"^[\w\sа-яА-ЯёЁ]+$", name):
+        if not re.match(r"^[\w\sа-яА-ЯёЁ(),]+$", name):
             raise ValueError('Product name cannot contain special characters')
         if len(name) > 100:
             raise ValueError('Product name must be less than 100 characters')

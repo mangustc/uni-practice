@@ -20,9 +20,9 @@ class Registr(BaseModel):
     @field_validator("number")
     def validate_number(cls, number):
         if number is not None:
-            number_pattern = r"^\d\(\d{3}\)-\d{3}-\d{2}-\d{2}$"
+            number_pattern = r"^\+7 \(\d{3}\) \d{3} \d{2} \d{2}$"
             if not re.match(number_pattern, number):
-                raise ValueError("Некорректный формат номера телефона. Пример: 7(123)-456-78-90")
+                raise ValueError("Некорректный формат номера телефона. Пример: +7 (923) 235 23 45")
         return number
 
     model_config = {
@@ -32,7 +32,7 @@ class Registr(BaseModel):
                     "email": "example@email.com",
                     "password": "Password123!",
                     "re_password": "Password123!",
-                    "number": "7(123)-456-78-90",
+                    "number": "+7 (923) 235 23 45",
                 }
             ]
         }
@@ -57,9 +57,9 @@ class RegistrLegalEntity(BaseModel):  # Для Юр.лиц и ИП
     @field_validator("number")
     def validate_number(cls, number):
         if number is not None:
-            number_pattern = r"^\d\(\d{3}\)-\d{3}-\d{2}-\d{2}$"
+            number_pattern = r"^\+7 \(\d{3}\) \d{3} \d{2} \d{2}$"
             if not re.match(number_pattern, number):
-                raise ValueError("Некорректный формат номера телефона. Пример: 7(123)-456-78-90")
+                raise ValueError("Некорректный формат номера телефона. Пример: +7 (923) 235 23 45")
         return number
 
     model_config = {
@@ -71,7 +71,7 @@ class RegistrLegalEntity(BaseModel):  # Для Юр.лиц и ИП
                     "INN": "9729219090",
                     "password": "Password123!",
                     "re_password": "Password123!",
-                    "number": "7(123)-456-78-90",
+                    "number": "+7 (923) 235 23 45",
                 }
             ]
         }

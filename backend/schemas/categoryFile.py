@@ -9,7 +9,7 @@ class AddCategoryRoot(BaseModel):
 
     @field_validator('name')
     def validate_name(cls, name: str) -> str:
-        if not re.match(r"^[a-zA-Z0-9\sа-яА-ЯёЁ]+$", name):
+        if not re.match(r"^[a-zA-Z0-9\sа-яА-ЯёЁ(),]+$", name):
             raise ValueError('Category name cannot contain special characters')
         if len(name) > 50:
             raise ValueError('Category name must be less than 50 characters')
@@ -22,7 +22,7 @@ class AddCategory(BaseModel):
 
     @field_validator('name')
     def validate_name(cls, name: str) -> str:
-        if not re.match(r"^[a-zA-Z0-9\sа-яА-ЯёЁ]+$", name):
+        if not re.match(r"^[a-zA-Z0-9\sа-яА-ЯёЁ(),]+$", name):
             raise ValueError('Category name cannot contain special characters')
         if len(name) > 50:
             raise ValueError('Category name must be less than 50 characters')
