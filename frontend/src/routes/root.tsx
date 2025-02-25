@@ -5,6 +5,7 @@ import Cookies from "universal-cookie";
 import Footer from "../components/footer";
 import CategoriesPanel from "../components/categories-panel";
 import Card from "../components/card";
+import { ToastContainer } from "react-toastify";
 
 const cookies = new Cookies();
 export const AuthContext = createContext({
@@ -23,6 +24,7 @@ export default function Root() {
     );
     return (
         <AuthContext.Provider value={{authenticated, setAuthenticated}}>
+            <ToastContainer />
             <Header></Header>
             <CategoriesPanel></CategoriesPanel>
             <Card productCatalog={{
