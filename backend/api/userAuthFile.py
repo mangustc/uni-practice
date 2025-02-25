@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status, Response, Request
+from fastapi import APIRouter, status, Response, Request, HTTPException
 from schemas import *
 from services import UserService
 
@@ -53,3 +53,18 @@ async def delete_me(request: Request, response: Response):
 @router.put("/change_role/{new_role}", response_model=Message, status_code=status.HTTP_200_OK)
 async def change_role(new_role: str, request: Request, response: Response):
     return await UserService.change_role(new_role, request, response)
+
+
+@router.post("/request_password_reset", response_model=Message, status_code=status.HTTP_200_OK)
+async def request_password_reset(email: str, new_password: str, re_new_password: str):
+    if new_password != re_new_password:
+        raise HTTPException(status_code=400, detail="Пароли не совпадают")
+    return await UserService.request_password_reset(email, new_password)
+
+
+@router.get("/confirm_password_reset/{token}", response_model=Message, status_code=status.HTTP_200_OK)
+async def confirm_password_reset(token: str):
+    return await UserService.confirm_password_reset(token)
+
+
+

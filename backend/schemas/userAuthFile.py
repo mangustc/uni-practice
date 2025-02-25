@@ -112,3 +112,10 @@ class GetUserInfoResponse(BaseModel):
     surname: Optional[str]
     number: Optional[str]
     role: str
+
+
+
+class ResetPassword(BaseModel):
+    new_password: str
+    re_new_password: str
+

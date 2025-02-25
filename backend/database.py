@@ -215,6 +215,16 @@ class Shop(Base):
     city = Column(String, nullable=False)
 
 
+class PasswordReset(Base):
+    __tablename__ = "password_resets"
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("user.id"))
+    token = Column(String, nullable=False)
+
+    user = relationship("User", backref="password_resets")
+
+
 async def create_tables():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)

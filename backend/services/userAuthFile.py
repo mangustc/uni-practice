@@ -1,3 +1,7 @@
+from datetime import timedelta
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from fastapi import HTTPException, status, Response, Request
 from database import *
 from schemas import *
@@ -248,10 +252,93 @@ class UserService:
             token_data = {
                 "id": user.id,
                 "email": user.email,
-                "role": user.role.value  # Используем новую роль из базы данных
+                "role": user.role.value
             }
             token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
             response.set_cookie(key="token", value=token, httponly=True, secure=False)
 
             return {"message": f"Роль пользователя с ID {user_id} успешно изменена на {new_role}."}
+
+    @classmethod
+    async def request_password_reset(cls, email: str, new_password: str):
+        async with new_session() as db:
+            result = await db.execute(select(User).where(User.email == email))
+            user = result.scalars().first()
+            if not user:
+                raise HTTPException(status_code=400, detail="Пользователь не найден")
+            token_data = {
+                "email": email,
+                "new_password": new_password,
+                "exp": datetime.utcnow() + timedelta(minutes=30)  # Время жизни токена 30 минут
+            }
+            token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
+
+            password_reset = PasswordReset(
+                user_id=user.id,
+                token=token
+            )
+            db.add(password_reset)
+            try:
+                await db.commit()
+            except IntegrityError:
+                await db.rollback()
+                raise HTTPException(status_code=500, detail="Ошибка при сохранении токена сброса пароля")
+
+            # Отправляем письмо с токеном
+            await cls.send_reset_password_email(email, token)
+
+            return {"message": "Ссылка для подтверждения сброса пароля отправлена на ваш email."}
+
+    @classmethod
+    async def confirm_password_reset(cls, token: str):
+        try:
+            token_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        except jwt.ExpiredSignatureError:
+            raise HTTPException(status_code=400, detail="Срок действия токена истек")
+        except jwt.InvalidTokenError:
+            raise HTTPException(status_code=400, detail="Некорректный токен")
+
+        async with new_session() as db:
+            result = await db.execute(select(PasswordReset).where(PasswordReset.token == token))
+            password_reset = result.scalars().first()
+            if not password_reset:
+                raise HTTPException(status_code=400, detail="Токен не найден")
+
+            user_id = password_reset.user_id
+            user = await db.get(User, user_id)
+            if not user:
+                raise HTTPException(status_code=404, detail="Пользователь не найден")
+
+            hashed_password = bcrypt.hashpw(token_data["new_password"].encode('utf-8'), bcrypt.gensalt()).decode(
+                'utf-8')
+            user.password = hashed_password
+
+            try:
+                await db.delete(password_reset)  # Удаляем токен сброса пароля
+                await db.commit()
+            except IntegrityError:
+                await db.rollback()
+                raise HTTPException(status_code=500, detail="Ошибка при сбросе пароля")
+
+            return {"message": "Новый пароль успешно установлен"}
+
+    @classmethod
+    async def send_reset_password_email(cls, email: str, token: str):
+        msg = MIMEMultipart()
+        msg['From'] = 'dart_side34@mail.ru'
+        msg['To'] = email
+        msg['Subject'] = 'Подтверждение сброса пароля'
+
+        confirm_link = f"http://localhost:8000/api/user/confirm_password_reset/{token}"
+        body = f"Ссылка для подтверждения сброса пароля: {confirm_link}"
+        msg.attach(MIMEText(body, 'plain'))
+
+        server = smtplib.SMTP_SSL("smtp.mail.ru", 465)
+        server.login(msg['From'], 'N5FinwTdTQpdnVqb0WHS')
+        text = msg.as_string()
+        server.sendmail(msg['From'], msg['To'], text)
+        server.quit()
+
+
+
 
