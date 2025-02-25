@@ -10,6 +10,7 @@ from api.orderFile import router as order_router
 from api.feedbackFile import router as feedback_router
 from api.vacancyFile import router as vacancy_router
 from api.contactsFile import router as contact_router
+from api.ourshopsFile import router as our_shop_router
 from fastapi import APIRouter
 
 
@@ -26,3 +27,4 @@ router.include_router(order_router)
 router.include_router(feedback_router)
 router.include_router(vacancy_router)
 router.include_router(contact_router)
+router.include_router(our_shop_router)

@@ -205,6 +205,15 @@ class Contact(Base):
     kpp = Column(String, nullable=True)
 
 
+
+class Shop(Base):
+    __tablename__ = "shops"
+    id = Column(Integer, primary_key=True, index=True)
+    address = Column(String, nullable=False)
+    schedule = Column(String, nullable=False)
+    photo_path = Column(String, nullable=True)
+
+
 async def create_tables():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)

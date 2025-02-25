@@ -10,3 +10,4 @@ from services.feedbackFile import *
 from services.vacancyFile import *
 from services.deliveryFile import *
 from services.contactsFile import *
+from services.ourshopsFile import *

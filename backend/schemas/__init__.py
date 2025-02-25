@@ -10,3 +10,4 @@ from schemas.feedbackFile import *
 from schemas.filterFile import *
 from schemas.vacancyFile import *
 from schemas.contactsFile import *
+from schemas.ourshopsFile import *
