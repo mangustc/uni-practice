@@ -1,11 +1,13 @@
 import os
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
-from fastapi import HTTPException, status, UploadFile, Request
+from fastapi import HTTPException, status, UploadFile, Request, Query
 from fastapi.responses import FileResponse
 from schemas import ShopCreate, ShopUpdate, ShopResponse
 from database import new_session, Shop
 from Function import Functions
+from typing import Optional
+
 
 class ShopService:
     @classmethod
@@ -16,7 +18,7 @@ class ShopService:
                 status_code=status.HTTP_403_FORBIDDEN, detail="Только администраторы могут добавлять магазины"
             )
         async with new_session() as db:
-            db_shop = Shop(**shop.dict(exclude={"photo_path"}))  # исключаем photo_path
+            db_shop = Shop(**shop.dict(exclude={"photo_path"}))
             db.add(db_shop)
             try:
                 await db.commit()
@@ -30,9 +32,12 @@ class ShopService:
                 )
 
     @classmethod
-    async def get_shops(cls) -> list[ShopResponse]:
+    async def get_shops(cls, city: Optional[str] = None) -> list[ShopResponse]:
         async with new_session() as db:
-            shops = await db.execute(select(Shop))
+            query = select(Shop)
+            if city:
+                query = query.where(Shop.city == city)
+            shops = await db.execute(query)
             return [ShopResponse.from_orm(shop) for shop in shops.scalars().all()]
 
     @classmethod
@@ -179,7 +184,6 @@ class ShopService:
 
         return {"message": f"Файл загружен {file_path}"}
 
-
     @classmethod
     async def delete_shop_photo(cls, request: Request, shop_id: int) -> dict:
         user_data = await Functions.get_user_data(request)
@@ -207,3 +211,4 @@ class ShopService:
             shop.photo_path = None
             await db.commit()
         return {"message": "Фотография магазина успешно удалена"}
+

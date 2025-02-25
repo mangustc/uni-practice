@@ -212,6 +212,7 @@ class Shop(Base):
     address = Column(String, nullable=False)
     schedule = Column(String, nullable=False)
     photo_path = Column(String, nullable=True)
+    city = Column(String, nullable=False)
 
 
 async def create_tables():
