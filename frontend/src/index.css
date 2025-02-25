@@ -673,6 +673,21 @@ input[type="radio"] {
   color: var(--text-color-black-main);
 }
 
+input[type="checkbox"] {
+  margin: 0 0 0 0;
+  cursor: pointer;
+  height: 24px;
+  outline: none;
+  width: 24px;
+  background-image: url("../public/checkbox-base.svg");
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  &:checked {
+    background-image: url("../public/checkbox-checked.svg");
+    transition: all 200ms ease; 
+  }
+}
+
 .price-input {
   width: 114px;
   height: 46px;
