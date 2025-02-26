@@ -28,4 +28,4 @@ class CartResponse(BaseModel):
     items: List[CartItem]
     total_products_price: float
     total_promotion_price: float
-    total_cart_price: PositiveFloat
+    total_cart_price: float
