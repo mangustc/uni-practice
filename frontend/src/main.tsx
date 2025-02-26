@@ -6,15 +6,19 @@ import "./index.css";
 import ErrorPage from "./error-page";
 import { Catalog } from "./routes/catalog";
 import { Cart } from "./routes/cart";
+import Main from "./routes/main";
 import LoginPage from "./routes/login";
 import RegistrationPage from "./routes/registration";
 
 const router = createBrowserRouter([
   {
-    path: "/",
     element: <Root />,
     errorElement: <ErrorPage />,
     children: [
+      {
+        path: "/",
+        element: <Main />,
+      },
       {
         path: "catalog",
         element: <Catalog />,

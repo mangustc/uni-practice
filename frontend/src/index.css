@@ -771,7 +771,6 @@ input[type="checkbox"] {
 /* Стили для основного контейнера */
 .login-container-main {
   width: 100%; 
-  min-height: calc(100vh - 194px);
   padding: 0px 0 0; /* Отступ сверху до хедера*/
   display: flex;
   justify-content: center;
@@ -1436,4 +1435,11 @@ input[type="number"]:hover,
 input[type="number"]:focus {
     appearance: none;
     -moz-appearance: textfield;
+}
+
+.outlet-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: calc(100vh - 194px);
 }

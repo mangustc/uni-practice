@@ -26,26 +26,8 @@ export default function Root() {
         <AuthContext.Provider value={{authenticated, setAuthenticated}}>
             <ToastContainer />
             <Header></Header>
-            <CategoriesPanel></CategoriesPanel>
-            {/* <Card productCatalog={{
-                productPrice: 100,
-                productID: 1,
-                productName: "fdsa",
-                productMeasuredIn: "м",
-                productHit: true,
-                productNew: false,
-                productPromotion: false,
-                productPercentPromotion: 0,
-                productNewPrice: 0,
-                productInWishlist: false,
-                productInStock: true,
-                categoryID: 1
-            }} photoSrc={""}></Card> */}
-            <div className="root-container">
-                {/* <span>Hello world</span> */}
-                <div className="outlet-container">
-                    <Outlet/>
-                </div>
+            <div className="outlet-container">
+                <Outlet/>
             </div>
             <Footer></Footer>
         </AuthContext.Provider>
