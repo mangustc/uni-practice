@@ -12,9 +12,6 @@ export default function Main() {
         <CategoriesPanel></CategoriesPanel>
         <div className="root-container">
             <span>Hello world</span>
-            <div className="outlet-container">
-                <Outlet/>
-            </div>
         </div>
         </>
     );
