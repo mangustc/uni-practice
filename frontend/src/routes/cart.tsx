@@ -2,6 +2,7 @@ import * as objects from "../objects";
 import * as requests from "../requests";
 import { useEffect, useState } from "react";
 import { CartProduct } from "../components/cart-product";
+import { CartEmpty } from "../components/cart-empty";
 
 
 export const Cart = function () {
@@ -90,16 +91,27 @@ export const Cart = function () {
 
   return (
     <>
-    {cart.items.length == 0 && <p>Корзина пуста</p>}
-    {cart.items.length > 0 && <>
-    {cart.items.map((item, index) => (
-        <CartProduct key={index} productInfo={item} changeProductAmount={changeProductAmount} deleteProduct={deleteProduct}/>
-    ))}
-    <div style={{ paddingLeft: "10px" }}>
-      <button onClick={clearCart}>Очистить корзину</button>
-      <p>Товары: {cart.totalProductsPrice} ₽</p>
-      <p>Скидка: {cart.totalPromotionPrice} ₽</p>
-      <p>Итоговая цена: {cart.totalCartPrice} ₽</p>
+    {cart.items.length == 0 && <CartEmpty />}
+
+    {cart.items.length > 0 && 
+    <>
+    <div className="cart-container">
+      <div className="cart-top">
+        <h1>Корзина</h1>
+        <a className="cart-clear-button" onClick={clearCart}>Очистить корзину</a>
+      </div>
+      <div className="cart-information">
+        <div className="cart-left-side">
+          {cart.items.map((item, index) => (
+              <CartProduct key={index} productInfo={item} changeProductAmount={changeProductAmount} deleteProduct={deleteProduct}/>
+          ))}
+        </div>
+        <div className="cart-right-side">
+          <p>Товары: {cart.totalProductsPrice} ₽</p>
+          <p>Скидка: {cart.totalPromotionPrice} ₽</p>
+          <p>Итоговая цена: {cart.totalCartPrice} ₽</p>
+        </div>
+      </div>
     </div>
     </>}
     </>
