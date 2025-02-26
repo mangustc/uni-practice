@@ -9,11 +9,11 @@ export default function Footer() {
           <div className="footer-categories">
             <div className="footer-category">
               <h6 style={{ marginBottom: "5px" }}>Каталог</h6>
-              <span onClick={() => navigate("/catalog?currentCategoryID=1")} className="footer-text-gray">Ткани</span>
-              <span onClick={() => navigate("/catalog?currentCategoryID=2")} className="footer-text-gray">Для интерьера</span>
-              <span onClick={() => navigate("/catalog?currentCategoryID=3")} className="footer-text-gray">Для творчества</span>
-              <span onClick={() => navigate("/catalog?currentCategoryID=4")} className="footer-text-gray">Фурнитура</span>
-              <span onClick={() => navigate("/catalog?currentFilterByParam=promotion&currentCategoryID=1")} className="footer-text-gray">Акции</span>
+              <span onClick={() => {navigate("/catalog?currentCategoryID=1"); location.reload()}} className="footer-text-gray">Ткани</span>
+              <span onClick={() => {navigate("/catalog?currentCategoryID=2"); location.reload()}} className="footer-text-gray">Для интерьера</span>
+              <span onClick={() => {navigate("/catalog?currentCategoryID=3"); location.reload()}} className="footer-text-gray">Для творчества</span>
+              <span onClick={() => {navigate("/catalog?currentCategoryID=4"); location.reload()}} className="footer-text-gray">Фурнитура</span>
+              <span onClick={() => {navigate("/catalog?currentFilterByParam=promotion&currentCategoryID=1"); location.reload()}} className="footer-text-gray">Акции</span>
             </div>
             <div className="footer-category">
               <h6 style={{ marginBottom: "5px" }}>Покупателям</h6>
