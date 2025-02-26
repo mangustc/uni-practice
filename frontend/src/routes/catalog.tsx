@@ -10,8 +10,36 @@ import { CatalogProducts } from "../components/catalog-products";
 const DEFAULT_SORT = "price";
 const DEFAULT_FILTER_BY_PARAM = "none";
 
+function newCatalogSearchParams(obj: {
+  currentFilters: objects.CatalogFilters,
+  currentSort: string,
+  currentCategoryID: number,
+  currentFilterByParam: string,
+}): URLSearchParams {
+  return createSearchParams({
+    currentFilters: JSON.stringify(obj.currentFilters),
+    currentSort: obj.currentSort,
+    currentCategoryID: String(obj.currentCategoryID),
+    currentFilterByParam: obj.currentFilterByParam
+  });
+}
+
+function getCatalogSearchParams(searchParams: URLSearchParams) {
+  return {
+    currentFilterByParam: searchParams.get("currentFilterByParam") ?? DEFAULT_FILTER_BY_PARAM,
+    currentCategoryID: searchParams.get("currentCategoryID")
+      ? Number(searchParams.get("currentCategoryID"))
+      : 0,
+    currentFilters: objects.NewCatalogFilters(
+      JSON.parse(searchParams.get("currentFilters") ?? "{}"),
+    ),
+    currentSort: searchParams.get("currentSort") ?? DEFAULT_SORT,
+  }
+}
+
 export const Catalog = function () {
   const [searchParams, setSearchParams] = useSearchParams();
+  const catalogSearchParams = getCatalogSearchParams(searchParams);
   const [currentValues, setCurrentValues] = useState<{
     currentCategoryID: number;
     categories: objects.Category[];
@@ -65,17 +93,13 @@ export const Catalog = function () {
         filterByParamName: "-",
       },
     ],
-    currentFilterByParam: searchParams.get("currentFilterByParam") ?? DEFAULT_FILTER_BY_PARAM,
+    currentFilterByParam: catalogSearchParams.currentFilterByParam,
     priceMin: 0,
     priceMax: 0,
     productAmount: 0,
-    currentCategoryID: searchParams.get("currentCategoryID")
-      ? Number(searchParams.get("currentCategoryID"))
-      : 0,
-    currentFilters: objects.NewCatalogFilters(
-      JSON.parse(searchParams.get("currentFilters") ?? "{}"),
-    ),
-    currentSort: searchParams.get("currentSort") ?? DEFAULT_SORT,
+    currentCategoryID: catalogSearchParams.currentCategoryID,
+    currentFilters: catalogSearchParams.currentFilters,
+    currentSort: catalogSearchParams.currentSort,
   });
   const [products, setProducts] = useState<objects.ProductCatalog[]>([]);
   const [tempFilters, setTempFilters] = useState(currentValues.currentFilters);
@@ -93,11 +117,11 @@ export const Catalog = function () {
       currentSort: newSort,
     });
     setSearchParams(
-      createSearchParams({
-        currentFilters: JSON.stringify(newFilters),
+      newCatalogSearchParams({
+        currentFilters: newFilters,
         currentSort: newSort,
         currentFilterByParam: newFilterByParam,
-        currentCategoryID: String(currentValues.currentCategoryID),
+        currentCategoryID: currentValues.currentCategoryID,
       }),
     );
     requests
@@ -167,10 +191,10 @@ export const Catalog = function () {
       });
       setProducts(obj.productCatalogList);
       setSearchParams(
-        createSearchParams({
-          currentFilters: JSON.stringify(newFilters),
+        newCatalogSearchParams({
+          currentFilters: newFilters,
           currentSort: newSort,
-          currentCategoryID: String(newCategoryID),
+          currentCategoryID: newCategoryID,
           currentFilterByParam: newFilterByParam,
         }),
       );
