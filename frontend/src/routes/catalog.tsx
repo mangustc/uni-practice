@@ -183,6 +183,7 @@ export const Catalog = function () {
         currentCategoryID: newCategoryID,
         currentFilters: newFilters,
         currentSort: newSort,
+        currentFilterByParam: newFilterByParam,
         categories: obj.categories,
         colors: obj.colors,
         properties: obj.properties,
