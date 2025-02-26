@@ -1,4 +1,6 @@
-from fastapi import APIRouter, status, Response, Request, HTTPException
+from fastapi import APIRouter, status, Response, Request, HTTPException, Form
+from starlette.responses import HTMLResponse
+
 from schemas import *
 from services import UserService
 
@@ -56,15 +58,37 @@ async def change_role(new_role: str, request: Request, response: Response):
 
 
 @router.post("/request_password_reset", response_model=Message, status_code=status.HTTP_200_OK)
-async def request_password_reset(email: str, new_password: str, re_new_password: str):
+async def request_password_reset(email: str):
+    return await UserService.request_password_reset(email)
+
+
+@router.get("/reset_password/{token}")
+async def reset_password_get(token: str, request: Request):
+    html_content = f"""
+    <html>
+        <head>
+            <title>Сброс пароля</title>
+        </head>
+        <body>
+            <h1>Сброс пароля</h1>
+            <form action="/api/user/reset_password/{token}" method="post">
+                <label for="new_password">Новый пароль:</label><br>
+                <input type="password" id="new_password" name="new_password"><br>
+                <label for="re_new_password">Повторите новый пароль:</label><br>
+                <input type="password" id="re_new_password" name="re_new_password"><br>
+                <input type="submit" value="Сбросить пароль">
+            </form>
+        </body>
+    </html>
+    """
+    return HTMLResponse(content=html_content, status_code=200)
+
+
+@router.post("/reset_password/{token}", response_model=Message, status_code=status.HTTP_200_OK)
+async def reset_password_post(token: str, new_password: str = Form(...), re_new_password: str = Form(...)):
     if new_password != re_new_password:
         raise HTTPException(status_code=400, detail="Пароли не совпадают")
-    return await UserService.request_password_reset(email, new_password)
 
-
-@router.get("/confirm_password_reset/{token}", response_model=Message, status_code=status.HTTP_200_OK)
-async def confirm_password_reset(token: str):
-    return await UserService.confirm_password_reset(token)
-
+    return await UserService.reset_password(token, new_password)
 
 

@@ -260,19 +260,21 @@ class UserService:
             return {"message": f"Роль пользователя с ID {user_id} успешно изменена на {new_role}."}
 
     @classmethod
-    async def request_password_reset(cls, email: str, new_password: str):
+    async def request_password_reset(cls, email: str):
         async with new_session() as db:
             result = await db.execute(select(User).where(User.email == email))
             user = result.scalars().first()
             if not user:
                 raise HTTPException(status_code=400, detail="Пользователь не найден")
+
+            # Генерируем токен сброса пароля
             token_data = {
                 "email": email,
-                "new_password": new_password,
                 "exp": datetime.utcnow() + timedelta(minutes=30)  # Время жизни токена 30 минут
             }
             token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
 
+            # Сохраняем токен в базе данных
             password_reset = PasswordReset(
                 user_id=user.id,
                 token=token
@@ -287,10 +289,10 @@ class UserService:
             # Отправляем письмо с токеном
             await cls.send_reset_password_email(email, token)
 
-            return {"message": "Ссылка для подтверждения сброса пароля отправлена на ваш email."}
+            return {"message": "Ссылка для сброса пароля отправлена на ваш email."}
 
     @classmethod
-    async def confirm_password_reset(cls, token: str):
+    async def reset_password(cls, token: str, new_password: str):
         try:
             token_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         except jwt.ExpiredSignatureError:
@@ -309,8 +311,7 @@ class UserService:
             if not user:
                 raise HTTPException(status_code=404, detail="Пользователь не найден")
 
-            hashed_password = bcrypt.hashpw(token_data["new_password"].encode('utf-8'), bcrypt.gensalt()).decode(
-                'utf-8')
+            hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
             user.password = hashed_password
 
             try:
@@ -327,10 +328,10 @@ class UserService:
         msg = MIMEMultipart()
         msg['From'] = 'dart_side34@mail.ru'
         msg['To'] = email
-        msg['Subject'] = 'Подтверждение сброса пароля'
+        msg['Subject'] = 'Сброс пароля'
 
-        confirm_link = f"http://localhost:8000/api/user/confirm_password_reset/{token}"
-        body = f"Ссылка для подтверждения сброса пароля: {confirm_link}"
+        reset_link = f"http://localhost:8000/api/user/reset_password/{token}"
+        body = f"Ссылка для сброса пароля: {reset_link}"
         msg.attach(MIMEText(body, 'plain'))
 
         server = smtplib.SMTP_SSL("smtp.mail.ru", 465)
@@ -338,7 +339,3 @@ class UserService:
         text = msg.as_string()
         server.sendmail(msg['From'], msg['To'], text)
         server.quit()
-
-
-
-
