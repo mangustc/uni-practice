@@ -65,7 +65,7 @@ export const Catalog = function () {
         filterByParamName: "-",
       },
     ],
-    currentFilterByParam: DEFAULT_FILTER_BY_PARAM,
+    currentFilterByParam: searchParams.get("currentFilterByParam") ?? DEFAULT_FILTER_BY_PARAM,
     priceMin: 0,
     priceMax: 0,
     productAmount: 0,
