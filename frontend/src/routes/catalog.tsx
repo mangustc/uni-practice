@@ -182,7 +182,9 @@ export const Catalog = function () {
 
   return (
     <>
-      <div style={{ display: "flex", flexDirection: "row" }}>
+    <div className="screen-container">
+      <div className="categories-page-container">
+        <div className="catalog-container">
         <CatalogCategories
           categories={currentValues.categories}
           currentCategoryID={currentValues.currentCategoryID}
@@ -197,7 +199,7 @@ export const Catalog = function () {
           priceMax={currentValues.priceMax}
           priceMin={currentValues.priceMin}
         />
-        
+        </div>
         <CatalogSort
           currentSort={currentValues.currentSort}
           currentFilterByParam={currentValues.currentFilterByParam}
@@ -206,6 +208,7 @@ export const Catalog = function () {
           updateSort={updateSort}
         />
         <CatalogProducts products={products} />
+      </div>
       </div>
     </>
   );

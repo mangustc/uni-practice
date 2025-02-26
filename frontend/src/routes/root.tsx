@@ -27,7 +27,7 @@ export default function Root() {
             <ToastContainer />
             <Header></Header>
             <CategoriesPanel></CategoriesPanel>
-            <Card productCatalog={{
+            {/* <Card productCatalog={{
                 productPrice: 100,
                 productID: 1,
                 productName: "fdsa",
@@ -40,9 +40,9 @@ export default function Root() {
                 productInWishlist: false,
                 productInStock: true,
                 categoryID: 1
-            }} photoSrc={""}></Card>
+            }} photoSrc={""}></Card> */}
             <div className="root-container">
-                <span>Hello world</span>
+                {/* <span>Hello world</span> */}
                 <div className="outlet-container">
                     <Outlet/>
                 </div>

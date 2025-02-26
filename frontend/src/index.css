@@ -613,6 +613,14 @@ p {
 }
 
 /* CATALOG */
+.catalog-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 251px;
+  border: 1px solid blue;
+}
 
 .catalog-filter-container {
   display: flex;
@@ -620,7 +628,7 @@ p {
   align-items: flex-start;
   justify-content: flex-start;
   width: 251px;
-  /* border: 1px solid blue; */
+  border: 1px solid red;
 }
 
 .catalog-filter-block {
@@ -682,6 +690,7 @@ input[type="checkbox"] {
   background-image: url("../public/checkbox-base.svg");
   -moz-appearance: none;
   -webkit-appearance: none;
+  transition: all 150ms ease; 
   &:checked {
     background-image: url("../public/checkbox-checked.svg");
     transition: all 200ms ease; 
@@ -732,15 +741,27 @@ input[type="checkbox"] {
   border: 1px solid var(--text-color-red-main);
 }
 
-
-
 .catalog-categories-container {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
   width: 251px;
-  border: 1px solid blue;
+  border: 1px solid red;
+}
+
+.categories-page-container {
+  /* height: 90px; */
+  min-width: 1260px;
+  max-width: 1260px;
+  display: flex;
+  overflow: hidden;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 30px;
+  background-color: white;
+  border: 1px dotted green;
 }
 
 /* LOGINPAGE */
