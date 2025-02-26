@@ -1,4 +1,7 @@
+import { useNavigate } from "react-router-dom";
+
 export default function Footer() {
+  const navigate = useNavigate();
   return (
     <div className="footer-container-container">
       <div className="footer-container">
@@ -6,11 +9,11 @@ export default function Footer() {
           <div className="footer-categories">
             <div className="footer-category">
               <h6 style={{ marginBottom: "5px" }}>Каталог</h6>
-              <span className="footer-text-gray">Ткани</span>
-              <span className="footer-text-gray">Для интерьера</span>
-              <span className="footer-text-gray">Для творчества</span>
-              <span className="footer-text-gray">Фурнитура</span>
-              <span className="footer-text-gray">Акции</span>
+              <span onClick={() => navigate("/catalog?currentCategoryID=1")} className="footer-text-gray">Ткани</span>
+              <span onClick={() => navigate("/catalog?currentCategoryID=2")} className="footer-text-gray">Для интерьера</span>
+              <span onClick={() => navigate("/catalog?currentCategoryID=3")} className="footer-text-gray">Для творчества</span>
+              <span onClick={() => navigate("/catalog?currentCategoryID=4")} className="footer-text-gray">Фурнитура</span>
+              <span onClick={() => navigate("/catalog?currentFilterByParam=promotion&currentCategoryID=1")} className="footer-text-gray">Акции</span>
             </div>
             <div className="footer-category">
               <h6 style={{ marginBottom: "5px" }}>Покупателям</h6>

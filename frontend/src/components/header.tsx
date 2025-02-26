@@ -1,15 +1,13 @@
 // import { useContext } from "react";
 // import { Link, useNavigate } from "react-router-dom";
 
+import { useContext } from "react";
+import { AuthContext } from "../routes/root";
+import { useNavigate } from "react-router-dom";
+
 export default function Header() {
-  // const navigate = useNavigate();
-  // const { authenticated, setAuthenticated } = useContext(AuthContext);
-  // const logout = function () {
-  //   requests.PUT_logout().then(() => {
-  //     setAuthenticated(false);
-  //     navigate("/auth");
-  //   });
-  // };
+  const navigate = useNavigate();
+  const { authenticated, setAuthenticated } = useContext(AuthContext);
   return (
     <div className="navigation-container-container">
       <div className="navigation-info">
@@ -34,7 +32,10 @@ export default function Header() {
           </button>
         </Link>
       </nav> */}
-        <div>
+        <div
+            style={{cursor: "pointer"}}
+            onClick={() => navigate("/")}
+        >
           <img src="/logo.svg" alt="" />
         </div>
         <div className="nav-panel-group">
@@ -53,7 +54,9 @@ export default function Header() {
             <img src="/search.svg" alt="" />
           </div>
           <div className="nav-panel-icons">
-            <div id="nav-heart" className="nav-panel-icon">
+            <div id="nav-heart" className="nav-panel-icon"
+                onClick={() => navigate("/favorites")}
+            >
               <img src="/heart.svg" alt="" />
               <span
                 style={{ fontWeight: 700, fontSize: "10px", height: "12px" }}
@@ -61,7 +64,9 @@ export default function Header() {
                 Избранное
               </span>
             </div>
-            <div id="nav-cart" className="nav-panel-icon">
+            <div id="nav-cart" className="nav-panel-icon"
+                onClick={() => navigate("/cart")}
+            >
               <img src="/shopping-cart.svg" alt="" />
               <span
                 style={{ fontWeight: 700, fontSize: "10px", height: "12px" }}
@@ -69,34 +74,39 @@ export default function Header() {
                 Корзина
               </span>
             </div>
-            <div id="nav-user" className="nav-panel-icon">
-              <img src="/user.svg" alt="" />
-              <span
-                style={{
-                  fontWeight: 700,
-                  fontSize: "10px",
-                  height: "12px",
-                }}
+            { authenticated ? (
+              <div id="nav-user" className="nav-panel-icon"
+                onClick={() => navigate("/user")}
               >
-                Кабинет
-              </span>
-            </div>
-            <div
-              id="nav-login"
-              className="nav-panel-icon"
-              style={{ display: "none" }}
-            >
-              <img src="/login.svg" alt="" />
-              <span
-                style={{
-                  fontWeight: 700,
-                  fontSize: "10px",
-                  height: "12px",
-                }}
+                <img src="/user.svg" alt="" />
+                <span
+                  style={{
+                    fontWeight: 700,
+                    fontSize: "10px",
+                    height: "12px",
+                  }}
+                >
+                  Кабинет
+                </span>
+              </div>
+            ) : (
+              <div
+                id="nav-login"
+                className="nav-panel-icon"
+                onClick={() => navigate("/login")}
               >
-                Вход
-              </span>
-            </div>
+                <img src="/login.svg" alt="" />
+                <span
+                  style={{
+                    fontWeight: 700,
+                    fontSize: "10px",
+                    height: "12px",
+                  }}
+                >
+                  Вход
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </div>
