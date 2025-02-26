@@ -286,7 +286,7 @@ const Registration = () => {
         {accountType !== 'individual' && (
           <form className="registration__form form" onSubmit={handleSubmit}>
             <div className="registration-fields-wrapper">
-            <div className="registration-new-field form__el">
+              <div className="registration-new-field form__el">
                 <span className="registration-new-field__label">E-mail *</span>
                 <span className="registration-new-field__wrapper">
                   <input
@@ -399,7 +399,7 @@ const Registration = () => {
            {accountType === 'individual' && (
           <form className="registration__form form" onSubmit={handleSubmit}>
             <div className="registration-fields-wrapper">
-            <div className="registration-new-field form__el">
+              <div className="registration-new-field form__el">
                 <span className="registration-new-field__label">E-mail *</span>
                 <span className="registration-new-field__wrapper">
                   <input
