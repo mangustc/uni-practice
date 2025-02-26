@@ -11,3 +11,4 @@ from schemas.filterFile import *
 from schemas.vacancyFile import *
 from schemas.contactsFile import *
 from schemas.ourshopsFile import *
+from schemas.optcustomerFile import *

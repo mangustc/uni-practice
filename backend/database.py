@@ -225,6 +225,16 @@ class PasswordReset(Base):
     user = relationship("User", backref="password_resets")
 
 
+class WholesaleBuyer(Base):
+    __tablename__ = "wholesale_buyers"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String, nullable=False)
+    email = Column(String, nullable=False)
+    phone = Column(String, nullable=True)
+    comment = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
 async def create_tables():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
