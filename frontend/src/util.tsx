@@ -65,5 +65,11 @@ export const NewNotification = {
       // DO NOT TOUCH
       style: { position: "fixed", maxWidth: "0px", maxHeight: "0px", right: "-1000px"}
     })
+  },
+  error: function(title: string, text: string): any {
+    toast(<ToastComponent statusClassName="toast-error" title={title} text={text}/>, {
+      // DO NOT TOUCH
+      style: { position: "fixed", maxWidth: "0px", maxHeight: "0px", right: "-1000px"}
+    })
   }
 }
