@@ -58,25 +58,30 @@ export function CatalogCategories({
   updateCategoryID: (newCategoryID: number) => void;
   categories: objects.Category[];
 }) {
-  function JSX_PrintTree(treeObj: Tree) {
+  function JSX_PrintTree(treeObj: Tree, depth: number) {
     return (
-      <ul key={treeObj.val.categoryID}>
+      <div key={treeObj.val.categoryID} style={{display: "flex", flexDirection: "column", gap: "6px"}}>
         <span
           onClick={
             treeObj.val.categoryID != 0
               ? () => updateCategoryID(treeObj.val.categoryID)
               : () => {}
           }
-          style={{ cursor: "pointer" }}
+          className={ depth <= 1 
+            ? (currentCategoryID == treeObj.val.categoryID
+              ? "catalog-categories__root-category text-link-active"
+              : "catalog-categories__root-category")
+            : (currentCategoryID == treeObj.val.categoryID
+              ? "catalog-categories__subcategory text-link-active"
+              : "catalog-categories__subcategory")
+          }
         >
-          {currentCategoryID == treeObj.val.categoryID ? (
-            <h6>{treeObj.val.categoryName}</h6>
-          ) : (
-            treeObj.val.categoryName
-          )}
+            {treeObj.val.categoryID == 0 ? (<h5>{treeObj.val.categoryName}</h5>) : treeObj.val.categoryName}
         </span>
-        {treeObj.children.map((childTreeObj) => JSX_PrintTree(childTreeObj))}
-      </ul>
+        <div style={{marginLeft: `${depth*14}px`}}>
+          {treeObj.children.map((childTreeObj) => JSX_PrintTree(childTreeObj, depth + 1))}
+        </div>
+      </div>
     );
   }
 
@@ -87,7 +92,7 @@ export function CatalogCategories({
         {JSX_PrintTree({
           val: objects.NewCategory({ category_name: "Категории" }),
           children: categoryTree,
-        })}
+        }, 0)}
       </div>
     </div>
   );
