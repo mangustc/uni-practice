@@ -2,6 +2,7 @@ import * as requests from "../requests";
 import * as util from "../util";
 import React, { useState, useEffect } from "react";
 import "../index.css";
+import { useNavigate } from 'react-router-dom'; 
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -9,6 +10,7 @@ const Login = () => {
 
   const [emailError, setEmailError] = useState({ isOn: false, detail: "" });
   const [passwordError, setPasswordError] = useState({ isOn: false, detail: "" });
+  const navigate = useNavigate();
 
   const handleEmailError = () => {
     if (email.length == 0) {
@@ -88,6 +90,7 @@ const Login = () => {
       if (obj.status != 200) {
         util.NewNotification.error("Ошибка", obj.detail);
       } else {
+        navigate("/customer");
         util.NewNotification.success("Успешно", "Авторизация прошла успешно"); // изменить на переход в личный кабинет
       }
     });

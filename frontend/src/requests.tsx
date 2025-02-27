@@ -227,3 +227,15 @@ export async function POST_RegisterIP(
   const info = await ResponseInfoFromResponse(response);
   return(info);
 }
+
+
+export async function POST_Logout() {
+  const response = await fetch(BACKEND_URL + `/user/logout`, {
+      method: "POST",
+      headers: HEADER_JSON,
+      credentials: "include",
+  });
+
+  const info = await ResponseInfoFromResponse(response);
+  return info;
+}

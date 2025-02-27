@@ -1,0 +1,345 @@
+/* Стили для personal container */
+.personal-container {
+  line-height: 1.15;
+  --swiper-theme-color: #007aff;
+  --swiper-navigation-size: 44px;
+  --edost_color: #27b;
+  color: #1a1a1a;
+  font-weight: 400;
+  font-style: normal;
+  font-family: "Roboto", sans-serif;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  max-width: 1180px;
+}
+
+/* Стили для personal aside */
+.personal-aside {
+  line-height: 1.15;
+  --swiper-theme-color: #007aff;
+  --swiper-navigation-size: 44px;
+  --edost_color: #27b;
+  color: #1a1a1a;
+  font-weight: 400;
+  font-style: normal;
+  font-family: "Roboto", sans-serif;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  width: 245px;
+  display: flex;
+  flex-direction: column;
+  margin-left: -70px;
+  padding-top: 20px;
+  flex-shrink: 0;
+}
+
+/* Стили для personal aside link */
+.personal-aside a {
+  line-height: 1.15;
+  --swiper-theme-color: #007aff;
+  --swiper-navigation-size: 44px;
+  --edost_color: #27b;
+  font-style: normal;
+  font-family: "Roboto", sans-serif;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  background-color: transparent;
+  outline: 0;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.125;
+  transition: color .2s;
+  color: #1a1a1a;
+  padding: 10px 0;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+/* Стили для personal aside link hover */
+.personal-aside a:hover {
+  color: #e32636;
+}
+
+/* Стили для personal aside link active */
+.personal-aside-link--active {
+  color: #e32636;
+  pointer-events: none;
+}
+
+/* Стили для personal exit button */
+.personal-exit-button {
+  line-height: 1.15;
+  --swiper-theme-color: #007aff;
+  --swiper-navigation-size: 44px;
+  --edost_color: #27b;
+  font-style: normal;
+  font-family: "Roboto", sans-serif;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  font-weight: 700;
+  box-sizing: border-box;
+  display: flex;
+  -webkit-box-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  align-items: center;
+  outline: 0;
+  border: 1px solid #e32636;
+  border-radius: 2px;
+  min-height: 48px;
+  text-align: center;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  padding: 15px;
+  background-color: transparent;
+  color: #e32636;
+  font-size: 15px;
+  line-height: 18px;
+  transition: background-color .2s,color .2s;
+  overflow: hidden;
+  width: 140px;
+  margin-top: 40px;
+}
+
+.personal-exit-button:hover {
+  background-color: #e32636;
+  color: #fff;
+}
+
+.personal-aside ul{
+      list-style: none;
+}
+
+
+
+
+/* Стили для personal info */
+.personal-info {
+line-height: 1.15;
+--swiper-theme-color: #007aff;
+--swiper-navigation-size: 44px;
+--edost_color: #27b;
+color: #1a1a1a;
+font-weight: 400;
+font-style: normal;
+font-family: "Roboto", sans-serif;
+-webkit-text-size-adjust: 100%;
+-webkit-tap-highlight-color: transparent;
+width: calc(100% - 245px);
+padding-top: 35px;
+padding-left: 95px;
+}
+
+/* Стили для personal info title */
+.personal-info-title {
+line-height: 1.15;
+--swiper-theme-color: #007aff;
+--swiper-navigation-size: 44px;
+--edost_color: #27b;
+color: #1a1a1a;
+font-style: normal;
+font-family: "Roboto", sans-serif;
+-webkit-text-size-adjust: 100%;
+-webkit-tap-highlight-color: transparent;
+/*font-size: 2em;*/
+font-size: 32px;
+margin: 0 0 30px;
+}
+
+/* Стили для personal info form */
+.personal-info-form {
+line-height: 1.15;
+--swiper-theme-color: #007aff;
+--swiper-navigation-size: 44px;
+--edost_color: #27b;
+color: #1a1a1a;
+font-weight: 400;
+font-style: normal;
+font-family: "Roboto", sans-serif;
+-webkit-text-size-adjust: 100%;
+-webkit-tap-highlight-color: transparent;
+display: flex;
+-webkit-box-orient: vertical;
+-webkit-box-direction: normal;
+flex-direction: column;
+margin-bottom: 90px;
+max-width: 616px;
+width: 100%;
+}
+
+/* Стили для personal info form row */
+.personal-info-form-row {
+line-height: 1.15;
+--swiper-theme-color: #007aff;
+--swiper-navigation-size: 44px;
+--edost_color: #27b;
+color: #1a1a1a;
+font-weight: 400;
+font-style: normal;
+font-family: "Roboto", sans-serif;
+-webkit-text-size-adjust: 100%;
+-webkit-tap-highlight-color: transparent;
+display: flex;
+-webkit-box-align: start;
+align-items: flex-start;
+-webkit-box-pack: justify;
+justify-content: space-between;
+flex-wrap: wrap;
+margin-bottom: 10px;
+}
+
+/* Стили для personal info form group */
+.personal-info-form-group {
+line-height: 1.15;
+--swiper-theme-color: #007aff;
+--swiper-navigation-size: 44px;
+--edost_color: #27b;
+color: #1a1a1a;
+font-weight: 400;
+font-style: normal;
+font-family: "Roboto", sans-serif;
+-webkit-text-size-adjust: 100%;
+-webkit-tap-highlight-color: transparent;
+box-sizing: border-box;
+position: relative;
+display: flex;
+-webkit-box-orient: vertical;
+-webkit-box-direction: normal;
+flex-direction: column;
+width: calc(50% - 15px);
+margin: 0 0 24px;
+}
+
+/* Стили для personal info form label */
+.personal-info-form-label {
+line-height: 1.15;
+--swiper-theme-color: #007aff;
+--swiper-navigation-size: 44px;
+--edost_color: #27b;
+font-style: normal;
+font-family: "Roboto", sans-serif;
+-webkit-text-size-adjust: 100%;
+-webkit-tap-highlight-color: transparent;
+font-weight: 500;
+font-size: 12px;
+line-height: 1.17;
+margin: 0 0 10px;
+color: rgba(26, 26, 26, .7);
+cursor: default;
+}
+
+/* Стили для personal info form input */
+.personal-info-form-input {
+line-height: 1.15;
+--swiper-theme-color: #007aff;
+--swiper-navigation-size: 44px;
+--edost_color: #27b;
+-webkit-text-size-adjust: 100%;
+-webkit-tap-highlight-color: transparent;
+margin: 0;
+box-shadow: none;
+outline: 0;
+color: #1a1a1a;
+font-family: "Roboto", sans-serif;
+box-sizing: border-box;
+border-radius: 2px;
+border: 1px solid rgba(26,26,26,.15);
+width: 100%;
+transition: border-color .2s;
+font-size: 14px;
+line-height: 1.17;
+font-weight: 500;
+height: 50px;
+padding: 17px 15px;
+/* -webkit-appearance: none; */
+}
+
+/* Стили для personal save button */
+.personal-save-button {
+line-height: 1.15;
+--swiper-theme-color: #007aff;
+--swiper-navigation-size: 44px;
+--edost_color: #27b;
+-webkit-text-size-adjust: 100%;
+-webkit-tap-highlight-color: transparent;
+margin: 0;
+text-transform: none;
+box-shadow: none;
+font-family: "Roboto", sans-serif;
+/* -webkit-appearance: button; */
+font-weight: 700;
+box-sizing: border-box;
+display: flex;
+-webkit-box-pack: center;
+justify-content: center;
+-webkit-box-align: center;
+align-items: center;
+outline: 0;
+border: 1px solid #e32636;
+border-radius: 2px;
+min-height: 48px;
+text-align: center;
+text-decoration: none;
+text-overflow: ellipsis;
+cursor: pointer;
+padding: 15px;
+font-size: 15px;
+line-height: 18px;
+transition: background-color .2s,color .2s;
+overflow: hidden;
+background-color: #e32636;
+color: #fff;
+align-self: flex-start;
+width: auto;
+padding-left: 30px;
+padding-right: 30px;
+}
+
+
+.personal-delete-account-button {
+line-height: 1.15;
+--swiper-theme-color: #007aff;
+--swiper-navigation-size: 44px;
+--edost_color: #27b;
+-webkit-text-size-adjust: 100%;
+-webkit-tap-highlight-color: transparent;
+margin: 0 !important;
+text-transform: none !important;
+box-shadow: none !important;
+font-family: "Roboto", sans-serif !important;
+/*-webkit-appearance: button;*/
+font-weight: 500 !important;
+box-sizing: border-box !important;
+display: flex !important;
+-webkit-box-pack: center !important;
+justify-content: center !important;
+-webkit-box-align: center !important;
+align-items: center !important;
+outline: 0 !important;
+/*border: 1px solid #e32636;*/
+border: none !important;
+border-radius: 2px !important;
+min-height: 48px !important;
+text-align: center !important;
+text-decoration: none !important;
+text-overflow: ellipsis !important;
+cursor: pointer !important;
+padding: 10px 0 !important;
+font-size: 14px !important;
+line-height: 1.17 !important;
+transition: color .2s !important;
+overflow: hidden !important;
+background-color: transparent !important;
+color: rgba(26,26,26,.7) !important;
+align-self: flex-start !important;
+width: auto !important;
+margin-top: -20px !important;
+}

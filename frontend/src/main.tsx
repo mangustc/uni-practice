@@ -9,6 +9,7 @@ import { Cart } from "./routes/cart";
 import Main from "./routes/main";
 import LoginPage from "./routes/login";
 import RegistrationPage from "./routes/registration";
+import CustomerPage from "./routes/customer";
 
 const router = createBrowserRouter([
   {
@@ -34,6 +35,10 @@ const router = createBrowserRouter([
       {
         path: "registration",
         element: <RegistrationPage />,
+      },
+      {
+        path: "customer",
+        element: <CustomerPage/>,
       }
     ],
   },
