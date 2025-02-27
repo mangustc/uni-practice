@@ -22,55 +22,28 @@ function CatalogFilter({
     <div className="catalog-filter-container">
       <div className="catalog-filter-block">
         <h6>Наличие товара</h6>
-        <div className="catalog-radio-line" style={{gap: "12px"}}>
-          <input
-            type="radio"
-            checked={!filters.productOnlyInStock}
-            onChange={(e) => {
-              if (e.target.checked)
-                setFilters({
-                  ...filters,
-                  productOnlyInStock: false,
-                });
-            }}
-          />
-          <label
-          id="radio-label"
+        <div className="catalog-radio-line" style={{gap: "12px", cursor: "pointer"}}
             onClick={() =>
               setFilters({
                 ...filters,
                 productOnlyInStock: false,
               })
             }
-          >
-            Все товары
-          </label>
-          
+        >
+          <input type="radio" checked={!filters.productOnlyInStock} />
+          <label id="radio-label" style={{cursor: "pointer"}}>Все товары</label>
         </div>
-        <div className="catalog-radio-line" style={{gap: "12px"}}>
-        <input
-            type="radio"
-            checked={filters.productOnlyInStock}
-            onChange={(e) => {
-              if (e.target.checked)
-                setFilters({
-                  ...filters,
-                  productOnlyInStock: true,
-                });
-            }}
-          />
-          <label
-          id="radio-label"
-            onClick={() =>
-              setFilters({
-                ...filters,
-                productOnlyInStock: true,
-              })
-            }
-          >
-            В наличии
-          </label>
-          
+ 
+        <div className="catalog-radio-line" style={{gap: "12px", cursor: "pointer"}}
+          onClick={() =>
+            setFilters({
+              ...filters,
+              productOnlyInStock: true,
+            })
+          }
+        >
+          <input type="radio" checked={filters.productOnlyInStock} />
+          <label id="radio-label" style={{cursor: "pointer"}}>В наличии</label>
         </div>
       </div>
       <div className="catalog-filter-block">
