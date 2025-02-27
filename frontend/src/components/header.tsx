@@ -32,13 +32,13 @@ export default function Header() {
           </button>
         </Link>
       </nav> */}
-        <div
-            style={{cursor: "pointer"}}
+        <div style={{ display: "flex" }}>
+          <div
+            className="navigation-logo"
             onClick={() => navigate("/")}
-        >
-          <img src="/logo.svg" alt="" />
-        </div>
-        <div className="nav-panel-group">
+          >
+            <img src="/logo.svg" alt="" />
+          </div>
           <div className="catalog-button">
             <img
               src="/menu.svg"
@@ -47,67 +47,67 @@ export default function Header() {
             />
             <p style={{ color: "white", fontWeight: 700 }}>Каталог</p>
           </div>
-          <div className="search">
-            <p style={{ color: "var(--text-color-black-main-50)" }}>
-              Поиск по каталогу
-            </p>
-            <img src="/search.svg" alt="" />
-          </div>
-          <div className="nav-panel-icons">
-            <div id="nav-heart" className="nav-panel-icon"
-                onClick={() => navigate("/favorites")}
+        </div>
+        <div className="search">
+          <p style={{ color: "var(--text-color-black-main-50)" }}>
+            Поиск по каталогу
+          </p>
+          <img src="/search.svg" alt="" />
+        </div>
+        <div className="nav-panel-icons">
+          <div id="nav-heart" className="nav-panel-icon"
+              onClick={() => navigate("/favorites")}
+          >
+            <img src="/heart.svg" alt="" />
+            <span
+              style={{ fontWeight: 700, fontSize: "10px", height: "12px" }}
             >
-              <img src="/heart.svg" alt="" />
+              Избранное
+            </span>
+          </div>
+          <div id="nav-cart" className="nav-panel-icon"
+              onClick={() => navigate("/cart")}
+          >
+            <img src="/shopping-cart.svg" alt="" />
+            <span
+              style={{ fontWeight: 700, fontSize: "10px", height: "12px" }}
+            >
+              Корзина
+            </span>
+          </div>
+          { authenticated ? (
+            <div id="nav-user" className="nav-panel-icon"
+              onClick={() => navigate("/user")}
+            >
+              <img src="/user.svg" alt="" />
               <span
-                style={{ fontWeight: 700, fontSize: "10px", height: "12px" }}
+                style={{
+                  fontWeight: 700,
+                  fontSize: "10px",
+                  height: "12px",
+                }}
               >
-                Избранное
+                Кабинет
               </span>
             </div>
-            <div id="nav-cart" className="nav-panel-icon"
-                onClick={() => navigate("/cart")}
+          ) : (
+            <div
+              id="nav-login"
+              className="nav-panel-icon"
+              onClick={() => navigate("/login")}
             >
-              <img src="/shopping-cart.svg" alt="" />
+              <img src="/login.svg" alt="" />
               <span
-                style={{ fontWeight: 700, fontSize: "10px", height: "12px" }}
+                style={{
+                  fontWeight: 700,
+                  fontSize: "10px",
+                  height: "12px",
+                }}
               >
-                Корзина
+                Вход
               </span>
             </div>
-            { authenticated ? (
-              <div id="nav-user" className="nav-panel-icon"
-                onClick={() => navigate("/user")}
-              >
-                <img src="/user.svg" alt="" />
-                <span
-                  style={{
-                    fontWeight: 700,
-                    fontSize: "10px",
-                    height: "12px",
-                  }}
-                >
-                  Кабинет
-                </span>
-              </div>
-            ) : (
-              <div
-                id="nav-login"
-                className="nav-panel-icon"
-                onClick={() => navigate("/login")}
-              >
-                <img src="/login.svg" alt="" />
-                <span
-                  style={{
-                    fontWeight: 700,
-                    fontSize: "10px",
-                    height: "12px",
-                  }}
-                >
-                  Вход
-                </span>
-              </div>
-            )}
-          </div>
+          )}
         </div>
       </div>
     </div>

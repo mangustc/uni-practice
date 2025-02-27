@@ -102,14 +102,30 @@ export function CartProduct({
     useEffect(() => {
         setAmount(productInfo.productAmountInCart.toString());
       }, [productInfo]);
-
-    return (
-        <div style={{ padding: "10px", display: "flex" }}>
+    
+    /*<div style={{ padding: "10px", display: "flex" }}>
             <textarea value={JSON.stringify(productInfo, null, 2)}></textarea>
             <button onClick={downProductAmount}>-</button>
             <input value={amount} onChange={handleChange} onKeyDown={handleKeyDown} onBlur={handleBlur}></input>
             <button onClick={upProductAmount}>+</button>
             <button onClick={() => {deleteProduct(productInfo)}}>Удалить</button>
+        </div>*/
+    
+    return (
+        <div className="cart-product-container">
+            <div className="cart-product-line">
+                <div style={{display: "flex"}}>
+                    <img style={{ width: "78px", maxHeight: "54px", marginRight: "16px" }} src="/cart-empty.svg" alt=""></img>
+                    <div>
+                        <div className="cart-opt-name">Арт. {productInfo.articleID}</div>
+                        <div className="cart-product-name">Хлопок рубашечный полоска 47560 (2, голубой)</div>
+                    </div>
+                </div>
+                <img src="/trash-alt.svg" alt=""></img>
+            </div>
+            <div className="cart-product-line">
+                
+            </div>
         </div>
     )
 }

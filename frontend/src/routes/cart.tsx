@@ -107,9 +107,23 @@ export const Cart = function () {
           ))}
         </div>
         <div className="cart-right-side">
-          <p>Товары: {cart.totalProductsPrice} ₽</p>
-          <p>Скидка: {cart.totalPromotionPrice} ₽</p>
-          <p>Итоговая цена: {cart.totalCartPrice} ₽</p>
+          <section className="cart-section-line">
+            <div className="cart-opt-name">Товары:</div>
+            <div className="cart-dotted-line"></div>
+            <div className="cart-num-value">{cart.totalProductsPrice} ₽</div>
+          </section>
+          <section className="cart-section-line">
+            <div className="cart-opt-name">Скидка:</div>
+            <div className="cart-dotted-line"></div>
+            <div className="cart-num-value">{cart.totalPromotionPrice} ₽</div>
+          </section>
+          <section className="cart-section-line" style={{marginTop: "10px"}}>
+            <h4>Итого:</h4>
+            <div className="cart-dotted-line"></div>
+            <h4>{cart.totalCartPrice} ₽</h4>
+          </section>
+          <button className="cart-button">Оформить заказ</button>
+          <div className="cart-opt-name" style={{ textAlign: "center", width: "200px" }}>Стоимость доставки определяется при оформлении заказа</div>
         </div>
       </div>
     </div>
