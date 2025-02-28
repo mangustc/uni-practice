@@ -211,7 +211,7 @@ class ProductService:
                                      product_promotion=prod.promotion,
                                      product_percent_promotion=prod.percent_promotion,
                                      product_new_price=prod.new_price,
-                                     product_in_wishlist=wishlist_state))
+                                     product_in_wishlist=wishlist_state).__dict__)
 
         return GetProductForPageResponse(
             product_id=product_field.id,
