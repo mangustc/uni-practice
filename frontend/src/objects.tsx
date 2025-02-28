@@ -325,8 +325,7 @@ export class UserInfo {
 }
 
 export type ProductForPageIn = {
-  category_id?: number;
-  category_name?: string;
+  categories?: CategoryIn[];
   article_id?: number;
   color_id?: number;
   color_name?: string;
@@ -351,8 +350,7 @@ export type ProductForPageIn = {
 }
 
 export type ProductForPage = {
-  categoryID: number;
-  categoryName: string;
+  categories: Category[];
   articleID: number;
   colorID: number;
   colorName: string;
@@ -386,8 +384,13 @@ export function NewProductForPage(obj: ProductForPageIn): ProductForPage {
     });
   }
 
+  const categories: Category[] = [];
+  for (const i of obj.categories ?? []) {
+    categories.push(NewCategory(i));
+  }
+
   return {
-    categoryName: obj.category_name ?? DEFAULT_STRING,
+    categories: categories,
     colorID: obj.color_id ?? DEFAULT_NUMBER,
     colorName: obj.color_name ?? DEFAULT_STRING,
     productAmount: obj.product_amount ?? DEFAULT_NUMBER,
@@ -405,6 +408,5 @@ export function NewProductForPage(obj: ProductForPageIn): ProductForPage {
     productPromotion: obj.product_promotion ?? DEFAULT_BOOLEAN,
     productMeasuredIn: obj.product_measured_in ?? DEFAULT_STRING,
     productName: obj.product_name ?? DEFAULT_STRING,
-    categoryID: obj.category_id ?? DEFAULT_NUMBER,
   };
 }
