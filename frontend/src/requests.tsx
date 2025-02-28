@@ -70,6 +70,15 @@ export async function POST_GetProductsByCategory(
   return objects.NewProductCatalogList(json);
 }
 
+export async function GET_GetProducts() { // для тестов
+  const response = await fetch(BACKEND_URL + '/product/get_all_products', {
+    method: "GET",
+    headers: HEADER_JSON,
+    credentials: "include",
+  });
+  return objects.NewProductCatalogList(await response.json());
+}
+
 export async function PUT_ChangeWishlistState(productID: number): Promise<{
   message: string;
   status: boolean;
@@ -125,19 +134,6 @@ export async function GET_GetCart() {
     total_cart_price: 482
   });
   */
-}
-
-export async function GET_getProductPhotoURL(productID: number) {
-  const response = await fetch(BACKEND_URL + `/product/get_photo/${productID}`, {
-    method: "GET",
-    headers: HEADER_JSON,
-  })
-  if (!response.ok) {
-    return "/no-photo.jpg";
-  }
-  const blob = await response.blob();
-  const url = URL.createObjectURL(blob);
-  return url;
 }
 
 export async function DELETE_deleteProductFromCart(productID: number) {

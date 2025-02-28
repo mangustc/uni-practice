@@ -3,17 +3,21 @@ import * as requests from "../requests";
 import { useEffect, useState } from "react";
 import { CartProduct } from "../components/cart-product";
 import { CartEmpty } from "../components/cart-empty";
+import { ProductList } from "../components/product-list";
 
 
-export const Cart = function () {
+export function Cart() {
   const [cart, setCart] = useState<objects.Cart>({items: [], totalProductsPrice: 0, totalPromotionPrice: 0, totalCartPrice: 0});
+  const [products, setProducts] = useState<objects.ProductCatalog[]>([]);
   
   useEffect(() => {
-    requests
-    .GET_GetCart()
+    requests.GET_GetCart()
     .then((obj) => {
         setCart({...obj});
     });
+    requests.GET_GetProducts().then((prod) => { // для тестов
+      setProducts([...prod, ...prod, ...prod]);
+    })
   }, []);
 
   var rounded = function(number: number){
@@ -90,12 +94,9 @@ export const Cart = function () {
   }
 
   return (
-    <>
-    {cart.items.length == 0 && <CartEmpty />}
-
-    {cart.items.length > 0 && 
-    <>
     <div className="cart-container">
+    {cart.items.length == 0 && <CartEmpty />}
+    {cart.items.length > 0 && <>
       <div className="cart-top">
         <h1>Корзина</h1>
         <a className="cart-clear-button" onClick={clearCart}>Очистить корзину</a>
@@ -126,8 +127,8 @@ export const Cart = function () {
           <div className="cart-opt-name" style={{ textAlign: "center", width: "200px" }}>Стоимость доставки определяется при оформлении заказа</div>
         </div>
       </div>
+      </>}
+      <ProductList title="Популярные товары" products={products}/>
     </div>
-    </>}
-    </>
-);
+    );
 };

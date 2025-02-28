@@ -21,9 +21,9 @@ async def get_product_for_page(product_id: int, request: Request):
     return await ProductService.get_product_for_page(product_id, request)
 
 
-@router.get("/get_all_products", response_model=list[GetProductResponseWithNames], status_code=status.HTTP_200_OK)
-async def get_all_products():
-    return await ProductService.get_all_products()
+@router.get("/get_all_products", response_model=list[ProductInCatalogInfo], status_code=status.HTTP_200_OK)
+async def get_all_products(request: Request):
+    return await ProductService.get_all_products(request)
 
 
 @router.get("/get_products_by_category_name/{category_id}", response_model=list[GetProductResponseWithNames],

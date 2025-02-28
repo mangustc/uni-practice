@@ -1,6 +1,7 @@
 import * as objects from "../objects";
 import * as requests from "../requests";
 import { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 
 export function CartProduct({
     productInfo,
@@ -11,15 +12,10 @@ export function CartProduct({
     changeProductAmount: (productID: number, amount: number) => void;
     deleteProduct: (productInfo: objects.ProductInCart) => void;
 }) {
+    const navigate = useNavigate();
     const [amount, setAmount] = useState<string>(productInfo.productAmountInCart.toString());
     const [wishlist, setWishlist] = useState<boolean>(productInfo.productInWishlist);
     const [imageSrc, setImageSrc] = useState<string>("");
-
-    useEffect(() => {
-        requests.GET_getProductPhotoURL(productInfo.productID).then((imageURL) => {
-            setImageSrc(imageURL);
-        });
-    }, []);
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setAmount(event.target.value);
@@ -111,14 +107,6 @@ export function CartProduct({
         setAmount(productInfo.productAmountInCart.toString());
       }, [productInfo]);
     
-    /*<div style={{ padding: "10px", display: "flex" }}>
-            <textarea value={JSON.stringify(productInfo, null, 2)}></textarea>
-            <button onClick={downProductAmount}>-</button>
-            <input value={amount} onChange={handleChange} onKeyDown={handleKeyDown} onBlur={handleBlur}></input>
-            <button onClick={upProductAmount}>+</button>
-            <button onClick={() => {deleteProduct(productInfo)}}>Удалить</button>
-        </div>*/
-    
     function handleWishlist() {
         requests.PUT_ChangeWishlistState(productInfo.productID);
         setWishlist(!wishlist);
@@ -128,10 +116,10 @@ export function CartProduct({
         <div className="cart-product-container">
             <div className="cart-product-line">
                 <div style={{display: "flex"}}>
-                    <img className="cart-product-image" src={imageSrc != "" ? imageSrc : undefined} alt=""></img>
+                    <img onClick={() => {navigate(`/product?productID=${productInfo.productID}`)}} className="cart-product-image" src={`${requests.BACKEND_URL}/product/get_photo/${productInfo.productID}`} alt=""></img>
                     <div>
                         <div className="cart-opt-name">Арт. {productInfo.articleID}</div>
-                        <div className="cart-product-name">{productInfo.productName}</div>
+                        <div onClick={() => {navigate(`/product?productID=${productInfo.productID}`)}} className="cart-product-name">{productInfo.productName}</div>
                     </div>
                 </div>
                 <div className="cart-product-trash" onClick={() => {deleteProduct(productInfo)}}></div>

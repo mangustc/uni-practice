@@ -238,34 +238,40 @@ class ProductService:
         )
 
     @classmethod
-    async def get_all_products(cls) -> List[GetProductResponse]:  # Add return type hint
+    async def get_all_products(cls, request: Request):  # Add return type hint
+        try:
+            user_data = await Functions.get_user_data(request)
+        except HTTPException:
+            user_data = None
         query = select(Product).options(joinedload(Product.category), joinedload(Product.color))
         async with new_session() as db:
             result = await db.execute(query)
             products = result.scalars().all()
+            if user_data is not None:
+                user_query = select(Wishlist).where(Wishlist.user_id == user_data["user_id"])
+                user_wishlist = await db.execute(user_query)
+                user_wishlist = user_wishlist.scalars().all()
+                user_wishlist_ids = [wishlist_elem.product_id for wishlist_elem in user_wishlist]
 
-        product_list: List[GetProductResponse] = []
+        product_list = []
         for p in products:
+            if user_data is not None and p.id in user_wishlist_ids:
+                wishlist_state = True
+            else:
+                wishlist_state = False
             product_list.append(
-                GetProductResponseWithNames(
-                    product_id=p.id,
-                    category_id=p.category_id,
-                    category_name=p.category.name,
-                    article_id=p.article_id,
-                    color_id=p.color_id,
-                    color_name=p.color.name if p.color else None,
-                    product_name=p.name,
-                    product_description=p.description,
-                    product_measured_in=p.measured_in,
-                    product_amount=p.amount,
-                    product_price=p.price,
-                    product_new=p.new,
-                    product_hit=p.hit,
-                    product_promotion=p.promotion,
-                    product_percent_promotion=p.percent_promotion,
-                    product_new_price=p.new_price
-                )
-            )
+                ProductInCatalogInfo(product_id=p.id,
+                                     category_id=p.category_id,
+                                     product_name=p.name,
+                                     product_measured_in=p.measured_in,
+                                     product_in_stock=True if p.amount > 0 else False,
+                                     product_price=p.price,
+                                     product_new=p.new,
+                                     product_hit=p.hit,
+                                     product_promotion=p.promotion,
+                                     product_percent_promotion=p.percent_promotion,
+                                     product_new_price=p.new_price,
+                                     product_in_wishlist=wishlist_state))
 
         return product_list
 
@@ -327,9 +333,7 @@ class ProductService:
                 status_code=status.HTTP_404_NOT_FOUND, detail="Продукт не найден"
             )
         if product_field.image_path is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Изображение продукта не было найдено"
-            )
+            return FileResponse("images/no-photo.jpg")
         return FileResponse(product_field.image_path)
 
     @classmethod

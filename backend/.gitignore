@@ -25,6 +25,7 @@ archive.zip
 images/*
 migrations/versions/*
 !**.gitkeep
+!no-photo.jpg
 
 # vim temporary files
 *~
