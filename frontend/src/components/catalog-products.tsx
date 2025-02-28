@@ -8,7 +8,35 @@ export function CatalogProducts({
   products: objects.ProductCatalog[];
 }) {
   return (
-    <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
+    <div className="product-list-screen">
+      {products.map((product) => (
+        <Card
+          key={product.productID}
+          productCatalog={product}
+          photoSrc={`${requests.BACKEND_URL}/product/get_photo/${product.productID}`}
+        />
+      ))}
+      {products.map((product) => (
+        <Card
+          key={product.productID}
+          productCatalog={product}
+          photoSrc={`${requests.BACKEND_URL}/product/get_photo/${product.productID}`}
+        />
+      ))}
+      {products.map((product) => (
+        <Card
+          key={product.productID}
+          productCatalog={product}
+          photoSrc={`${requests.BACKEND_URL}/product/get_photo/${product.productID}`}
+        />
+      ))}
+      {products.map((product) => (
+        <Card
+          key={product.productID}
+          productCatalog={product}
+          photoSrc={`${requests.BACKEND_URL}/product/get_photo/${product.productID}`}
+        />
+      ))}
       {products.map((product) => (
         <Card
           key={product.productID}

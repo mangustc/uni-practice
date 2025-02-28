@@ -225,6 +225,13 @@ export const Catalog = function () {
           priceMin={currentValues.priceMin}
         />
         </div>
+        <div className="catalog-products-container">
+          <div className="catalog-sort-line">
+            <div className="categories-card-filter-line">
+              <div className="categories-card-filter">Хиты</div>
+              <div className="categories-card-filter">Новинки</div>
+              <div className="categories-card-filter">Акция</div>
+            </div>
         <CatalogSort
           currentSort={currentValues.currentSort}
           currentFilterByParam={currentValues.currentFilterByParam}
@@ -232,7 +239,9 @@ export const Catalog = function () {
           sorts={currentValues.sorts}
           updateSort={updateSort}
         />
-        <CatalogProducts products={products} />
+        </div>
+            <CatalogProducts products={products} />
+        </div>
       </div>
       </div>
     </>
