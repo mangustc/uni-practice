@@ -1,5 +1,4 @@
 from typing import Optional, List
-
 from pydantic import BaseModel, field_validator
 import re
 from pydantic.types import PositiveFloat, PositiveInt
@@ -97,8 +96,29 @@ class ProductInfo(BaseModel):
     name: str
 
 
+class CategoryPath(BaseModel):
+    category_id: int
+    category_name: str
+
+
+class ProductInCatalogInfo(BaseModel):
+    product_id: PositiveInt
+    category_id: PositiveInt
+    product_name: str
+    product_measured_in: MeasurementEnum
+    product_in_stock: bool
+    product_price: int
+    product_new: bool
+    product_hit: bool
+    product_promotion: bool
+    product_percent_promotion: Optional[float]
+    product_new_price: Optional[float]
+    product_in_wishlist: bool
+
+
 class GetProductForPageResponse(BaseModel):
     category_id: PositiveInt
+    category_path: list[CategoryPath]
     category_name: str
     article_id: PositiveInt
     color_id: Optional[PositiveInt] = None
@@ -115,7 +135,7 @@ class GetProductForPageResponse(BaseModel):
     product_new_price: Optional[float] = None
     product_in_wishlist: bool
     get_products_by_article: list[ProductInfo]
-    similar_products: List[ProductInfo]
+    similar_products: List[ProductInCatalogInfo]
     characteristics: list[GetCharacteristicResponse]
 
 

@@ -138,7 +138,7 @@ export function CartProduct({
             </div>
             <div className="cart-product-line">
                 <div style={{ display: "flex" }}>
-                    <div style={{ marginRight: "52px" }}>
+                    <div style={{ marginRight: "40px" }}>
                         <div className="cart-opt-name">Цена, {productInfo.productMeasuredIn}</div>
                         <div style={{ display: "flex", alignItems: "end", gap: "12px" }}>
                             <div className="cart-num-value" style={{ lineHeight: "18px" }}>{productInfo.productNewPrice != 0 ? productInfo.productNewPrice : productInfo.productPrice} ₽</div>

@@ -1,8 +1,7 @@
 from typing import Optional, List
 from pydantic import BaseModel
 from enum import Enum
-from schemas import CategoryResponse, GetColorResponse, MeasurementEnum, GetProductResponseWithNames
-import re
+from schemas import CategoryResponse, GetColorResponse
 from pydantic.types import PositiveFloat, PositiveInt
 from datetime import datetime
 from database import MeasurementEnum

@@ -145,6 +145,13 @@ class ProductService:
                 user_wishlist = user_wishlist.scalars().all()
                 user_wishlist_ids = [wishlist_elem.product_id for wishlist_elem in user_wishlist]
 
+            category_field = await db.get(Category, product_field.category_id)
+            path = [CategoryPath(category_id=category_field.id, category_name=category_field.name)]
+            while category_field.parent_id is not None:
+                category_field = await db.get(Category, category_field.parent_id)
+                path.append(CategoryPath(category_id=category_field.id, category_name=category_field.name))
+            path = list(reversed(path))
+
             # Получаем товары с тем же артикулом (товары с разными цветами)
             products_with_same_article_query = select(Product).where(
                 Product.article_id == product_field.article_id,
@@ -188,11 +195,28 @@ class ProductService:
 
         similar_products_list = []
         for prod in similar_products:
-            similar_products_list.append(ProductInfo(product_id=prod.id, name=prod.name))
+            if user_data is not None and prod.id in user_wishlist_ids:
+                wishlist_state = True
+            else:
+                wishlist_state = False
+            similar_products_list.append(
+                ProductInCatalogInfo(product_id=prod.id,
+                                     category_id=prod.category_id,
+                                     product_name=prod.name,
+                                     product_measured_in=prod.measured_in,
+                                     product_in_stock=True if prod.amount > 0 else False,
+                                     product_price=prod.price,
+                                     product_new=prod.new,
+                                     product_hit=prod.hit,
+                                     product_promotion=prod.promotion,
+                                     product_percent_promotion=prod.percent_promotion,
+                                     product_new_price=prod.new_price,
+                                     product_in_wishlist=wishlist_state))
 
         return GetProductForPageResponse(
             product_id=product_field.id,
             category_id=product_field.category_id,
+            category_path=path,
             category_name=product_field.category.name,
             article_id=product_field.article_id,
             color_id=product_field.color_id,
