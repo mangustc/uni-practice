@@ -2,16 +2,23 @@ import { useState } from "react";
 import * as objects from "../objects.tsx";
 import * as requests from "../requests.tsx";
 import * as util from "../util.tsx";
+import { useNavigate } from "react-router-dom";
 
 
 export default function Card({productCatalog, photoSrc}: {
     productCatalog: objects.ProductCatalog;
     photoSrc: string;
 }) {
+    const navigate = useNavigate();
     const [wishlist, setWishlist] = useState(productCatalog.productInWishlist)
+
+    function navigateProductPage(productID: number) {
+        navigate(`/product?productID=${productID}`)
+    }
     return (
         <div className="card-container">
-            <div className="card-photo" style={{backgroundImage: `url("${photoSrc}")`}}>
+            <div onClick={() => navigateProductPage(productCatalog.productID)}
+                className="card-photo" style={{cursor: "pointer", backgroundImage: `url("${photoSrc}")`}}>
                 <div>
                     {productCatalog.productHit ? <div className="card-filter">Хит</div> : null}
                     {productCatalog.productNew ? <div className="card-filter">Новинка</div> : null}
@@ -25,7 +32,7 @@ export default function Card({productCatalog, photoSrc}: {
                     }}
                 ></div>
             </div>
-            <span className="card-name">{productCatalog.productName}</span>
+            <span className="card-name text-link" onClick={() => navigateProductPage(productCatalog.productID)}>{productCatalog.productName}</span>
             <span className="card-descr">Цена, {productCatalog.productMeasuredIn}</span>
             <span className="card-cost">{productCatalog.productPrice} ₽</span>
             <button className="card-add-btn" onClick={() => {

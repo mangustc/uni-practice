@@ -26,6 +26,25 @@ export async function GET_GetInfoForCatalogPage(
   return objects.GetCatalogPageValues(json);
 }
 
+export async function GET_GetProductForPage(
+  productID: number,
+): Promise<objects.ProductForPage> {
+  let response = await fetch(
+    BACKEND_URL + `/product/get_product_for_page/${productID}`,
+    {
+      method: "GET",
+      headers: HEADER_JSON,
+      credentials: "include",
+    },
+  );
+  const json: objects.ProductForPageIn = await response.json();
+
+  // TODO: HANDLE ERROR
+  const status = response.status;
+
+  return objects.NewProductForPage(json);
+}
+
 export async function POST_GetProductsByCategory(
   catalogFilterSort: objects.CatalogFilterSortOut,
 ): Promise<objects.ProductCatalog[]> {
@@ -239,7 +258,6 @@ export async function POST_Logout() {
   const info = await ResponseInfoFromResponse(response);
   return info;
 }
-
 
 
 export async function GET_GetUserInfo() {

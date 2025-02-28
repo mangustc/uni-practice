@@ -306,7 +306,6 @@ export type ResponseInfo = {
   detail: string;
 }
 
-
 export class UserInfo {
   user_id: number;
   email: string;
@@ -323,4 +322,89 @@ export class UserInfo {
       this.number = data?.number ?? null;
       this.role = data?.role ?? "";
   }
+}
+
+export type ProductForPageIn = {
+  category_id?: number;
+  category_name?: string;
+  article_id?: number;
+  color_id?: number;
+  color_name?: string;
+  product_name?: string;
+  product_description?: string;
+  product_measured_in?: string;
+  product_amount?: number;
+  product_price?: number;
+  product_new?: boolean;
+  product_hit?: boolean;
+  product_promotion?: boolean;
+  product_percent_promotion?: number;
+  product_new_price?: number;
+  product_in_wishlist?: boolean;
+  get_products_by_article?: ProductCatalogIn[];
+  similar_products?: ProductCatalogIn[];
+  characteristics?: {
+    property_id?: number;
+    property_name?: string;
+    property_value?: string;
+  }[];
+}
+
+export type ProductForPage = {
+  categoryID: number;
+  categoryName: string;
+  articleID: number;
+  colorID: number;
+  colorName: string;
+  productName: string;
+  productDescription: string;
+  productMeasuredIn: string;
+  productAmount: number;
+  productPrice: number;
+  productNew: boolean;
+  productHit: boolean;
+  productPromotion: boolean;
+  productPercentPromotion: number;
+  productNewPrice: number;
+  productInWishlist: boolean;
+  productsByArcticle: ProductCatalog[];
+  productsSimilar: ProductCatalog[];
+  properties: {
+    propertyID: number;
+    propertyName: string;
+    propertyValue: string;
+  }[];
+}
+
+export function NewProductForPage(obj: ProductForPageIn): ProductForPage {
+  const properties = [];
+  for (const i of obj.characteristics ?? []) {
+    properties.push({
+      propertyID: i.property_id ?? DEFAULT_NUMBER,
+      propertyValue: i.property_value ?? DEFAULT_STRING,
+      propertyName: i.property_name ?? DEFAULT_STRING,
+    });
+  }
+
+  return {
+    categoryName: obj.category_name ?? DEFAULT_STRING,
+    colorID: obj.color_id ?? DEFAULT_NUMBER,
+    colorName: obj.color_name ?? DEFAULT_STRING,
+    productAmount: obj.product_amount ?? DEFAULT_NUMBER,
+    productDescription: obj.product_description ?? DEFAULT_STRING,
+    articleID: obj.article_id ?? DEFAULT_NUMBER,
+    properties: properties,
+    productsByArcticle: NewProductCatalogList(obj.get_products_by_article ?? []),
+    productsSimilar: NewProductCatalogList(obj.similar_products ?? []),
+    productHit: obj.product_hit ?? DEFAULT_BOOLEAN,
+    productInWishlist: obj.product_in_wishlist ?? DEFAULT_BOOLEAN,
+    productNew: obj.product_new ?? DEFAULT_BOOLEAN,
+    productNewPrice: obj.product_new_price ?? DEFAULT_NUMBER,
+    productPercentPromotion: obj.product_percent_promotion ?? DEFAULT_NUMBER,
+    productPrice: obj.product_price ?? DEFAULT_NUMBER,
+    productPromotion: obj.product_promotion ?? DEFAULT_BOOLEAN,
+    productMeasuredIn: obj.product_measured_in ?? DEFAULT_STRING,
+    productName: obj.product_name ?? DEFAULT_STRING,
+    categoryID: obj.category_id ?? DEFAULT_NUMBER,
+  };
 }

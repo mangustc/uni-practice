@@ -10,6 +10,7 @@ import Main from "./routes/main";
 import LoginPage from "./routes/login";
 import RegistrationPage from "./routes/registration";
 import CustomerPage from "./routes/customer";
+import { Product } from "./routes/product";
 
 const router = createBrowserRouter([
   {
@@ -39,6 +40,10 @@ const router = createBrowserRouter([
       {
         path: "customer",
         element: <CustomerPage/>,
+      },
+      {
+        path: "product",
+        element: <Product />,
       }
     ],
   },
