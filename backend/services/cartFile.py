@@ -56,6 +56,10 @@ class CartService:
             joinedload(Cart.product)).where(Cart.user_id == user_data["user_id"])
         async with new_session() as db:
             cart_items = await db.execute(query)
+            user_query = select(Wishlist).where(Wishlist.user_id == user_data["user_id"])
+            user_wishlist = await db.execute(user_query)
+            user_wishlist = user_wishlist.scalars().all()
+            user_wishlist_ids = [wishlist_elem.product_id for wishlist_elem in user_wishlist]
         cart_items = cart_items.scalars().all()
 
         items: List[CartItem] = []
@@ -71,7 +75,10 @@ class CartService:
             total_price = round(cart_item.amount * price, 2)
             if cart_item.product.new_price is not None:
                 total_promotion_price += round(cart_item.amount * cart_item.product.price, 2) - total_price
-
+            if cart_item.product_id in user_wishlist_ids:
+                wishlist_state = True
+            else:
+                wishlist_state = False
             item = CartItem(
                 product_id=cart_item.product_id,
                 article_id=cart_item.product.article_id,
@@ -82,7 +89,8 @@ class CartService:
                 product_price=cart_item.product.price,
                 product_percent_promotion=cart_item.product.percent_promotion,
                 product_new_price=cart_item.product.new_price,
-                total_price=total_price
+                total_price=total_price,
+                product_in_wishlist=wishlist_state
             )
             items.append(item)
         total_products_price = round(total_products_price, 2)

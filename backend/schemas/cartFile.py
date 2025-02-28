@@ -16,6 +16,7 @@ class CartItem(BaseModel):
     product_percent_promotion: Optional[int]
     product_new_price: Optional[float]
     total_price: PositiveFloat
+    product_in_wishlist: bool
 
     @field_validator('product_name')
     def validate_product_name(cls, product_name: str) -> str:

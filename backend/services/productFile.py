@@ -613,7 +613,7 @@ class ProductService:
                 await db.delete(result)
                 try:
                     await db.commit()
-                    return {"message": "Продукт убран из избранного", "status": false}  # Правильный формат
+                    return {"message": "Продукт убран из избранного", "status": False}  # Правильный формат
                 except IntegrityError:
                     await db.rollback()
                     raise HTTPException(
@@ -632,7 +632,7 @@ class ProductService:
             db.add(field)
             try:
                 await db.commit()
-                return {"message": "Продукт добавлен в избранное", "status": true}  # Правильный формат
+                return {"message": "Продукт добавлен в избранное", "status": True}  # Правильный формат
             except IntegrityError:
                 await db.rollback()
                 raise HTTPException(

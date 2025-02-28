@@ -249,6 +249,7 @@ export type ProductInCartIn = {
   product_percent_promotion?: number;
   product_new_price?: number;
   total_price?: number;
+  product_in_wishlist?: boolean;
 }
 
 export type CartIn = {
@@ -269,6 +270,7 @@ export type ProductInCart = {
   productPercentPromotion: number;
   productNewPrice: number;
   totalPrice: number;
+  productInWishlist: boolean;
 }
 
 export type Cart = {
@@ -292,7 +294,8 @@ export function mapCart(obj: CartIn): Cart {
     productPrice: i.product_price ?? DEFAULT_NUMBER,
     productPercentPromotion: i.product_percent_promotion ?? DEFAULT_NUMBER,
     productNewPrice: i.product_new_price ?? DEFAULT_NUMBER,
-    totalPrice: i.total_price ?? DEFAULT_NUMBER
+    totalPrice: i.total_price ?? DEFAULT_NUMBER,
+    productInWishlist: i.product_in_wishlist ?? DEFAULT_BOOLEAN
     });
   }
   return cart;

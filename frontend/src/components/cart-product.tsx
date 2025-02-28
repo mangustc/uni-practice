@@ -12,6 +12,7 @@ export function CartProduct({
     deleteProduct: (productInfo: objects.ProductInCart) => void;
 }) {
     const [amount, setAmount] = useState<string>(productInfo.productAmountInCart.toString());
+    const [wishlist, setWishlist] = useState<boolean>(productInfo.productInWishlist);
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setAmount(event.target.value);
@@ -111,20 +112,40 @@ export function CartProduct({
             <button onClick={() => {deleteProduct(productInfo)}}>Удалить</button>
         </div>*/
     
+    function handleWishlist() {
+        requests.PUT_ChangeWishlistState(productInfo.productID);
+        setWishlist(!wishlist);
+    }
+    
     return (
         <div className="cart-product-container">
             <div className="cart-product-line">
                 <div style={{display: "flex"}}>
-                    <img style={{ width: "78px", maxHeight: "54px", marginRight: "16px" }} src="/cart-empty.svg" alt=""></img>
+                    <img style={{ width: "78px", height: "54px", marginRight: "16px" }} src="/cart-empty.svg" alt=""></img>
                     <div>
                         <div className="cart-opt-name">Арт. {productInfo.articleID}</div>
-                        <div className="cart-product-name">Хлопок рубашечный полоска 47560 (2, голубой)</div>
+                        <div className="cart-product-name">{productInfo.productName}</div>
                     </div>
                 </div>
-                <img src="/trash-alt.svg" alt=""></img>
+                <div className="cart-product-trash" onClick={() => {deleteProduct(productInfo)}}></div>
             </div>
             <div className="cart-product-line">
-                
+                <div style={{ display: "flex" }}>
+                    <div style={{ marginRight: "52px" }}>
+                        <div className="cart-opt-name">Цена, {productInfo.productMeasuredIn}</div>
+                        <div className="cart-num-value">{productInfo.productPrice} ₽</div>
+                    </div>
+                    <div>
+                        <div className="cart-opt-name">Сумма</div>
+                        <div className="cart-num-value">{productInfo.totalPrice} ₽</div>
+                    </div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center"}}>
+                    <div className="cart-product-minus" onClick={downProductAmount}></div>
+                    <input className="cart-product-input" value={amount} onChange={handleChange} onKeyDown={handleKeyDown} onBlur={handleBlur}></input>
+                    <div className="cart-product-plus" onClick={upProductAmount}></div>
+                    <div className={wishlist ? "cart-product-like" : "cart-product-not-like"} onClick={handleWishlist}></div>
+                </div>
             </div>
         </div>
     )
