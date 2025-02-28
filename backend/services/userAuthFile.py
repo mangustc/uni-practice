@@ -199,6 +199,52 @@ class UserService:
             }
 
     @classmethod
+    async def update_user_info(cls, request: Request, user_update: UpdateUserInfoRequest):
+        user_data = await Functions.get_user_data(request)
+        user_id = user_data["user_id"]
+
+        async with new_session() as db:
+            old_user = await db.get(User, user_id)
+            if old_user is None:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Пользователь не найден",
+                )
+
+            update_data = user_update.dict(exclude_unset=True)
+            for key, value in update_data.items():
+                if key == "password":
+                    if value == "" or user_update.confirm_password == "":
+                        # Не обновляем пароль, если переданы пустые строки
+                        continue
+                    elif value != user_update.confirm_password:
+                        raise HTTPException(
+                            status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Пароли не совпадают",
+                        )
+                    # Хеширование пароля с помощью bcrypt
+                    salt = bcrypt.gensalt()
+                    hashed_password = bcrypt.hashpw(value.encode('utf-8'), salt)
+                    setattr(old_user, key,
+                            hashed_password.decode('utf-8'))  # Сохранение хешированного пароля в виде строки
+                elif key == "email":
+                    # Не обновляем email
+                    continue
+                else:
+                    setattr(old_user, key, value)
+
+            try:
+                await db.commit()
+                await db.refresh(old_user)
+                return {"message": "Данные пользователя обновлены успешно"}
+            except IntegrityError:
+                await db.rollback()
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Не удалось обновить данные пользователя",
+                )
+
+    @classmethod
     async def delete_account(cls, request: Request, response: Response):
         user_data = await Functions.get_user_data(request)
         user_id = user_data["user_id"]

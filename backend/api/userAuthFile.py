@@ -47,6 +47,12 @@ async def get_user_info(request: Request):
     return await UserService.get_user_info(request)
 
 
+@router.put("/update_info", response_model=Message, status_code=status.HTTP_200_OK)
+async def update_user_info(request: Request, user_update: UpdateUserInfoRequest):
+    return await UserService.update_user_info(request, user_update)
+
+
+
 @router.delete("/delete_me", response_model=Message, status_code=status.HTTP_200_OK)
 async def delete_me(request: Request, response: Response):
     return await UserService.delete_account(request=request, response=response)

@@ -239,3 +239,48 @@ export async function POST_Logout() {
   const info = await ResponseInfoFromResponse(response);
   return info;
 }
+
+
+
+export async function GET_GetUserInfo() {
+  const response = await fetch(BACKEND_URL + `/user/me`, {
+    method: "GET",
+    headers: HEADER_JSON,
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    throw new Error(`Ошибка при получении данных пользователя: ${response.status}`);
+  }
+
+  return await response.json();
+}
+
+export async function PUT_UpdateUserInfo(
+  name: string,
+  surname: string,
+  number: string,
+  password: string,
+  confirmPassword: string
+) {
+  const request = {
+    name,
+    surname,
+    number,
+    password,
+    confirm_password: confirmPassword,
+  };
+
+  const response = await fetch(BACKEND_URL + `/user/update_info`, {
+    method: "PUT",
+    headers: HEADER_JSON,
+    body: JSON.stringify(request),
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    throw new Error(`Ошибка при обновлении данных пользователя: ${response.status}`);
+  }
+
+  return await response.json();
+}

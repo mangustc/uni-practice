@@ -2,7 +2,7 @@ import * as requests from "../requests";
 import * as util from "../util";
 import React, { useState, useEffect } from "react";
 import "../index.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import IMask from "imask";
 
 const Registration = () => {
@@ -13,6 +13,7 @@ const Registration = () => {
   const [accountType, setAccountType] = useState("individual");
   const [organizationName, setOrganizationName] = useState("");
   const [inn, setInn] = useState("");
+  const navigate = useNavigate();
 
   const [emailError, setEmailError] = useState({ isOn: false, detail: "" });
   const [passwordError, setPasswordError] = useState({
@@ -243,6 +244,7 @@ const Registration = () => {
           if (obj.status != 201) {
             util.NewNotification.error("Ошибка", obj.detail);
           } else {
+            navigate('/login');
             util.NewNotification.success(
               "Успешно",
               "Регистрация прошла успешно"

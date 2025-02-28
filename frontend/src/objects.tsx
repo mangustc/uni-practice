@@ -302,3 +302,22 @@ export type ResponseInfo = {
   status: number;
   detail: string;
 }
+
+
+export class UserInfo {
+  user_id: number;
+  email: string;
+  name: string | null;
+  surname: string | null;
+  number: string | null;
+  role: string;
+
+  constructor(data: any) {
+      this.user_id = data?.user_id ?? 0;
+      this.email = data?.email ?? "";
+      this.name = data?.name ?? null;
+      this.surname = data?.surname ?? null;
+      this.number = data?.number ?? null;
+      this.role = data?.role ?? "";
+  }
+}
