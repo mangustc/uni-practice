@@ -127,6 +127,19 @@ export async function GET_GetCart() {
   */
 }
 
+export async function GET_getProductPhotoURL(productID: number) {
+  const response = await fetch(BACKEND_URL + `/product/get_photo/${productID}`, {
+    method: "GET",
+    headers: HEADER_JSON,
+  })
+  if (!response.ok) {
+    return "/no-photo.jpg";
+  }
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+  return url;
+}
+
 export async function DELETE_deleteProductFromCart(productID: number) {
   await fetch(BACKEND_URL + `/cart/delete_from_cart/${productID}`, {
     method: "DELETE",

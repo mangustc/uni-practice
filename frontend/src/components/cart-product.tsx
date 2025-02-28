@@ -13,6 +13,13 @@ export function CartProduct({
 }) {
     const [amount, setAmount] = useState<string>(productInfo.productAmountInCart.toString());
     const [wishlist, setWishlist] = useState<boolean>(productInfo.productInWishlist);
+    const [imageSrc, setImageSrc] = useState<string>("");
+
+    useEffect(() => {
+        requests.GET_getProductPhotoURL(productInfo.productID).then((imageURL) => {
+            setImageSrc(imageURL);
+        });
+    }, []);
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setAmount(event.target.value);
@@ -121,7 +128,7 @@ export function CartProduct({
         <div className="cart-product-container">
             <div className="cart-product-line">
                 <div style={{display: "flex"}}>
-                    <img style={{ width: "78px", height: "54px", marginRight: "16px" }} src="/cart-empty.svg" alt=""></img>
+                    <img className="cart-product-image" src={imageSrc != "" ? imageSrc : undefined} alt=""></img>
                     <div>
                         <div className="cart-opt-name">Арт. {productInfo.articleID}</div>
                         <div className="cart-product-name">{productInfo.productName}</div>
@@ -133,7 +140,14 @@ export function CartProduct({
                 <div style={{ display: "flex" }}>
                     <div style={{ marginRight: "52px" }}>
                         <div className="cart-opt-name">Цена, {productInfo.productMeasuredIn}</div>
-                        <div className="cart-num-value">{productInfo.productPrice} ₽</div>
+                        <div style={{ display: "flex", alignItems: "end", gap: "12px" }}>
+                            <div className="cart-num-value" style={{ lineHeight: "18px" }}>{productInfo.productNewPrice != 0 ? productInfo.productNewPrice : productInfo.productPrice} ₽</div>
+                            {productInfo.productNewPrice != 0 && <>
+                            <div className="cart-opt-name" style={{ lineHeight: "16px", textDecoration: "line-through" }}>{productInfo.productPrice} ₽</div>
+                            <div className="cart-product-percent">-{productInfo.productPercentPromotion}%</div>
+                            </>
+                            }
+                        </div>
                     </div>
                     <div>
                         <div className="cart-opt-name">Сумма</div>

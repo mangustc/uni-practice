@@ -1544,6 +1544,25 @@ input[type="number"]:focus {
 .cart-product-container {
   width: 100%;
   border-bottom: 1px solid var(--text-color-black-main-10);
+  margin-bottom: 32px;
+}
+.cart-product-image {
+  width: 78px;
+  height: 54px;
+  margin-right: 16px;
+  object-fit: cover;
+}
+.cart-product-percent {
+  display: flex;
+  align-items: center;
+  font-family: var(--text-font);
+  font-size: 10px;
+  font-weight: var(--text-weight-h);
+  padding: 0 4px;
+  color: white;
+  background-color: var(--text-color-red-main);
+  border-radius: 2px;
+  line-height: 16px;
 }
 .cart-product-line {
   display: flex;
