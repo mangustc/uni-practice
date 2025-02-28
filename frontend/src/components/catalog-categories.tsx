@@ -69,11 +69,11 @@ export function CatalogCategories({
           }
           className={ depth <= 1 
             ? (currentCategoryID == treeObj.val.categoryID
-              ? "catalog-categories__root-category text-link-active"
-              : "catalog-categories__root-category")
+              ? "catalog-categories__root-category text-link text-link-active"
+              : "catalog-categories__root-category text-link")
             : (currentCategoryID == treeObj.val.categoryID
-              ? "catalog-categories__subcategory text-link-active"
-              : "catalog-categories__subcategory")
+              ? "catalog-categories__subcategory text-link text-link-active"
+              : "catalog-categories__subcategory text-link")
           }
         >
             {treeObj.val.categoryID == 0 ? (<h5>{treeObj.val.categoryName}</h5>) : treeObj.val.categoryName}

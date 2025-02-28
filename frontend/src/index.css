@@ -1652,22 +1652,21 @@ input[type="number"]:focus {
   color: var(--text-color-red-main-hover) !important;
 }
 
-.catalog-categories__root-category {
-  color: var(--text-color-black-main);
-  font-weight: var(--text-weight-link);
-  font-size: var(--text-size-14px);
+.text-link {
   cursor: pointer;
   &:hover {
     color: var(--text-color-red-main-hover);
   }
 }
 
+.catalog-categories__root-category {
+  color: var(--text-color-black-main);
+  font-weight: var(--text-weight-link);
+  font-size: var(--text-size-14px);
+}
+
 .catalog-categories__subcategory {
   color: var(--text-color-black-main-70);
   font-weight: var(--text-weight-link);
   font-size: var(--text-size-13px);
-  cursor: pointer;
-  &:hover {
-    color: var(--text-color-red-main-hover);
-  }
 }
