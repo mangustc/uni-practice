@@ -9,17 +9,20 @@ import { useDraggable } from "react-use-draggable-scroll";
 export function ProductList({title, products} : {title: string, products:  objects.ProductCatalog[]}) {
   const [prev, setPrev] = useState(false);
   const [next, setNext] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const scrollOffset = 219 + 40;
 
   useEffect(() => {
     if (products.length != 0) {
       setNext(true);
+      setMounted(true);
     }
   }, [products]);
 
   const ref = useRef<HTMLDivElement>(null) as React.MutableRefObject<HTMLDivElement>;
   const { events } = useDraggable(ref, {
-    applyRubberBandEffect: true
+    applyRubberBandEffect: true,
+    isMounted: mounted
   });
 
   const handleScroll = () => {
