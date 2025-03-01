@@ -1,8 +1,6 @@
 import * as objects from "../objects";
 import * as requests from "../requests";
 import { useEffect, useState, useRef } from "react";
-import { CartProduct } from "./cart-product";
-import { CartEmpty } from "./cart-empty";
 import Card from "./card";
 
 import { useDraggable } from "react-use-draggable-scroll";
@@ -11,9 +9,7 @@ import { useDraggable } from "react-use-draggable-scroll";
 export function ProductList({title, products} : {title: string, products:  objects.ProductCatalog[]}) {
   const [prev, setPrev] = useState(false);
   const [next, setNext] = useState(false);
-  const [scrollPosition, setScrollPosition] = useState(0);
   const scrollOffset = 219 + 40;
-  const scrollContainer = document.querySelector('.product-list-scroll');
 
   useEffect(() => {
     if (products.length != 0) {
@@ -21,7 +17,7 @@ export function ProductList({title, products} : {title: string, products:  objec
     }
   }, [products]);
 
-  const ref = useRef<HTMLDivElement>(null) as React.MutableRefObject<HTMLInputElement>;
+  const ref = useRef<HTMLDivElement>(null) as React.MutableRefObject<HTMLDivElement>;
   const { events } = useDraggable(ref, {
     applyRubberBandEffect: true
   });
@@ -38,15 +34,13 @@ export function ProductList({title, products} : {title: string, products:  objec
       } else {
         setNext(true);
       }
-      if (ref.current.scrollLeft )
-      setScrollPosition(ref.current.scrollLeft);
     }
   };
 
   function handleLeft() {
-    if (ref.current && scrollContainer) {
+    if (ref.current) {
       const currentScrollPosition = ref.current.scrollLeft - scrollOffset;
-      scrollContainer.scroll({
+      ref.current.scroll({
         left: currentScrollPosition,
         behavior: 'smooth'
       });
@@ -54,9 +48,9 @@ export function ProductList({title, products} : {title: string, products:  objec
   }
 
   function handleRight() {
-    if (ref.current && scrollContainer) {
+    if (ref.current) {
       const currentScrollPosition = ref.current.scrollLeft + scrollOffset;
-      scrollContainer.scroll({
+      ref.current.scroll({
         left: currentScrollPosition,
         behavior: 'smooth'
       });
