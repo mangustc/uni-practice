@@ -42,7 +42,7 @@ export function ProductList({title, products} : {title: string, products:  objec
 
   function handleLeft() {
     if (ref.current) {
-      const currentScrollPosition = ref.current.scrollLeft - scrollOffset;
+      const currentScrollPosition = Math.round((ref.current.scrollLeft - scrollOffset) / scrollOffset) * scrollOffset;
       ref.current.scroll({
         left: currentScrollPosition,
         behavior: 'smooth'
@@ -52,7 +52,7 @@ export function ProductList({title, products} : {title: string, products:  objec
 
   function handleRight() {
     if (ref.current) {
-      const currentScrollPosition = ref.current.scrollLeft + scrollOffset;
+      const currentScrollPosition = Math.round((ref.current.scrollLeft + scrollOffset) / scrollOffset) * scrollOffset;
       ref.current.scroll({
         left: currentScrollPosition,
         behavior: 'smooth'
