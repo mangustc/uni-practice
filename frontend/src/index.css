@@ -1860,3 +1860,52 @@ input[type="number"]:focus {
   transform: rotate(-90deg);
   opacity: 0.5;
 }
+
+.hover-dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.hover-dropdown-button {
+  padding: 5px;
+  color: var(--text-color-red-main);
+  cursor: pointer;
+}
+
+.hover-dropdown-caption {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.hover-dropdown-items {
+  display: none;
+  flex-direction: column;
+  position: absolute;
+  right: -10px;
+  background-color: var(--color-background);
+  z-index: 1;
+  white-space: nowrap;
+  padding: 20px;
+  gap: 20px;
+  border: 1px solid rgba(26,26,26,.1);
+  box-shadow: 0 16px 26px rgba(26,26,26,.1);
+  & *:hover {
+    cursor: pointer;
+    color:var(--text-color-red-main)
+  }
+}
+
+.hover-dropdown-container:hover .hover-dropdown-items {display: flex;}
+
+.hover-dropdown-item-active {
+  color: var(--text-color-red-main);
+}
+
+
+.hover-dropdown-icon {
+  min-width: 10px;
+  max-width: 10px;
+  min-height: 6px;
+  max-height: 6px;
+  color: var(--text-color-red-main);
+}
