@@ -64,8 +64,9 @@ async def change_role(new_role: str, request: Request, response: Response):
 
 
 @router.post("/request_password_reset", response_model=Message, status_code=status.HTTP_200_OK)
-async def request_password_reset(email: str):
-    return await UserService.request_password_reset(email)
+async def request_password_reset(email_data: EmailData):
+    return await UserService.request_password_reset(email_data.email)
+
 
 
 @router.get("/reset_password/{token}")

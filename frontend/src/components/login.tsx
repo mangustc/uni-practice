@@ -2,7 +2,7 @@ import * as requests from "../requests";
 import * as util from "../util";
 import React, { useState, useEffect } from "react";
 import "../index.css";
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate,Link } from 'react-router-dom'; 
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -155,10 +155,15 @@ const Login = () => {
             Войти
           </button>
 
-          <div className="login__links">
+          {/* <div className="login__links">
             <a href="/customer/restore" className="login__link">
               Забыли пароль?
             </a>
+          </div> */}
+          <div className="login__links">
+            <Link to="/forgot-password" className="login__link">
+              Забыли пароль?
+            </Link>
           </div>
         </form>
       </div>

@@ -11,6 +11,7 @@ import LoginPage from "./routes/login";
 import RegistrationPage from "./routes/registration";
 import CustomerPage from "./routes/customer";
 import { Product } from "./routes/product";
+import ForgotPasswordPage from "./routes/forgotpassword";
 
 const router = createBrowserRouter([
   {
@@ -40,6 +41,10 @@ const router = createBrowserRouter([
       {
         path: "customer",
         element: <CustomerPage/>,
+      },
+      {
+        path: "/forgot-password",
+        element: <ForgotPasswordPage />,
       },
       {
         path: "product",

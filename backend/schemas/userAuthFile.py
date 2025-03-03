@@ -165,3 +165,7 @@ class UpdateUserInfoRequest(BaseModel):
     #         ]
     #     }
     # }
+
+
+class EmailData(BaseModel):
+    email: str

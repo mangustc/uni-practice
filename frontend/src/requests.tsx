@@ -311,3 +311,30 @@ export async function PUT_UpdateUserInfo(
 
   return await response.json();
 }
+
+
+export async function POST_RequestPasswordReset(email: string) {
+  try {
+    const request = { email: email };
+    console.log("Отправляем запрос на сброс пароля с email:", email);
+
+    const response = await fetch(BACKEND_URL + `/user/request_password_reset`, {
+      method: "POST",
+      headers: {
+        ...HEADER_JSON,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(request),
+      credentials: "include",
+    });
+
+    console.log("Получен ответ от сервера:", response);
+
+    const info = await ResponseInfoFromResponse(response);
+    console.log("Результат обработки ответа:", info);
+    return info;
+  } catch (error) {
+    console.error("Ошибка при отправке запроса:", error);
+    throw error;
+  }
+}
