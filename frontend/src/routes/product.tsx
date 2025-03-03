@@ -2,6 +2,7 @@ import { createSearchParams, useSearchParams } from "react-router-dom";
 import * as objects from "../objects"
 import * as requests from "../requests"
 import { useEffect, useState } from "react";
+import { CategoryPath } from "../components/category-path";
 
 function newProductSearchParams(obj: {
   productID: number,
@@ -29,6 +30,9 @@ export function Product({}: {}) {
   return (
     <>
     <div className="screen-container">
+      <div className="center-container" style={{paddingTop: "20px", paddingBottom: "12px"}}>
+        <CategoryPath categories={productForPage.categories}/>
+      </div>
       <div className="product-container">
         <div className="product-photos-container">
           <div className="product-photos-column">
