@@ -852,6 +852,84 @@ row-gap: 30px;
 background-color: white;
 /* border: 1px double saddlebrown; */
 }
+
+/* PRODUCT PAGE */
+
+.product-container {
+  height: 547px;
+  min-width: 1260px;
+  max-width: 1260px;
+  display: flex;
+  overflow: hidden;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+  background-color: white;
+  /* border: 1px solid blue; */
+}
+
+.product-photos-container {
+  width: 615px;
+  height: 547px;
+  /* border: 1px solid red; */
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.product-photos-column {
+  width: 56px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  /* border: 1px solid gray; */
+}
+
+.product-mini-photo-box {
+  width: 48px;
+  height: 48px;
+  padding: 4px;
+  border-radius: 2px;
+  background-color: white;
+  margin-bottom: 8px;
+}
+
+.product-mini-photo-box-active {
+  width: 48px;
+  height: 48px;
+  padding: 4px;
+  border-radius: 2px;
+  border: 1px solid var(--text-color-red-main);
+  background-color: white;
+  margin-bottom: 8px;
+}
+
+.product-mini-photo {
+  width: 48px;
+  height: 48px;
+  background-color: burlywood;
+}
+
+.product-big-photo {
+  width: 547px;
+  height: 547px;
+  border-radius: 2px;
+  background-color: burlywood;
+}
+
+.product-info-container {
+  width: 585px;
+  height: 547px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  border: 1px solid green;
+}
+
 /* LOGINPAGE */
 
 
