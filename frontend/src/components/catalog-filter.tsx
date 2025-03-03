@@ -30,7 +30,7 @@ function CatalogFilter({
               })
             }
         >
-          <input type="radio" checked={!filters.productOnlyInStock} />
+          <input type="radio" checked={!filters.productOnlyInStock} readOnly/>
           <label id="radio-label" style={{cursor: "pointer"}}>Все товары</label>
         </div>
  
@@ -42,7 +42,7 @@ function CatalogFilter({
             })
           }
         >
-          <input type="radio" checked={filters.productOnlyInStock} />
+          <input type="radio" checked={filters.productOnlyInStock} readOnly/>
           <label id="radio-label" style={{cursor: "pointer"}}>В наличии</label>
         </div>
       </div>
@@ -83,21 +83,21 @@ function CatalogFilter({
           <div
             key={color.colorID}
             className="catalog-filter-line" style={{gap:"12px"}}
+            onClick={(e) => {
+              const newColors = structuredClone(filters.colors);
+              !filters.colors.includes(color.colorID)
+                ? newColors.push(color.colorID)
+                : newColors.splice(newColors.indexOf(color.colorID), 1);
+
+              setFilters({ ...filters, colors: newColors });
+            }}
           >
             <input
               type="checkbox"
               checked={filters.colors.includes(color.colorID)}
-              onChange={(e) => {
-                const newColors = structuredClone(filters.colors);
-                e.target.checked
-                  ? newColors.push(color.colorID)
-                  : newColors.splice(newColors.indexOf(color.colorID), 1);
-
-                setFilters({ ...filters, colors: newColors });
-              }}
+              readOnly
             />
-            <label>{color.colorName}</label>
-            
+            <label style={{cursor: "pointer"}}>{color.colorName}</label>
           </div>
         ))}
       </div>
@@ -129,31 +129,32 @@ function CatalogFilter({
                   value
                 }
                 className="catalog-filter-line" style={{gap:"12px"}}
+                onClick={(e) => {
+                  const newProperties = structuredClone(filters.properties);
+                  !filters.properties[filterPropertyIndex].propertyValues.includes(value)
+                    ? newProperties[filterPropertyIndex].propertyValues.push(
+                        value,
+                      )
+                    : newProperties[
+                        filterPropertyIndex
+                      ].propertyValues.splice(
+                        newProperties[
+                          filterPropertyIndex
+                        ].propertyValues.indexOf(value),
+                        1,
+                      );
+
+                  setFilters({ ...filters, properties: newProperties });
+                }}
               >
                 <input
                   type="checkbox"
                   checked={filters.properties[
                     filterPropertyIndex
                   ].propertyValues.includes(value)}
-                  onChange={(e) => {
-                    const newProperties = structuredClone(filters.properties);
-                    e.target.checked
-                      ? newProperties[filterPropertyIndex].propertyValues.push(
-                          value,
-                        )
-                      : newProperties[
-                          filterPropertyIndex
-                        ].propertyValues.splice(
-                          newProperties[
-                            filterPropertyIndex
-                          ].propertyValues.indexOf(value),
-                          1,
-                        );
-
-                    setFilters({ ...filters, properties: newProperties });
-                  }}
+                  readOnly
                 />
-                <label>{value}</label>
+                <label style={{cursor: "pointer"}}>{value}</label>
               </div>
             ))}
           </div>

@@ -43,6 +43,7 @@ export default function CatalogSort({
           <div className="hover-dropdown-items">
             {sorts.map((sort) => (
               <div
+                key={sort.sortValue}
                 className={sort.sortValue == currentSort ? "hover-dropdown-caption hover-dropdown-item-active" : "hover-dropdown-caption"}
                 onClick={(e) => updateSort(sort.sortValue, currentFilterByParam)}>
                 {sort.sortName}
