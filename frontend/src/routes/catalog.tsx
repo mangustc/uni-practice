@@ -209,21 +209,21 @@ export const Catalog = function () {
     <>
     <div className="screen-container">
       <div className="categories-page-container">
-        <div className="catalog-container">
-        <CatalogCategories
-          categories={currentValues.categories}
-          currentCategoryID={currentValues.currentCategoryID}
-          updateCategoryID={updateCategoryID}
-        />
-        <CatalogFilter
-          filters={tempFilters}
-          setFilters={setTempFilters}
-          updateFilters={updateFilters}
-          properties={currentValues.properties}
-          colors={currentValues.colors}
-          priceMax={currentValues.priceMax}
-          priceMin={currentValues.priceMin}
-        />
+        <div className="catalog-container" style={{gap: "20px"}}>
+          <CatalogCategories
+            categories={currentValues.categories}
+            currentCategoryID={currentValues.currentCategoryID}
+            updateCategoryID={updateCategoryID}
+          />
+          <CatalogFilter
+            filters={tempFilters}
+            setFilters={setTempFilters}
+            updateFilters={updateFilters}
+            properties={currentValues.properties}
+            colors={currentValues.colors}
+            priceMax={currentValues.priceMax}
+            priceMin={currentValues.priceMin}
+          />
         </div>
         <div className="catalog-products-container">
           <div className="catalog-sort-line">

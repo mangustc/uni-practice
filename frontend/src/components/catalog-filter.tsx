@@ -130,7 +130,6 @@ function CatalogFilter({
                 }
                 className="catalog-filter-line" style={{gap:"12px"}}
               >
-                
                 <input
                   type="checkbox"
                   checked={filters.properties[
@@ -163,7 +162,7 @@ function CatalogFilter({
       <button onClick={() => updateFilters(structuredClone(filters))} className="catalog-filter-btn-done">
         Применить
       </button>
-      <button className="catalog-filter-btn-reset">Сбросить</button>
+      <button className="catalog-filter-btn-reset">Сбросить все</button>
     </div>
   );
 }

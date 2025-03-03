@@ -123,6 +123,13 @@ p {
   color: var(--text-color-black-main-80);
 }
 
+label{
+  font-size: var(--text-size-14px);
+  line-height: var(--text-height-12px);
+  font-weight: 500;
+  color: var(--text-color-black-main);
+}
+
 /* NAVIGATION */
 
 .navigation-container-container {
@@ -639,7 +646,7 @@ p {
 .catalog-radio-line {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
+  align-items: center;
   justify-content: flex-start;
 }
 
@@ -705,6 +712,8 @@ input[type="checkbox"] {
   color: white;
   transition: all 200ms ease;
   margin-bottom: 20px;
+  font-size: var(--text-size-15px);
+  font-weight: var(--text-weight-h);
 }
 .catalog-filter-btn-done:hover {
   cursor: pointer;
@@ -721,6 +730,8 @@ input[type="checkbox"] {
   text-align: center;
   color: var(--text-color-black-main-50);
   transition: all 200ms ease;
+  font-size: var(--text-size-15px);
+  font-weight: var(--text-weight-h);
 }
 .catalog-filter-btn-reset:hover {
   cursor: pointer;
