@@ -130,6 +130,10 @@ label{
   color: var(--text-color-black-main);
 }
 
+.center-container {
+  width: 1260px;
+}
+
 /* NAVIGATION */
 
 .navigation-container-container {
@@ -1997,4 +2001,29 @@ input[type="number"]:focus {
   min-height: 6px;
   max-height: 6px;
   color: var(--text-color-red-main);
+}
+
+.category-path__container {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  justify-content: left;
+}
+
+.category-path__category {
+  color: var(--text-color-black-main-70);
+  font-weight: 500;
+  font-size: var(--text-size-12px);
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  text-decoration: none;
+  &:hover {
+    cursor: pointer;
+    color: var(--text-color-red-main);
+  }
+  &::after {
+    content: '/';
+    color: var(--text-color-black-main-70);
+  }
 }

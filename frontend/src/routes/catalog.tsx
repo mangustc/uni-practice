@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import CatalogSort from "../components/catalog-sort";
 import { CatalogCategories } from "../components/catalog-categories";
 import { CatalogProducts } from "../components/catalog-products";
+import { CategoryPath } from "../components/category-path";
 
 const DEFAULT_SORT = "price";
 const DEFAULT_FILTER_BY_PARAM = "none";
@@ -35,6 +36,30 @@ function getCatalogSearchParams(searchParams: URLSearchParams) {
     ),
     currentSort: searchParams.get("currentSort") ?? DEFAULT_SORT,
   }
+}
+
+function getCategoryPath(currentCategoryID: number, categories: objects.Category[]) {
+  let currentCategory: objects.Category = objects.NewCategory({})
+  const out: objects.Category[] = [];
+  for (const i of categories) {
+    if (i.categoryID == currentCategoryID) {
+      currentCategory = i;
+      out.unshift(structuredClone(currentCategory));
+      break;
+    }
+  }
+
+  while (currentCategory.categoryParentID != 0) {
+    for (const i of categories) {
+      if (i.categoryID == currentCategory.categoryParentID) {
+        currentCategory = i;
+        out.unshift(structuredClone(currentCategory));
+        break;
+      }
+    }
+  }
+
+  return out;
 }
 
 export const Catalog = function () {
@@ -206,8 +231,14 @@ export const Catalog = function () {
   }
 
   return (
-    <>
     <div className="screen-container">
+      <div className="center-container" style={{paddingTop: "20px", paddingBottom: "12px"}}>
+        <CategoryPath categories={getCategoryPath(currentValues.currentCategoryID, currentValues.categories)}/>
+      </div>
+      <div className="center-container" style={{paddingTop: "20px", paddingBottom: "12px", display: "flex", flexDirection: "row", gap: "20px"}}>
+        <h1>Белая Роза - официальный интернет-магазин</h1>
+        <p>{currentValues.productAmount} товаров</p>
+      </div>
       <div className="categories-page-container">
         <div className="catalog-container" style={{gap: "20px"}}>
           <CatalogCategories
@@ -238,7 +269,6 @@ export const Catalog = function () {
           <CatalogProducts products={products} />
         </div>
       </div>
-      </div>
-    </>
+    </div>
   );
 };
