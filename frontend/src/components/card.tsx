@@ -5,9 +5,10 @@ import * as util from "../util.tsx";
 import { useNavigate } from "react-router-dom";
 
 
-export default function Card({productCatalog, photoSrc}: {
+export default function Card({productCatalog, photoSrc, refreshOnAdd = false}: {
     productCatalog: objects.ProductCatalog;
     photoSrc: string;
+    refreshOnAdd?: boolean;
 }) {
     const navigate = useNavigate();
     const [wishlist, setWishlist] = useState(productCatalog.productInWishlist)
@@ -38,6 +39,9 @@ export default function Card({productCatalog, photoSrc}: {
             <button className="card-add-btn" onClick={() => {
                 util.NewNotification.success("Товар успешно добавлен в корзину", `Товар ${productCatalog.productName} в количестве 1`);
                 requests.POST_AddInCart(productCatalog.productID, 1);
+                if (refreshOnAdd) {
+                    window.location.reload();
+                }
             }}>В корзину</button>
         </div>
     );

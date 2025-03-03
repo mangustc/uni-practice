@@ -75,6 +75,7 @@ export function ProductList({title, products} : {title: string, products:  objec
             key={index}
             productCatalog={product}
             photoSrc={`${requests.BACKEND_URL}/product/get_photo/${product.productID}`}
+            refreshOnAdd
           />
         ))}
       </div>
