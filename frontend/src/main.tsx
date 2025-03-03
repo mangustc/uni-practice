@@ -13,6 +13,7 @@ import CustomerPage from "./routes/customer";
 import { Product } from "./routes/product";
 import ForgotPasswordPage from "./routes/forgotpassword";
 import ResetPasswordPage from "./routes/resetpass";
+import Contacts from "./components/contacts";
 
 const router = createBrowserRouter([
   {
@@ -54,6 +55,10 @@ const router = createBrowserRouter([
       {
         path: "product",
         element: <Product />,
+      },
+      {
+        path: "contacts",
+        element: <Contacts />,
       }
     ],
   },
