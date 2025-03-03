@@ -376,7 +376,8 @@ class UserService:
         msg['To'] = email
         msg['Subject'] = 'Сброс пароля'
 
-        reset_link = f"http://localhost:8000/api/user/reset_password/{token}"
+        # reset_link = f"http://localhost:8000/api/user/reset_password/{token}"
+        reset_link = f"http://localhost:5173/reset-password/{token}"
         body = f"Ссылка для сброса пароля: {reset_link}"
         msg.attach(MIMEText(body, 'plain'))
 
