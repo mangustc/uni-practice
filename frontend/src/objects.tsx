@@ -325,7 +325,7 @@ export class UserInfo {
 }
 
 export type ProductForPageIn = {
-  categories?: CategoryIn[];
+  category_path?: CategoryIn[];
   article_id?: number;
   color_id?: number;
   color_name?: string;
@@ -399,7 +399,7 @@ export function NewProductForPage(obj: ProductForPageIn): ProductForPage {
   }
 
   const categories: Category[] = [];
-  for (const i of obj.categories ?? []) {
+  for (const i of obj.category_path ?? []) {
     categories.push(NewCategory(i));
   }
 
