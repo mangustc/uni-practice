@@ -227,20 +227,15 @@ export const Catalog = function () {
         </div>
         <div className="catalog-products-container">
           <div className="catalog-sort-line">
-            <div className="categories-card-filter-line">
-              <div className="categories-card-filter">Хиты</div>
-              <div className="categories-card-filter">Новинки</div>
-              <div className="categories-card-filter">Акция</div>
-            </div>
-        <CatalogSort
-          currentSort={currentValues.currentSort}
-          currentFilterByParam={currentValues.currentFilterByParam}
-          filterByParams={currentValues.filterByParams}
-          sorts={currentValues.sorts}
-          updateSort={updateSort}
-        />
-        </div>
-            <CatalogProducts products={products} />
+            <CatalogSort
+              currentSort={currentValues.currentSort}
+              currentFilterByParam={currentValues.currentFilterByParam}
+              filterByParams={currentValues.filterByParams}
+              sorts={currentValues.sorts}
+              updateSort={updateSort}
+            />
+          </div>
+          <CatalogProducts products={products} />
         </div>
       </div>
       </div>
