@@ -4,10 +4,20 @@
 import { useContext } from "react";
 import { AuthContext } from "../routes/root";
 import { useNavigate } from "react-router-dom";
+import * as util from "../util";
 
 export default function Header() {
   const navigate = useNavigate();
   const { authenticated, setAuthenticated } = useContext(AuthContext);
+
+  function handleFavorites() {
+    if (authenticated) {
+      navigate("/favorites");
+    } else {
+      util.NewNotification.error("Избранное не доступно", 'Необходимо авторизоваться или зарегистрироваться на сайте, чтобы использовать "Избранное"');
+    }
+  }
+  
   return (
     <div className="navigation-container-container">
       <div className="navigation-info">
@@ -56,7 +66,7 @@ export default function Header() {
         </div>
         <div className="nav-panel-icons">
           <div id="nav-heart" className="nav-panel-icon"
-              onClick={() => navigate("/favorites")}
+              onClick={handleFavorites}
           >
             <img src="/heart.svg" alt="" />
             <span
@@ -77,7 +87,7 @@ export default function Header() {
           </div>
           { authenticated ? (
             <div id="nav-user" className="nav-panel-icon"
-              onClick={() => navigate("/user")}
+              onClick={() => navigate("/customer")}
             >
               <img src="/user.svg" alt="" />
               <span

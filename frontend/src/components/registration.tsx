@@ -1,11 +1,13 @@
 import * as requests from "../requests";
 import * as util from "../util";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "../index.css";
 import { Link, useNavigate } from "react-router-dom";
 import IMask from "imask";
+import { AuthContext } from "../routes/root";
 
 const Registration = () => {
+  const { authenticated, setAuthenticated } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -244,11 +246,8 @@ const Registration = () => {
           if (obj.status != 201) {
             util.NewNotification.error("Ошибка", obj.detail);
           } else {
-            navigate('/login');
-            util.NewNotification.success(
-              "Успешно",
-              "Регистрация прошла успешно"
-            ); // изменить на переход в личный кабинет
+            setAuthenticated(true);
+            navigate("/customer");
           }
         });
     }
@@ -266,10 +265,8 @@ const Registration = () => {
           if (obj.status != 201) {
             util.NewNotification.error("Ошибка", obj.detail);
           } else {
-            util.NewNotification.success(
-              "Успешно",
-              "Регистрация прошла успешно"
-            ); // изменить на переход в личный кабинет
+            setAuthenticated(true);
+            navigate("/customer");
           }
         });
     }
@@ -287,10 +284,8 @@ const Registration = () => {
           if (obj.status != 201) {
             util.NewNotification.error("Ошибка", obj.detail);
           } else {
-            util.NewNotification.success(
-              "Успешно",
-              "Регистрация прошла успешно"
-            ); // изменить на переход в личный кабинет
+            setAuthenticated(true);
+            navigate("/customer");
           }
         });
     }

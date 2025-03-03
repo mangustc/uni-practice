@@ -8,18 +8,18 @@ router = APIRouter(tags=["User"], prefix="/user")
 
 
 @router.post("/register", response_model=RegistrResponse, status_code=status.HTTP_201_CREATED)
-async def register(user: Registr):
-    return await UserService.registration(user)
+async def register(user: Registr, response: Response):
+    return await UserService.registration(user, response)
 
 
 @router.post("/register_legal_entity", response_model=RegistrResponse, status_code=status.HTTP_201_CREATED)
-async def register_legal_entity(user: RegistrLegalEntity):
-    return await UserService.registration_legal_entity(user)
+async def register_legal_entity(user: RegistrLegalEntity, response: Response):
+    return await UserService.registration_legal_entity(user, response)
 
 
 @router.post("/register_ip", response_model=RegistrResponse, status_code=status.HTTP_201_CREATED)
-async def register_ip(user: RegistrLegalEntity):
-    return await UserService.registration_ip(user)
+async def register_ip(user: RegistrLegalEntity, response: Response):
+    return await UserService.registration_ip(user, response)
 
 
 @router.put("/login", response_model=LoginResponse, status_code=status.HTTP_200_OK)

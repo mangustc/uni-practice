@@ -18,7 +18,7 @@ ALGORITHM = "HS256"
 
 class UserService:
     @classmethod
-    async def registration(cls, user: Registr):
+    async def registration(cls, user: Registr, response: Response):
         async with new_session() as db:
             result = await db.execute(select(User).where(User.email == user.email))
             existing_user = result.scalars().first()
@@ -44,6 +44,13 @@ class UserService:
                 await db.rollback()
                 raise HTTPException(status_code=500, detail="Ошибка при сохранении пользователя")
 
+            token_data = {
+                "id": new_user.id,
+                "email": new_user.email,
+                "role": new_user.role.value
+            }
+            token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
+            response.set_cookie(key="token", value=token, httponly=False, secure=False)
             return {
                 "user_id": new_user.id,
                 "email": new_user.email,
@@ -51,15 +58,15 @@ class UserService:
             }
 
     @classmethod
-    async def registration_legal_entity(cls, user: RegistrLegalEntity):
-        return await UserService.registration_legal_entity_or_ip(user, "Юр.лицо")
+    async def registration_legal_entity(cls, user: RegistrLegalEntity, response: Response):
+        return await UserService.registration_legal_entity_or_ip(user, "Юр.лицо", response)
 
     @classmethod
-    async def registration_ip(cls, user: RegistrLegalEntity):
-        return await UserService.registration_legal_entity_or_ip(user, "ИП")
+    async def registration_ip(cls, user: RegistrLegalEntity, response: Response):
+        return await UserService.registration_legal_entity_or_ip(user, "ИП", response)
 
     @classmethod
-    async def registration_legal_entity_or_ip(cls, user: RegistrLegalEntity, role: str):
+    async def registration_legal_entity_or_ip(cls, user: RegistrLegalEntity, role: str, response: Response):
         async with new_session() as db:
             result = await db.execute(select(User).where(User.email == user.email))
             existing_user = result.scalars().first()
@@ -83,6 +90,14 @@ class UserService:
             except IntegrityError:
                 await db.rollback()
                 raise HTTPException(status_code=500, detail="Ошибка при сохранении пользователя")
+
+            token_data = {
+                "id": new_user.id,
+                "email": new_user.email,
+                "role": new_user.role.value
+            }
+            token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
+            response.set_cookie(key="token", value=token, httponly=False, secure=False)
             return {
                 "user_id": new_user.id,
                 "email": new_user.email,
@@ -107,7 +122,7 @@ class UserService:
                 "role": user.role.value  # Добавляем роль в токен
             }
             token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
-            response.set_cookie(key="token", value=token, httponly=True, secure=False)
+            response.set_cookie(key="token", value=token, httponly=False, secure=False)
             return {
                 "email": user.email,
                 "token": token,
@@ -301,7 +316,7 @@ class UserService:
                 "role": user.role.value
             }
             token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
-            response.set_cookie(key="token", value=token, httponly=True, secure=False)
+            response.set_cookie(key="token", value=token, httponly=False, secure=False)
 
             return {"message": f"Роль пользователя с ID {user_id} успешно изменена на {new_role}."}
 

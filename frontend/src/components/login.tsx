@@ -1,10 +1,12 @@
 import * as requests from "../requests";
 import * as util from "../util";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "../index.css";
-import { useNavigate,Link } from 'react-router-dom'; 
+import { useNavigate, Link } from 'react-router-dom';
+import { AuthContext } from "../routes/root";
 
 const Login = () => {
+  const { authenticated, setAuthenticated } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -90,8 +92,8 @@ const Login = () => {
       if (obj.status != 200) {
         util.NewNotification.error("Ошибка", obj.detail);
       } else {
+        setAuthenticated(true);
         navigate("/customer");
-        util.NewNotification.success("Успешно", "Авторизация прошла успешно"); // изменить на переход в личный кабинет
       }
     });
   };
