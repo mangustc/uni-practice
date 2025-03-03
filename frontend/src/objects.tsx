@@ -340,7 +340,10 @@ export type ProductForPageIn = {
   product_percent_promotion?: number;
   product_new_price?: number;
   product_in_wishlist?: boolean;
-  get_products_by_article?: ProductCatalogIn[];
+  get_products_by_article?: {
+    product_id?: number;
+    name?: string;
+  }[];
   similar_products?: ProductCatalogIn[];
   characteristics?: {
     property_id?: number;
@@ -365,7 +368,10 @@ export type ProductForPage = {
   productPercentPromotion: number;
   productNewPrice: number;
   productInWishlist: boolean;
-  productsByArcticle: ProductCatalog[];
+  productsByArticle: {
+    productID: number;
+    productName: string;
+  }[];
   productsSimilar: ProductCatalog[];
   properties: {
     propertyID: number;
@@ -375,6 +381,14 @@ export type ProductForPage = {
 }
 
 export function NewProductForPage(obj: ProductForPageIn): ProductForPage {
+  const productsByArticle = [];
+  for (const i of obj.get_products_by_article ?? []) {
+    productsByArticle.push({
+      productID: i.product_id ?? DEFAULT_NUMBER,
+      productName: i.name ?? DEFAULT_STRING,
+    });
+  }
+
   const properties = [];
   for (const i of obj.characteristics ?? []) {
     properties.push({
@@ -397,7 +411,7 @@ export function NewProductForPage(obj: ProductForPageIn): ProductForPage {
     productDescription: obj.product_description ?? DEFAULT_STRING,
     articleID: obj.article_id ?? DEFAULT_NUMBER,
     properties: properties,
-    productsByArcticle: NewProductCatalogList(obj.get_products_by_article ?? []),
+    productsByArticle: productsByArticle,
     productsSimilar: NewProductCatalogList(obj.similar_products ?? []),
     productHit: obj.product_hit ?? DEFAULT_BOOLEAN,
     productInWishlist: obj.product_in_wishlist ?? DEFAULT_BOOLEAN,
