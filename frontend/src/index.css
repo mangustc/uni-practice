@@ -2198,6 +2198,7 @@ input[type="number"]:focus {
 }
 .main-animated-photo {
   position: absolute;
+  object-fit: cover;
   top: 0;
   left: 0;
   width: 100%;
@@ -2208,6 +2209,7 @@ input[type="number"]:focus {
 }
 .main-animated-photo--show {
   position: absolute;
+  object-fit: cover;
   top: 0;
   left: 0;
   width: 100%;
