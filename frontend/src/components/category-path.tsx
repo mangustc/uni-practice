@@ -11,6 +11,7 @@ export function CategoryPath({
       </a>
       {categories.map((category) => (
         <a
+          key={category.categoryID}
           className="category-path__category"
           href={`/catalog/?currentCategoryID=${category.categoryID}`}
         >
