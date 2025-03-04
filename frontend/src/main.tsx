@@ -14,6 +14,8 @@ import { Product } from "./routes/product";
 import ForgotPasswordPage from "./routes/forgotpassword";
 import ResetPasswordPage from "./routes/resetpass";
 import Contacts from "./components/contacts";
+import { Wishlist } from "./components/Wishlist";
+
 
 const router = createBrowserRouter([
   {
@@ -59,6 +61,10 @@ const router = createBrowserRouter([
       {
         path: "contacts",
         element: <Contacts />,
+      },
+      {
+        path: "customer/wishlist",
+        element: <Wishlist/>,
       }
     ],
   },

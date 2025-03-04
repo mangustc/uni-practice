@@ -34,7 +34,7 @@ export default function Footer() {
               <h6 style={{ marginBottom: "5px" }}>Информация</h6>
               <span className="footer-text-gray">Наши магазины</span>
               <span className="footer-text-gray">Обратная связь</span>
-              <span className="footer-text-gray">Контакты</span>
+              <span onClick={() => {navigate("/contacts"); location.reload()}} className="footer-text-gray">Контакты</span>
             </div>
           </div>
           <div className="footer-contacts">

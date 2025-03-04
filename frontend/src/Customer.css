@@ -19,6 +19,7 @@
 
 /* Стили для personal aside */
 .personal-aside {
+  position: sticky;
   line-height: 1.15;
   --swiper-theme-color: #007aff;
   --swiper-navigation-size: 44px;
