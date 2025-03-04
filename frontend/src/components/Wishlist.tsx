@@ -24,7 +24,7 @@ export function Wishlist() {
     <div className="wishlist-empty-main" style={{ position: "relative" }}>
       <aside className="personal-aside" style={{ position: "sticky", top: 0, marginRight: "90px", marginTop: "-20px", width: 250 }}>
         <ul className="personal-aside-list">
-          <li><a href="#" className="personal-aside-link">Личные данные</a></li>
+          <li><a href="/customer" className="personal-aside-link">Личные данные</a></li>
           <li><a href="#" className="personal-aside-link">Заказы</a></li>
           <li><a href="#" className="personal-aside-link">Профили заказов</a></li>
           <li><a href="#" className="personal-aside-link">Избранное</a></li>
