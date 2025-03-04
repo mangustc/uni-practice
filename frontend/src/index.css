@@ -914,6 +914,8 @@ background-color: white;
   width: 48px;
   height: 48px;
   background-color: burlywood;
+  background-size: cover;
+  background-position: center;
 }
 
 .product-big-photo {
@@ -921,6 +923,8 @@ background-color: white;
   height: 547px;
   border-radius: 2px;
   background-color: burlywood;
+  background-size: cover;
+  background-position: center;
 }
 
 .product-info-container {

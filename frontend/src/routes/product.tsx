@@ -36,14 +36,23 @@ export function Product({}: {}) {
       <div className="product-container">
         <div className="product-photos-container">
           <div className="product-photos-column">
-            <div className="product-mini-photo-box">
-              <div className="product-mini-photo"></div>
+            <div className="product-mini-photo-box-active">
+              <div
+                className="product-mini-photo"
+                style={{
+                  cursor: "pointer",
+                  backgroundImage: `url("${requests.BACKEND_URL}/product/get_photo/${getProductSearchParams(searchParams).productID}")`
+                }}
+              ></div>
             </div>
-            <div className="product-mini-photo-box"><div className="product-mini-photo"></div></div>
-            <div className="product-mini-photo-box"><div className="product-mini-photo"></div></div>
-            <div className="product-mini-photo-box-active"><div className="product-mini-photo"></div></div>
           </div>
-          <div className="product-big-photo"></div>
+          <div 
+            className="product-big-photo"
+            style={{
+              cursor: "pointer",
+              backgroundImage: `url("${requests.BACKEND_URL}/product/get_photo/${getProductSearchParams(searchParams).productID}")`
+            }}
+          ></div>
         </div>
         <div className="product-info-container">
           <textarea value={JSON.stringify(productForPage, null, 2)} readOnly/>
