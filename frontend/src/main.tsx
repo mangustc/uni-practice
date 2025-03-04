@@ -63,7 +63,7 @@ const router = createBrowserRouter([
         element: <Contacts />,
       },
       {
-        path: "customer/wishlist",
+        path: "favorites",
         element: <Wishlist/>,
       }
     ],

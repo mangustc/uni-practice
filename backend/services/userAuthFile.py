@@ -3,6 +3,8 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from fastapi import HTTPException, status, Response, Request
+from sqlalchemy.orm import joinedload
+
 from database import *
 from schemas import *
 from sqlalchemy.exc import IntegrityError
@@ -199,19 +201,43 @@ class UserService:
         user_id = user_data["user_id"]
         async with new_session() as db:
             result = await db.execute(select(User).where(User.id == user_id))
-            user = result.scalars().first()
+        user = result.scalars().first()
 
-            if not user:
-                raise HTTPException(status_code=404, detail="Пользователь не найден")
+        if not user:
+            raise HTTPException(status_code=404, detail="Пользователь не найден")
 
-            return {
-                "user_id": user.id,
-                "email": user.email,
-                "name": user.name,
-                "surname": user.surname,
-                "number": user.number,
-                "role": user.role.value
-            }
+        return {
+            "user_id": user.id,
+            "email": user.email,
+            "name": user.name,
+            "surname": user.surname,
+            "number": user.number,
+            "role": user.role.value
+        }
+
+    @classmethod
+    async def get_wishlist(cls, request: Request):
+        user_data = await Functions.get_user_data(request)
+        user_id = user_data["user_id"]
+        async with new_session() as db:
+            result = await db.execute(select(Wishlist).options(joinedload(Wishlist.product)).where(
+                Wishlist.user_id == user_id))
+        wishlist = result.scalars().all()
+
+        return [ProductInCatalogInfo(
+            product_id=w.product.id,
+            category_id=w.product.category_id,
+            product_name=w.product.name,
+            product_measured_in=w.product.measured_in,
+            product_in_stock=True if w.product.amount > 0 else False,
+            product_price=w.product.price,
+            product_new=w.product.new,
+            product_hit=w.product.hit,
+            product_promotion=w.product.promotion,
+            product_percent_promotion=w.product.percent_promotion,
+            product_new_price=w.product.new_price,
+            product_in_wishlist=True
+        ) for w in wishlist]
 
     @classmethod
     async def update_user_info(cls, request: Request, user_update: UpdateUserInfoRequest):

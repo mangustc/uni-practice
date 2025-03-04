@@ -47,6 +47,11 @@ async def get_user_info(request: Request):
     return await UserService.get_user_info(request)
 
 
+@router.get("/get_wishlist", response_model=list[ProductInCatalogInfo], status_code=status.HTTP_200_OK)
+async def get_wishlist(request: Request):
+    return await UserService.get_wishlist(request)
+
+
 @router.put("/update_info", response_model=Message, status_code=status.HTTP_200_OK)
 async def update_user_info(request: Request, user_update: UpdateUserInfoRequest):
     return await UserService.update_user_info(request, user_update)

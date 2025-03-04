@@ -1,67 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { WishlistEmpty } from "./wishlist-empty";
 import Card from "./card";
 import * as objects from "../objects"; // Импортируйте тип ProductCatalog
+import * as requests from "../requests";
+import { Navigate } from 'react-router-dom';
+import { AuthContext } from "../routes/root";
 
 export function Wishlist() {
-  const [wishlist, setWishlist] = useState<objects.ProductCatalog[]>([
-    {
-      productID: 1,
-      productName: "Тестовый товар",
-      productPrice: 100,
-      productInWishlist: true,
-      productHit: false,
-      productNew: false,
-      productPromotion: false,
-      categoryID: 1,
-      productMeasuredIn: "шт", 
-      productInStock: true, 
-      productPercentPromotion: 0, 
-      productNewPrice: 0, 
-    },
-    {
-      productID: 2,
-      productName: "Тестовый товар",
-      productPrice: 100,
-      productInWishlist: true,
-      productHit: false,
-      productNew: false,
-      productPromotion: false,
-      categoryID: 1,
-      productMeasuredIn: "шт", 
-      productInStock: true, 
-      productPercentPromotion: 0, 
-      productNewPrice: 0, 
-    },
-    {
-      productID: 3,
-      productName: "Тестовый товар",
-      productPrice: 100,
-      productInWishlist: true,
-      productHit: false,
-      productNew: false,
-      productPromotion: false,
-      categoryID: 1,
-      productMeasuredIn: "шт", 
-      productInStock: true, 
-      productPercentPromotion: 0, 
-      productNewPrice: 0, 
-    },
-    {
-      productID: 3,
-      productName: "Тестовый товар",
-      productPrice: 100,
-      productInWishlist: true,
-      productHit: false,
-      productNew: false,
-      productPromotion: false,
-      categoryID: 1,
-      productMeasuredIn: "шт", 
-      productInStock: true, 
-      productPercentPromotion: 0, 
-      productNewPrice: 0, 
-    }
-  ]);
+  const [wishlist, setWishlist] = useState<objects.ProductCatalog[]>([]);
+  const { authenticated, setAuthenticated } = useContext(AuthContext);
+  if (!authenticated) {
+    return <Navigate to="/login" />;
+  }
+
+  useEffect(() => {
+    requests.GET_GetWishlist().then((objs) => {
+      setWishlist(objs);
+    })
+  }, []);
+
 
   return (
     <div className="wishlist-empty-main" style={{ position: "relative" }}>
@@ -87,7 +44,7 @@ export function Wishlist() {
           <div key={index} className="wishlist-card-container">
             <Card
               productCatalog={item}
-              photoSrc="/test-image.jpg"
+              photoSrc={`${requests.BACKEND_URL}/product/get_photo/${item.productID}`}
               refreshOnAdd={false}
               />
           </div>

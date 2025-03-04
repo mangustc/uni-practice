@@ -136,6 +136,15 @@ export async function GET_GetCart() {
   */
 }
 
+export async function GET_GetWishlist() {
+  let response = await fetch(BACKEND_URL + "/user/get_wishlist", {
+    method: "GET",
+    headers: HEADER_JSON,
+    credentials: "include",
+  });
+  return objects.NewProductCatalogList(await response.json());
+}
+
 export async function DELETE_deleteProductFromCart(productID: number) {
   await fetch(BACKEND_URL + `/cart/delete_from_cart/${productID}`, {
     method: "DELETE",
