@@ -16,7 +16,7 @@ export function Cart() {
         setCart({...obj});
     });
     requests.GET_GetProducts().then((prod) => { // для тестов
-      setProducts([...prod, ...prod, ...prod]);
+      setProducts([...prod, ...prod, ...prod].splice(0, 10));
     })
   }, []);
 

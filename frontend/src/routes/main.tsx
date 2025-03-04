@@ -20,8 +20,8 @@ export default function Main() {
 
     useEffect(() => {
         requests.GET_GetProducts().then((prod) => { // для тестов
-          setPopularProducts([...prod, ...prod, ...prod]);
-          setNewProducts([...prod, ...prod, ...prod]);
+          setPopularProducts([...prod, ...prod, ...prod].splice(0, 10));
+          setNewProducts([...prod, ...prod, ...prod].splice(0, 10));
         })
       }, []);
 
