@@ -2097,12 +2097,19 @@ input[type="number"]:focus {
   flex-wrap: wrap;
   width: 100%;
   margin-top: 40px;
+  gap: 12px;
 }
 .main-advantages-elem {
   display: flex;
   align-items: center;
   width: 315px;
   flex-wrap: wrap;
+}
+.main-advantages-last-elem {
+  display: flex;
+  align-items: center;
+  align-self: end;
+  width: 276px;
 }
 .main-advantages-num {
   display: flex;
@@ -2142,6 +2149,73 @@ input[type="number"]:focus {
   margin-left: 40px;
   margin-top: 10px;
 }
+.main-underline-text {
+  position: relative;
+  cursor: pointer;
+}
+.main-line-red {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: red;
+  height: 2px;
+  width: 100%;
+}
+.main-line-white {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: white;
+  height: 2px;
+  width: 0px;
+}
+.main-underline-text:hover .main-line-white{
+  animation: move-line ease .7s forwards
+}
+@keyframes move-line {
+  0% {
+    width: 0;
+    left: 0;
+  }
+  50% {
+    width: 100%;
+    left: 0;
+  }
+  100% {
+    width: 0;
+    left: 100%;
+  }
+}
+.main-animated-container {
+  position: absolute;
+  width: 300px;
+  height: 200px;
+  z-index: 1;
+  border-radius: 4px;
+  user-select: none;
+  pointer-events: none;
+  overflow: hidden;
+}
+.main-animated-photo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  transform: translateX(-100%);
+  transition: transform .2s;
+}
+.main-animated-photo--show {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  transform: translateX(0);
+  transition: transform .2s;
+}
 
 @media (max-width: 1344px) {
   .main-first-line {
@@ -2161,9 +2235,16 @@ input[type="number"]:focus {
     max-width: 700px;
     align-self: start;
   }
+  .main-advantages-last-elem {
+    width: 315px;
+  }
 }
 @media (max-width: 1000px) {
   .main-text-container > h1 {
+    font-size: var(--text-size-h3);
+    line-height: var(--text-height-h3);
+  }
+  .main-underline-text > h1 {
     font-size: var(--text-size-h3);
     line-height: var(--text-height-h3);
   }
