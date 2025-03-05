@@ -13,6 +13,7 @@ from sqlalchemy import select, delete
 import bcrypt
 import jwt
 from Function import Functions
+from services.cartFile import CartService
 
 SECRET_KEY = "manilovefishing"
 ALGORITHM = "HS256"
@@ -20,7 +21,7 @@ ALGORITHM = "HS256"
 
 class UserService:
     @classmethod
-    async def registration(cls, user: Registr, response: Response):
+    async def registration(cls, user: Registr, response: Response, request: Request):
         async with new_session() as db:
             result = await db.execute(select(User).where(User.email == user.email))
             existing_user = result.scalars().first()
@@ -46,29 +47,50 @@ class UserService:
                 await db.rollback()
                 raise HTTPException(status_code=500, detail="Ошибка при сохранении пользователя")
 
-            token_data = {
-                "id": new_user.id,
-                "email": new_user.email,
-                "role": new_user.role.value
-            }
-            token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
-            response.set_cookie(key="token", value=token, httponly=False, secure=False)
-            return {
-                "user_id": new_user.id,
-                "email": new_user.email,
-                "message": "Пользователь успешно зарегистрирован."
-            }
+        token_data = {
+            "id": new_user.id,
+            "email": new_user.email,
+            "role": new_user.role.value
+        }
+        token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
+        response.set_cookie(key="token", value=token, httponly=False, secure=False)
+
+        cookie_cart = request.cookies.get("cart")
+        if cookie_cart is not None:
+            try:
+                payload: list[dict[str, int]] = jwt.decode(cookie_cart, SECRET_KEY, algorithms=[ALGORITHM])["cart"]
+            except jwt.InvalidTokenError or jwt.ExpiredSignatureError:
+                response.delete_cookie("cart")
+                return {
+                    "user_id": new_user.id,
+                    "email": new_user.email,
+                    "message": "Пользователь успешно зарегистрирован."
+                }
+            data: list[CartInfo] = [CartInfo(**item) for item in payload]
+            for elem in data:
+                try:
+                    await CartService.add_in_cart_for_auth_request(new_user.id, elem.product_id, elem.amount)
+                except HTTPException:
+                    continue
+            cookie_data = jwt.encode({"cart": []}, SECRET_KEY, algorithm=ALGORITHM)
+            response.set_cookie(key="cart", value=cookie_data, httponly=False, secure=False)
+
+        return {
+            "user_id": new_user.id,
+            "email": new_user.email,
+            "message": "Пользователь успешно зарегистрирован."
+        }
 
     @classmethod
-    async def registration_legal_entity(cls, user: RegistrLegalEntity, response: Response):
-        return await UserService.registration_legal_entity_or_ip(user, "Юр.лицо", response)
+    async def registration_legal_entity(cls, user: RegistrLegalEntity, response: Response, request: Request):
+        return await UserService.registration_legal_entity_or_ip(user, "Юр.лицо", response, request)
 
     @classmethod
-    async def registration_ip(cls, user: RegistrLegalEntity, response: Response):
-        return await UserService.registration_legal_entity_or_ip(user, "ИП", response)
+    async def registration_ip(cls, user: RegistrLegalEntity, response: Response, request: Request):
+        return await UserService.registration_legal_entity_or_ip(user, "ИП", response, request)
 
     @classmethod
-    async def registration_legal_entity_or_ip(cls, user: RegistrLegalEntity, role: str, response: Response):
+    async def registration_legal_entity_or_ip(cls, user: RegistrLegalEntity, role: str, response: Response, request: Request):
         async with new_session() as db:
             result = await db.execute(select(User).where(User.email == user.email))
             existing_user = result.scalars().first()
@@ -100,6 +122,27 @@ class UserService:
             }
             token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
             response.set_cookie(key="token", value=token, httponly=False, secure=False)
+
+            cookie_cart = request.cookies.get("cart")
+            if cookie_cart is not None:
+                try:
+                    payload: list[dict[str, int]] = jwt.decode(cookie_cart, SECRET_KEY, algorithms=[ALGORITHM])["cart"]
+                except jwt.InvalidTokenError or jwt.ExpiredSignatureError:
+                    response.delete_cookie("cart")
+                    return {
+                        "user_id": new_user.id,
+                        "email": new_user.email,
+                        "message": "Пользователь успешно зарегистрирован."
+                    }
+                data: list[CartInfo] = [CartInfo(**item) for item in payload]
+                for elem in data:
+                    try:
+                        await CartService.add_in_cart_for_auth_request(new_user.id, elem.product_id, elem.amount)
+                    except HTTPException:
+                        continue
+                cookie_data = jwt.encode({"cart": []}, SECRET_KEY, algorithm=ALGORITHM)
+                response.set_cookie(key="cart", value=cookie_data, httponly=False, secure=False)
+
             return {
                 "user_id": new_user.id,
                 "email": new_user.email,
@@ -107,7 +150,7 @@ class UserService:
             }
 
     @classmethod
-    async def login(cls, login_data: Login, response: Response):
+    async def login(cls, login_data: Login, response: Response, request: Request):
         async with new_session() as db:
             result = await db.execute(select(User).where(User.email == login_data.email))
             try:
@@ -125,6 +168,28 @@ class UserService:
             }
             token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
             response.set_cookie(key="token", value=token, httponly=False, secure=False)
+
+            cookie_cart = request.cookies.get("cart")
+            if cookie_cart is not None:
+                try:
+                    payload: list[dict[str, int]] = jwt.decode(cookie_cart, SECRET_KEY, algorithms=[ALGORITHM])["cart"]
+                except jwt.InvalidTokenError or jwt.ExpiredSignatureError:
+                    response.delete_cookie("cart")
+                    return {
+                        "email": user.email,
+                        "token": token,
+                        "message": "Пользователь успешно авторизован."
+                    }
+                data: list[CartInfo] = [CartInfo(**item) for item in payload]
+                for elem in data:
+                    try:
+                        await CartService.add_in_cart_for_auth_request(user.id, elem.product_id, elem.amount)
+                    except HTTPException:
+                        continue
+
+                cookie_data = jwt.encode({"cart": []}, SECRET_KEY, algorithm=ALGORITHM)
+                response.set_cookie(key="cart", value=cookie_data, httponly=False, secure=False)
+
             return {
                 "email": user.email,
                 "token": token,

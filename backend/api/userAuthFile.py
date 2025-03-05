@@ -8,23 +8,23 @@ router = APIRouter(tags=["User"], prefix="/user")
 
 
 @router.post("/register", response_model=RegistrResponse, status_code=status.HTTP_201_CREATED)
-async def register(user: Registr, response: Response):
-    return await UserService.registration(user, response)
+async def register(user: Registr, response: Response, request: Request):
+    return await UserService.registration(user, response, request)
 
 
 @router.post("/register_legal_entity", response_model=RegistrResponse, status_code=status.HTTP_201_CREATED)
-async def register_legal_entity(user: RegistrLegalEntity, response: Response):
-    return await UserService.registration_legal_entity(user, response)
+async def register_legal_entity(user: RegistrLegalEntity, response: Response, request: Request):
+    return await UserService.registration_legal_entity(user, response, request)
 
 
 @router.post("/register_ip", response_model=RegistrResponse, status_code=status.HTTP_201_CREATED)
-async def register_ip(user: RegistrLegalEntity, response: Response):
-    return await UserService.registration_ip(user, response)
+async def register_ip(user: RegistrLegalEntity, response: Response, request: Request):
+    return await UserService.registration_ip(user, response, request)
 
 
 @router.put("/login", response_model=LoginResponse, status_code=status.HTTP_200_OK)
-async def login(login_data: Login, response: Response):
-    return await UserService.login(login_data, response)
+async def login(login_data: Login, response: Response, request: Request):
+    return await UserService.login(login_data, response, request)
 
 
 @router.post("/logout", response_model=Message, status_code=status.HTTP_200_OK)

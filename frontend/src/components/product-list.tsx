@@ -6,7 +6,8 @@ import Card from "./card";
 import { useDraggable } from "react-use-draggable-scroll";
 
 
-export function ProductList({title, products} : {title: string, products:  objects.ProductCatalog[]}) {
+export function ProductList({title, products, onAddListener}
+  : {title: string, products:  objects.ProductCatalog[], onAddListener?: () => void;}) {
   const [prev, setPrev] = useState(false);
   const [next, setNext] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -75,7 +76,7 @@ export function ProductList({title, products} : {title: string, products:  objec
             key={index}
             productCatalog={product}
             photoSrc={`${requests.BACKEND_URL}/product/get_photo/${product.productID}`}
-            refreshOnAdd
+            onAddListener={onAddListener}
           />
         ))}
       </div>

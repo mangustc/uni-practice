@@ -164,7 +164,7 @@ class FilterService:
             product_percent_promotion=p.percent_promotion,
             product_new_price=p.new_price,
             product_in_wishlist=True if user_data is not None and p.id in user_wishlist_ids else False
-        ).__dict__ for p in products]
+        ) for p in products]
 
     @classmethod
     async def get_products_by_category_id(
@@ -276,7 +276,7 @@ class FilterService:
             product_percent_promotion=p.percent_promotion,
             product_new_price=p.new_price,
             product_in_wishlist=True if user_data is not None and p.id in user_wishlist_ids else False
-        ).__dict__ for p in products]
+        ) for p in products]
 
     @classmethod
     async def get_all_subcategory_ids(cls, category_id: int) -> List[int]:

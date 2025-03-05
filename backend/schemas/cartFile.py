@@ -5,6 +5,11 @@ from pydantic.types import PositiveFloat, PositiveInt
 from datetime import datetime
 
 
+class CartInfo(BaseModel):
+    product_id: int
+    amount: float
+
+
 class CartItem(BaseModel):
     product_id: PositiveInt
     article_id: PositiveInt

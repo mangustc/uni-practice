@@ -9,12 +9,16 @@ import { ProductList } from "../components/product-list";
 export function Cart() {
   const [cart, setCart] = useState<objects.Cart>({items: [], totalProductsPrice: 0, totalPromotionPrice: 0, totalCartPrice: 0});
   const [products, setProducts] = useState<objects.ProductCatalog[]>([]);
-  
-  useEffect(() => {
+
+  function refreshCart() {
     requests.GET_GetCart()
     .then((obj) => {
         setCart({...obj});
     });
+  }
+  
+  useEffect(() => {
+    refreshCart();
     requests.GET_GetProducts().then((prod) => { // для тестов
       setProducts([...prod, ...prod, ...prod].splice(0, 10));
     })
@@ -128,7 +132,7 @@ export function Cart() {
         </div>
       </div>
       </>}
-      <ProductList title="Популярные товары" products={products}/>
+      <ProductList title="Популярные товары" products={products} onAddListener={refreshCart}/>
     </div>
     );
 };
