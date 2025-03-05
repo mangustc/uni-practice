@@ -56,7 +56,7 @@ export function Product({}: {}) {
         </div>
         <div className="product-info-container">
           <div className="product-info-article">Артикул <b className="product-info-article-number">361365</b> </div>
-          <h3>Название продукта</h3>
+          <h3 style={{marginBottom: "25px"}}>Название продукта</h3>
           <div className="product-info-price-line">
             <div className="product-info-amount-container">
               <div className="product-info-article">Количество, м</div>
@@ -73,6 +73,23 @@ export function Product({}: {}) {
             <div className="product-info-sale-container">
               <div className="product-info-sale-full-price">899 ₽</div>
               <div className="product-info-sale-discount">-20%</div>
+            </div>
+            
+          </div>
+          <div className="product-info-btns-line">
+            <button className="product-add-btn">В корзину</button>
+            <button className="product-like"></button>
+          </div>
+          <div className="product-info-article" style={{marginBottom: "27px"}}>В наличии:  <b className="product-info-article-number">116.9 м</b> </div>
+          <div className="product-info-inner">
+            <button className="product-info-inner-delivery">Рассчитать доставку
+              <img src="/car.svg" alt="" style={{marginLeft: "10px"}}/>
+            </button>
+            <div className="product-info-inner-share-line">Поделиться: 
+              <div className="product-info-inner-share-icon info-vk"/>
+              <div className="product-info-inner-share-icon info-wa"/>
+              <div className="product-info-inner-share-icon info-tg"/>
+              <div className="product-info-inner-share-icon info-ok"/>
             </div>
           </div>
           {/* <textarea value={JSON.stringify(productForPage, null, 2)} readOnly/> */}

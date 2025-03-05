@@ -934,7 +934,7 @@ background-color: white;
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
-  border: 1px solid green;
+  /* border: 1px solid green; */
 }
 
 .product-info-article {
@@ -1028,6 +1028,150 @@ background-color: white;
   font-weight: var(--text-weight-link);
   line-height: var(--text-height-16px);
   text-decoration: line-through;
+}
+
+.product-info-btns-line {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.product-add-btn {
+  height: 50px;
+  width: 240px;
+  text-align: center;
+  border: 1px solid var(--text-color-red-main);
+  border-radius: 2px;
+  background-color: white;
+  color: #e32636;
+  font-weight: var(--text-weight-h);
+  font-size: var(--text-size-15px);
+  transition: all 200ms ease;
+}
+
+.product-add-btn:hover {
+  background-color: #e32636;
+  color: white;
+  cursor: pointer;
+}
+
+.product-like {
+  margin-left: 15px;
+  width: 50px;
+  height: 50px;
+  text-align: center;
+  border: 1px solid var(--text-color-red-main);
+  border-radius: 2px;
+  background-color: white;
+  background-position: center;
+  background-image: url("../public/red-heart.svg");
+  /* background-size: contain; */
+background-repeat: no-repeat;
+  transition: all 200ms ease;
+}
+
+.product-like:hover {
+  background-image: url("../public/white-heart.svg");
+  background-color: var(--text-color-red-main);
+  cursor: pointer;
+}
+
+.product-info-inner {
+  width: 585px;
+  height: 38px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.product-info-inner-delivery {
+  color: var(--text-color-red-main);
+  font-size: var(--text-size-14px);
+  font-weight: var(--text-weight-h);
+  padding: 10px 0;
+  border: 0;
+  outline: 0;
+  background-color: white;
+  display: flex;
+  align-items: center;
+}
+
+.product-info-inner-delivery:hover {
+  color: var(--text-color-red-main-hover);
+  cursor: pointer;
+} 
+
+.product-info-inner-share-line {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  font-size: var(--text-size-13px);
+  font-weight: 400;
+  color: var(--text-color-black-main-70);
+}
+
+.product-info-inner-share-icon {
+  margin-left: 16px;
+}
+
+.info-vk {
+  width: 23px;
+  height: 13px;
+  background-image: url("/public/gray-vk.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: all 200ms ease;
+}
+
+.info-vk:hover {
+  background-image: url("/public/blue-vk.svg");
+  cursor: pointer;
+}
+
+.info-tg {
+  width: 20px;
+  height: 20px;
+  background-image: url("/public/tg.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: all 200ms ease;
+}
+
+.info-tg:hover {
+  background-image: url("/public/blue-tg.svg");
+  cursor: pointer;
+}
+
+.info-wa {
+  width: 18px;
+  height: 18px;
+  background-image: url("/public/wa.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: all 200ms ease;
+} 
+
+.info-wa:hover {
+  background-image: url("/public/green-wa.svg");
+  cursor: pointer;
+}
+
+.info-ok {
+  width: 20px;
+  height: 20px;
+  background-image: url("/public/ok.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: all 200ms ease;
+} 
+
+.info-ok:hover {
+  background-image: url("/public/red-ok.svg");
+  cursor: pointer;
 }
 
 /* LOGINPAGE */
