@@ -1070,13 +1070,33 @@ background-color: white;
   /* background-size: contain; */
 background-repeat: no-repeat;
   transition: all 200ms ease;
+  &:hover {
+    background-image: url("../public/white-heart.svg");
+    background-color: var(--text-color-red-main);
+    cursor: pointer;
+  }
 }
 
-.product-like:hover {
-  background-image: url("../public/white-heart.svg");
-  background-color: var(--text-color-red-main);
-  cursor: pointer;
+.product-like-active {
+  margin-left: 15px;
+  width: 50px;
+  height: 50px;
+  text-align: center;
+  border: 1px solid var(--text-color-red-main);
+  border-radius: 2px;
+  background-color: white;
+  background-position: center;
+  background-image: url("../public/red-heart-fill.svg");
+  /* background-size: contain; */
+background-repeat: no-repeat;
+  transition: all 200ms ease;
+  &:hover {
+    /* background-image: url("../public/red-heart-fill.svg"); */
+    background-color: var(--text-color-red-main);
+    cursor: pointer;
+  }
 }
+
 
 .product-info-inner {
   width: 585px;
@@ -1172,6 +1192,30 @@ background-repeat: no-repeat;
 .info-ok:hover {
   background-image: url("/public/red-ok.svg");
   cursor: pointer;
+}
+
+.product-info-products-article-container {
+  display: flex;
+  flex-direction: row;
+  row-gap: 12px;
+  column-gap: 12px;
+  padding-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.product-info-products-article-product {
+  width: 54px;
+  height: 54px;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.product-info-products-article-product-active {
+  width: 54px;
+  height: 54px;
+  cursor: pointer;
+  border-radius: 2px;
+  border: 1px solid var(--text-color-red-main)
 }
 
 /* LOGINPAGE */

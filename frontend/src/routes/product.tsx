@@ -1,8 +1,18 @@
-import { createSearchParams, useSearchParams } from "react-router-dom";
+import { createSearchParams, useNavigate, useSearchParams } from "react-router-dom";
 import * as objects from "../objects"
 import * as requests from "../requests"
+import * as util from "../util"
 import { useEffect, useState } from "react";
 import { CategoryPath } from "../components/category-path";
+
+function formatNumberLength(num: number, length: number) {
+    var r = "" + num;
+    while (r.length < length) {
+        r = "0" + r;
+    }
+    return r;
+}
+
 
 function newProductSearchParams(obj: {
   productID: number,
@@ -22,11 +32,25 @@ export function Product({}: {}) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [productForPage, setProductForPage] = useState<objects.ProductForPage>(objects.NewProductForPage({}));
   useEffect(() => {
-    requests.GET_GetProductForPage(getProductSearchParams(searchParams).productID).then((obj) => {
+    requests.GET_GetProductForPage(currentProductID).then((obj) => {
       setProductForPage(obj);
     }) 
   }, [searchParams]);
 
+  const [productAmount, _setProductAmount] = useState(0.1)
+  function setProductAmount(newAmount: number): any {
+    if (newAmount <= 0)
+      return;
+    else if (newAmount > productForPage.productAmount)
+      return;
+    _setProductAmount(+newAmount.toFixed(1));
+  }
+
+
+  const [wishlist, setWishlist] = useState(productForPage.productInWishlist)
+
+  const navigate = useNavigate();
+  const currentProductID = getProductSearchParams(searchParams).productID;
   return (
     <>
     <div className="screen-container">
@@ -41,7 +65,7 @@ export function Product({}: {}) {
                 className="product-mini-photo"
                 style={{
                   cursor: "pointer",
-                  backgroundImage: `url("${requests.BACKEND_URL}/product/get_photo/${getProductSearchParams(searchParams).productID}")`
+                  backgroundImage: `url("${requests.BACKEND_URL}/product/get_photo/${currentProductID}")`
                 }}
               ></div>
             </div>
@@ -50,37 +74,62 @@ export function Product({}: {}) {
             className="product-big-photo"
             style={{
               cursor: "pointer",
-              backgroundImage: `url("${requests.BACKEND_URL}/product/get_photo/${getProductSearchParams(searchParams).productID}")`
+              backgroundImage: `url("${requests.BACKEND_URL}/product/get_photo/${currentProductID}")`
             }}
           ></div>
         </div>
         <div className="product-info-container">
-          <div className="product-info-article">Артикул <b className="product-info-article-number">361365</b> </div>
-          <h3 style={{marginBottom: "25px"}}>Название продукта</h3>
+          <div className="product-info-article">Артикул <b className="product-info-article-number">{formatNumberLength(productForPage.articleID, 5)}</b> </div>
+          <h3 style={{marginBottom: "25px"}}>{productForPage.productName}</h3>
+          <div className="product-info-products-article-container" key={JSON.stringify(productForPage.productsByArticle)}>
+            {structuredClone(productForPage.productsByArticle)
+              .concat({productID: currentProductID, productName: productForPage.productName})
+              .sort((a, b) => a.productID - b.productID)
+              .map((productInfo) => (
+              <img
+                src={`${requests.BACKEND_URL}/product/get_photo/${productInfo.productID}`}
+                key={productInfo.productID + currentProductID}
+                className={productInfo.productID == currentProductID
+                    ? "product-info-products-article-product-active"
+                    : "product-info-products-article-product"}
+                onClick={(e) => navigate(`/product?productID=${productInfo.productID}`)}
+              />
+            ))}
+          </div>
           <div className="product-info-price-line">
             <div className="product-info-amount-container">
-              <div className="product-info-article">Количество, м</div>
+              <div className="product-info-article">Количество, {productForPage.productMeasuredIn}</div>
               <div className="product-info-amount-input-line">
-                <img src="/minus-circle.svg" alt="" />
-                <div className="product-info-amount-input">0.1</div>
-                <img src="/plus-circle.svg" alt="" />
+                <img src="/minus-circle.svg" alt="" onClick={(e) => setProductAmount(productAmount-0.1) } />
+                <div className="product-info-amount-input">{productAmount}</div>
+                <img src="/plus-circle.svg" alt="" onClick={(e) => setProductAmount(productAmount+0.1) } />
               </div>
             </div>
             <div className="product-info-price-container">
-            <div className="product-info-article">Цена, м</div>
-            <h3>719.20 ₽</h3>
+            <div className="product-info-article">Цена, {productForPage.productMeasuredIn}</div>
+            <h3>{productForPage.productPrice} ₽</h3>
             </div>
+            { productForPage.productPromotion ?
             <div className="product-info-sale-container">
-              <div className="product-info-sale-full-price">899 ₽</div>
-              <div className="product-info-sale-discount">-20%</div>
-            </div>
-            
+              <div className="product-info-sale-full-price">{productForPage.productNewPrice} ₽</div>
+              <div className="product-info-sale-discount">-${productForPage.productPercentPromotion}%</div>
+            </div> : null}
           </div>
           <div className="product-info-btns-line">
-            <button className="product-add-btn">В корзину</button>
-            <button className="product-like"></button>
+            <button className="product-add-btn"
+              onClick={(e) => {
+                requests.POST_AddInCart(currentProductID, productAmount);
+                util.NewNotification.success("Товар успешно добавлен в корзину", `Товар ${productForPage.productName} в количестве ${productAmount}`);
+              }}
+            >В корзину</button>
+            <button className={wishlist ? "product-like-active" : "product-like"}
+              onClick={() => {
+                requests.PUT_ChangeWishlistState(currentProductID);
+                setWishlist(!wishlist);
+              }}
+            ></button>
           </div>
-          <div className="product-info-article" style={{marginBottom: "27px"}}>В наличии:  <b className="product-info-article-number">116.9 м</b> </div>
+          <div className="product-info-article" style={{marginBottom: "27px"}}>В наличии:  <b className="product-info-article-number">{productForPage.productAmount} {productForPage.productMeasuredIn}</b> </div>
           <div className="product-info-inner">
             <button className="product-info-inner-delivery">Рассчитать доставку
               <img src="/car.svg" alt="" style={{marginLeft: "10px"}}/>
