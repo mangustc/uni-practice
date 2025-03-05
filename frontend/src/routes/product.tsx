@@ -55,7 +55,27 @@ export function Product({}: {}) {
           ></div>
         </div>
         <div className="product-info-container">
-          <textarea value={JSON.stringify(productForPage, null, 2)} readOnly/>
+          <div className="product-info-article">Артикул <b className="product-info-article-number">361365</b> </div>
+          <h3>Название продукта</h3>
+          <div className="product-info-price-line">
+            <div className="product-info-amount-container">
+              <div className="product-info-article">Количество, м</div>
+              <div className="product-info-amount-input-line">
+                <img src="/minus-circle.svg" alt="" />
+                <div className="product-info-amount-input">0.1</div>
+                <img src="/plus-circle.svg" alt="" />
+              </div>
+            </div>
+            <div className="product-info-price-container">
+            <div className="product-info-article">Цена, м</div>
+            <h3>719.20 ₽</h3>
+            </div>
+            <div className="product-info-sale-container">
+              <div className="product-info-sale-full-price">899 ₽</div>
+              <div className="product-info-sale-discount">-20%</div>
+            </div>
+          </div>
+          {/* <textarea value={JSON.stringify(productForPage, null, 2)} readOnly/> */}
         </div>
       </div>
     </div>

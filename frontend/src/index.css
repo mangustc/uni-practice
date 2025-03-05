@@ -937,6 +937,99 @@ background-color: white;
   border: 1px solid green;
 }
 
+.product-info-article {
+  font-size: var(--text-size-12px);
+  height: 14px;
+  font-weight: 400;
+  color: var(--text-color-black-main-70);
+  margin-bottom: 8px;
+}
+
+.product-info-article-number {
+  font-size: var(--text-size-12px);
+  height: 14px;
+  font-weight: 500;
+  color: var(--text-color-black-main);
+}
+
+.product-info-price-line {
+  width: 585px;
+  /* height: 50px; */
+  margin-bottom: 25px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  /* border: 1px solid blueviolet; */
+}
+
+.product-info-amount-container {
+  width: 155px;
+  height: 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-right: 42px;
+  /* border: 1px solid red; */
+}
+
+.product-info-amount-input-line {
+  width: 155px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.product-info-amount-input {
+  font-size: var(--text-size-15px);
+  height: 18px;
+  font-weight: var(--text-weight-h);
+  color:  var(--text-color-black-main);
+}
+
+.product-info-price-container {
+  width: fit-content;
+  height: 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  /* border: 1px solid red; */
+}
+
+.product-info-sale-container {
+  width: fit-content;
+  height: 45px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: flex-end;
+  margin-left: 20px;
+  padding-bottom: 5px;
+  /* border: 1px solid red; */
+}
+
+.product-info-sale-discount {
+  margin-left: 12px;
+  padding: 3px 4px 2px;
+  border-radius: 2px;
+  background-color: var(--text-color-red-main);
+  color: white;
+  font-weight: 700;
+  font-size: var(--text-size-12px);
+  line-height: 13px;
+}
+
+.product-info-sale-full-price {
+  color: var(--text-color-black-main-70);
+  font-size: var(--text-size-14px);
+  font-weight: var(--text-weight-link);
+  line-height: var(--text-height-16px);
+  text-decoration: line-through;
+}
+
 /* LOGINPAGE */
 
 
