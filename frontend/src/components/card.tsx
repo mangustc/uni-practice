@@ -19,7 +19,10 @@ export default function Card({productCatalog, photoSrc, refreshOnAdd = false, on
     }
     return (
         <div className="card-container">
-            <div onClick={() => navigateProductPage(productCatalog.productID)}
+            <div onClick={(e) => {
+                e.stopPropagation()
+                navigateProductPage(productCatalog.productID)
+            }}
                 className="card-photo" style={{cursor: "pointer", backgroundImage: `url("${photoSrc}")`}}>
                 <div>
                     {productCatalog.productHit ? <div className="card-filter">Хит</div> : null}
@@ -28,7 +31,8 @@ export default function Card({productCatalog, photoSrc, refreshOnAdd = false, on
                 </div>
                 <div 
                     className={wishlist ? "card-like-wishlist" : "card-like"} 
-                    onClick={() => {
+                    onClick={(e) => {
+                        e.stopPropagation()
                         requests.PUT_ChangeWishlistState(productCatalog.productID)
                         setWishlist(!wishlist);
                     }}
