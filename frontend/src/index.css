@@ -894,11 +894,19 @@ background-color: white;
   align-items: center;
 }
 
+.product-char-line-name {
+  color: var(--text-color-black-main-70);
+}
+
 .product-char-line-dots {
   width: 100%;
   height: 50%;
   border-bottom: 1px dotted var(--text-color-black-main-70);
   margin: 0 10px;
+}
+
+.product-char-line-val {
+  color: var(--text-color-black-main);
 }
 
 .product-container {

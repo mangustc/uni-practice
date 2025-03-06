@@ -150,12 +150,13 @@ export function Product({}: {}) {
         </div>
         <div className="product-chars">
           <h4 style={{marginBottom: "16px"}}>Характеристики</h4>
-          <div className="product-char-line">
-            <p style={{color: "var(--text-color-black-main-70)"}}>Артикул</p>
-            <div className="product-char-line-dots"></div>
-            <p style={{color: "var(--text-color-black-main)"}}>2356256</p>
-          </div>
-          
+          {productForPage.properties.map((property) => (
+            <div className="product-char-line">
+              <p className="product-char-line-name">{property.propertyName}</p>
+              <div className="product-char-line-dots"></div>
+              <p className="product-char-line-val">{property.propertyValue}</p>
+            </div>
+          ))}
         </div>
       </div>
     </div>
