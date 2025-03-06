@@ -119,7 +119,7 @@ const CustomerComponent = () => {
           <li><a href="#" className="personal-aside-link">Личные данные</a></li>
           <li><a href="#" className="personal-aside-link">Заказы</a></li>
           <li><a href="#" className="personal-aside-link">Профили заказов</a></li>
-          <li><a href="#" className="personal-aside-link">Избранное</a></li>
+          <li><a href="/favorites" className="personal-aside-link">Избранное</a></li>
           <button className="personal-exit-button" onClick={handleLogout}>Выход</button>
         </ul>
       </aside>
