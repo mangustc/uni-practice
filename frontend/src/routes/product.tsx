@@ -151,7 +151,7 @@ export function Product({}: {}) {
         <div className="product-chars">
           <h4 style={{marginBottom: "16px"}}>Характеристики</h4>
           {productForPage.properties.map((property) => (
-            <div className="product-char-line">
+            <div className="product-char-line" key={property.propertyID}>
               <p className="product-char-line-name">{property.propertyName}</p>
               <div className="product-char-line-dots"></div>
               <p className="product-char-line-val">{property.propertyValue}</p>
