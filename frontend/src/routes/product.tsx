@@ -148,6 +148,12 @@ export function Product({}: {}) {
             {/* <textarea value={JSON.stringify(productForPage, null, 2)} readOnly/> */}
           </div>
         </div>
+        { productForPage.productDescription != "" ? (
+          <div className="product-chars">
+            <h4>Описание</h4>
+            <p style={{width: "615px"}}>{productForPage.productDescription}</p>
+          </div>
+        ) : null}
         <div className="product-chars">
           <h4 style={{marginBottom: "16px"}}>Характеристики</h4>
           {productForPage.properties.map((property) => (
