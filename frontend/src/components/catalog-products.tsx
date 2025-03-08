@@ -16,34 +16,6 @@ export function CatalogProducts({
           photoSrc={`${requests.BACKEND_URL}/product/get_photo/${product.productID}`}
         />
       ))}
-      {products.map((product) => (
-        <Card
-          key={product.productID}
-          productCatalog={product}
-          photoSrc={`${requests.BACKEND_URL}/product/get_photo/${product.productID}`}
-        />
-      ))}
-      {products.map((product) => (
-        <Card
-          key={product.productID}
-          productCatalog={product}
-          photoSrc={`${requests.BACKEND_URL}/product/get_photo/${product.productID}`}
-        />
-      ))}
-      {products.map((product) => (
-        <Card
-          key={product.productID}
-          productCatalog={product}
-          photoSrc={`${requests.BACKEND_URL}/product/get_photo/${product.productID}`}
-        />
-      ))}
-      {products.map((product) => (
-        <Card
-          key={product.productID}
-          productCatalog={product}
-          photoSrc={`${requests.BACKEND_URL}/product/get_photo/${product.productID}`}
-        />
-      ))}
     </div>
   );
 }
