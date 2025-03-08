@@ -23,7 +23,7 @@ export default function Card({productCatalog, photoSrc, refreshOnAdd = false, on
                 e.stopPropagation()
                 navigateProductPage(productCatalog.productID)
             }}
-                className="card-photo" style={{cursor: "pointer", backgroundImage: `url("${photoSrc}")`}}>
+                className="card-photo" style={{cursor: "pointer", backgroundImage: `url("${photoSrc}?rand=${Date.now()}")`}}>
                 <div>
                     {productCatalog.productHit ? <div className="card-filter">Хит</div> : null}
                     {productCatalog.productNew ? <div className="card-filter">Новинка</div> : null}
