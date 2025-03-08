@@ -111,11 +111,13 @@ export function Product({}: {}) {
               </div>
               <div className="product-info-price-container">
               <div className="product-info-article">Цена, {productForPage.productMeasuredIn}</div>
-              <h3>{productForPage.productPrice} ₽</h3>
+              { productForPage.productPromotion
+              ? <h3>{productForPage.productNewPrice} ₽</h3>
+              : <h3>{productForPage.productPrice} ₽</h3>}
               </div>
               { productForPage.productPromotion ?
               <div className="product-info-sale-container">
-                <div className="product-info-sale-full-price">{productForPage.productNewPrice} ₽</div>
+                <div className="product-info-sale-full-price">{productForPage.productPrice} ₽</div>
                 <div className="product-info-sale-discount">-${productForPage.productPercentPromotion}%</div>
               </div> : null}
             </div>
