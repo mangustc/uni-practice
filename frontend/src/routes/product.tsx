@@ -29,6 +29,7 @@ function getProductSearchParams(searchParams: URLSearchParams) {
 }
 
 export function Product({}: {}) {
+  const [photoRand, setPhotoRand] = useState(Date.now());
   const [searchParams, setSearchParams] = useSearchParams();
   const [productForPage, setProductForPage] = useState<objects.ProductForPage>(objects.NewProductForPage({}));
   useEffect(() => {
@@ -66,7 +67,7 @@ export function Product({}: {}) {
                   className="product-mini-photo"
                   style={{
                     cursor: "pointer",
-                    backgroundImage: `url("${requests.BACKEND_URL}/product/get_photo/${currentProductID}?rand=${Date.now()}")`
+                    backgroundImage: `url("${requests.BACKEND_URL}/product/get_photo/${currentProductID}?rand=${photoRand}")`
                   }}
                 ></div>
               </div>
@@ -76,7 +77,7 @@ export function Product({}: {}) {
                 className="product-big-photo"
                 style={{
                   cursor: "pointer",
-                  backgroundImage: `url("${requests.BACKEND_URL}/product/get_photo/${currentProductID}?rand=${Date.now()}")`
+                  backgroundImage: `url("${requests.BACKEND_URL}/product/get_photo/${currentProductID}?rand=${photoRand}")`
                 }}
               ></div>
               <div className="product-info-article" style={{height: "fit-content",  width: "435px", lineHeight: "15px", marginBottom: 0}}>Обращаем ваше внимание, что цвет товара может отличаться по тону, в зависимости от настроек вашего монитора</div>
@@ -91,7 +92,7 @@ export function Product({}: {}) {
                 .sort((a, b) => a.productID - b.productID)
                 .map((productInfo) => (
                 <img
-                  src={`${requests.BACKEND_URL}/product/get_photo/${productInfo.productID}?rand=${Date.now()}`}
+                  src={`${requests.BACKEND_URL}/product/get_photo/${productInfo.productID}?rand=${photoRand}`}
                   key={productInfo.productID + currentProductID}
                   className={productInfo.productID == currentProductID
                       ? "product-info-products-article-product-active"

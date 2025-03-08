@@ -11,6 +11,7 @@ export default function Card({productCatalog, photoSrc, refreshOnAdd = false, on
     refreshOnAdd?: boolean;
     onAddListener?: () => void;
 }) {
+    const [photoRand, setPhotoRand] = useState(Date.now());
     const navigate = useNavigate();
     const [wishlist, setWishlist] = useState(productCatalog.productInWishlist)
 
@@ -23,7 +24,7 @@ export default function Card({productCatalog, photoSrc, refreshOnAdd = false, on
                 e.stopPropagation()
                 navigateProductPage(productCatalog.productID)
             }}
-                className="card-photo" style={{cursor: "pointer", backgroundImage: `url("${photoSrc}?rand=${Date.now()}")`}}>
+                className="card-photo" style={{cursor: "pointer", backgroundImage: `url("${photoSrc}?rand=${photoRand}")`}}>
                 <div>
                     {productCatalog.productHit ? <div className="card-filter">Хит</div> : null}
                     {productCatalog.productNew ? <div className="card-filter">Новинка</div> : null}
