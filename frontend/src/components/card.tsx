@@ -40,7 +40,7 @@ export default function Card({productCatalog, photoSrc, refreshOnAdd = false, on
             </div>
             <span className="card-name text-link" onClick={() => navigateProductPage(productCatalog.productID)}>{productCatalog.productName}</span>
             <span className="card-descr">Цена, {productCatalog.productMeasuredIn}</span>
-            <span className="card-cost">{productCatalog.productPrice} ₽</span>
+            <span className="card-cost">{productCatalog.productPromotion ? productCatalog.productNewPrice : productCatalog.productPrice} ₽</span>
             <button className="card-add-btn" onClick={() => {
                 requests.POST_AddInCart(productCatalog.productID, 1).then(() => {
                     util.NewNotification.success("Товар успешно добавлен в корзину", `Товар ${productCatalog.productName} в количестве 1`);
