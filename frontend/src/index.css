@@ -907,6 +907,7 @@ background-color: white;
 
 .product-char-line-val {
   color: var(--text-color-black-main);
+  text-wrap-mode: nowrap;
 }
 
 .product-container {
