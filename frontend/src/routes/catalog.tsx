@@ -76,7 +76,6 @@ export const Catalog = function () {
     currentFilterByParam: string;
     priceMin: number;
     priceMax: number;
-    productAmount: number;
     filterByParams: objects.CatalogFilterByParam[];
   }>({
     categories: [],
@@ -121,7 +120,6 @@ export const Catalog = function () {
     currentFilterByParam: catalogSearchParams.currentFilterByParam,
     priceMin: 0,
     priceMax: 0,
-    productAmount: 0,
     currentCategoryID: catalogSearchParams.currentCategoryID,
     currentFilters: catalogSearchParams.currentFilters,
     currentSort: catalogSearchParams.currentSort,
@@ -237,7 +235,7 @@ export const Catalog = function () {
       </div>
       <div className="center-container" style={{paddingTop: "20px", paddingBottom: "12px", display: "flex", flexDirection: "row", gap: "20px"}}>
         <h1>Белая Роза - официальный интернет-магазин</h1>
-        <p>{currentValues.productAmount} товаров</p>
+        <p>{products.length} товаров</p>
       </div>
       <div className="categories-page-container">
         <div className="catalog-container" style={{gap: "20px"}}>
